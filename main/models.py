@@ -89,8 +89,8 @@ class ChatMessages(models.Model):
     datetime_message = models.DateTimeField(auto_now=True, verbose_name="Дата и время сообщения")
     
     class Meta:
-        verbose_name = "Сообщение"
-        verbose_name_plural = "Сообщения"
+        verbose_name = "Сообщение чата"
+        verbose_name_plural = "Сообщения чатов"
         
 
 class TaskStatus(models.Model):
@@ -115,15 +115,15 @@ class TypeReward(models.Model):
         verbose_name_plural = "Типы вознаграждения"
         
         
-class CategoryTask(models.Model):
+class Tag(models.Model):
     name = models.CharField(max_length=40, verbose_name="Название")
     
     def __str__(self):
         return self.name
     
     class Meta:
-        verbose_name = "Категория задачи"
-        verbose_name_plural = "Категории задачи"
+        verbose_name = "Тег"
+        verbose_name_plural = "Теги"
 
 
 class Task(models.Model):
@@ -131,7 +131,6 @@ class Task(models.Model):
     moderator = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Модератор")
     executor = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Исполнитель")
     task_status = models.ForeignKey(TaskStatus, on_delete=models.CASCADE, verbose_name="Статус задачи")
-    category_task = models.ForeignKey(CategoryTask, on_delete=models.CASCADE, verbose_name="Категория задачи")
     name = models.CharField(max_length=40, verbose_name="Название")
     description = models.CharField(max_length=300,verbose_name="Описание")
     type_reward = models.ForeignKey(TypeReward, on_delete=models.CASCADE, verbose_name="Тип вознаграждения")
@@ -147,7 +146,16 @@ class Task(models.Model):
     class Meta:
         verbose_name = "Задача"
         verbose_name_plural = "Задачи"
+        
+        
+class TaskTags(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задача")
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, verbose_name="Тег")
     
+    class Meta:
+        verbose_name = "Теги задачи"
+        verbose_name_plural = "Теги задач"
+        
 
 class Feedback(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задача")
