@@ -70,3 +70,8 @@ class TaskTagsAdmin(admin.ModelAdmin):
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
     list_display = ["task", "number_stars", "comment",]
+    
+    
+@admin.register(Response)
+class ResponseAdmin(admin.ModelAdmin):
+    list_display = ["task", "student", "comment",]

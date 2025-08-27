@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Balance(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, unique=True, verbose_name="Студент")
+    student = models.OneToOneField(User, on_delete=models.CASCADE, unique=True, verbose_name="Студент")
     number_points = models.IntegerField(verbose_name="Количество баллов")
     
     class Meta:
@@ -158,10 +158,21 @@ class TaskTags(models.Model):
         
 
 class Feedback(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задача")
+    task = models.OneToOneField(Task, on_delete=models.CASCADE, verbose_name="Задача")
     number_stars = models.IntegerField(verbose_name="Количество звезд")
     comment = models.CharField(max_length=120, null=True, blank=True, verbose_name="Коментарий")
     
     class Meta:
         verbose_name = "Отзыв"
         verbose_name_plural = "Отзывы"
+        
+        
+class Response(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задача")
+    student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Студент")
+    comment = models.CharField(max_length=120, null=True, blank=True, verbose_name="Коментарий")
+    
+    class Meta:
+        verbose_name = "Отклик"
+        verbose_name_plural = "Отклики"
+        unique_together = ("task", "student")
