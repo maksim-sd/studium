@@ -1,0 +1,107 @@
+[
+{
+    "model": "main.taskstatus",
+    "pk": 1,
+    "fields": {
+        "name": "На проверке"
+    }
+},
+{
+    "model": "main.taskstatus",
+    "pk": 2,
+    "fields": {
+        "name": "Поиск исполнителя"
+    }
+},
+{
+    "model": "main.taskstatus",
+    "pk": 3,
+    "fields": {
+        "name": "В работе"
+    }
+},
+{
+    "model": "main.taskstatus",
+    "pk": 4,
+    "fields": {
+        "name": "Завершена"
+    }
+},
+{
+    "model": "main.taskstatus",
+    "pk": 5,
+    "fields": {
+        "name": "Отменена"
+    }
+},
+{
+    "model": "main.purchasestatus",
+    "pk": 1,
+    "fields": {
+        "name": "Оформлена"
+    }
+},
+{
+    "model": "main.purchasestatus",
+    "pk": 2,
+    "fields": {
+        "name": "Получена"
+    }
+},
+{
+    "model": "main.purchasestatus",
+    "pk": 3,
+    "fields": {
+        "name": "Отменена"
+    }
+},
+{
+    "model": "main.chatstatus",
+    "pk": 1,
+    "fields": {
+        "name": "Доступен"
+    }
+},
+{
+    "model": "main.chatstatus",
+    "pk": 2,
+    "fields": {
+        "name": "Недоступен"
+    }
+},
+{
+    "model": "main.typereward",
+    "pk": 1,
+    "fields": {
+        "name": "Балльное"
+    }
+},
+{
+    "model": "main.typereward",
+    "pk": 2,
+    "fields": {
+        "name": "Денежное"
+    }
+},
+{
+    "model": "main.productstatus",
+    "pk": 1,
+    "fields": {
+        "name": "Появится в будущем"
+    }
+},
+{
+    "model": "main.productstatus",
+    "pk": 2,
+    "fields": {
+        "name": "В наличии"
+    }
+},
+{
+    "model": "main.productstatus",
+    "pk": 3,
+    "fields": {
+        "name": "Отсутствует"
+    }
+}
+]

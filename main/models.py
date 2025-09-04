@@ -1,10 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 
 class Balance(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, unique=True, verbose_name="Студент")
-    number_points = models.IntegerField(verbose_name="Количество баллов")
+    executor = models.OneToOneField(User, on_delete=models.CASCADE, unique=True, verbose_name="Исполнитель")
+    number_points = models.IntegerField(default=0, verbose_name="Количество баллов")
     
     class Meta:
         verbose_name = "Баланс"
@@ -20,14 +20,26 @@ class CategoryProduct(models.Model):
     class Meta:
         verbose_name = "Категория товара"
         verbose_name_plural = "Категории товара"
-        
+       
+
+class ProductStatus(models.Model):
+    name = models.CharField(max_length=40, verbose_name="Название")
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Статус товара"
+        verbose_name_plural = "Статусы товара"
+
 
 class Product(models.Model):
     category_product = models.ForeignKey(CategoryProduct, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Категория товара")
     name = models.CharField(max_length=40, verbose_name="Название")
     description = models.CharField(max_length=300, null=True, blank=True, verbose_name="Описание")
     price = models.IntegerField(verbose_name="Цена")
-    photo = models.ImageField(null=True, blank=True, verbose_name="Фото")
+    photo = models.ImageField(upload_to="images/", null=True, blank=True, verbose_name="Фото")
+    product_status = models.ForeignKey(ProductStatus, on_delete=models.CASCADE, verbose_name="Статус товара")
     
     def __str__(self):
         return self.name
@@ -49,7 +61,7 @@ class PurchaseStatus(models.Model):
         
 
 class Purchase(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Студент")
+    executor = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Исполнитель")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
     price = models.IntegerField(verbose_name="Цена")
     purchase_status = models.ForeignKey(PurchaseStatus, on_delete=models.CASCADE, verbose_name="Статус покупки")
@@ -75,7 +87,7 @@ class Chat(models.Model):
     datetime_creation = models.DateTimeField(auto_now=True, verbose_name="Дата и время создания")
     
     def __str__(self):
-        return self.id
+        return str(self.id)
     
     class Meta:
         verbose_name = "Чат"
@@ -85,7 +97,8 @@ class Chat(models.Model):
 class ChatMessages(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, verbose_name="Чат")
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
-    message = models.CharField(max_length=120, verbose_name="Сообщение")
+    message = models.CharField( null=True, blank=True, max_length=120, verbose_name="Сообщение")
+    file = models.FileField(null=True, blank=True, upload_to="files/",verbose_name="Файл")
     datetime_message = models.DateTimeField(auto_now=True, verbose_name="Дата и время сообщения")
     
     class Meta:
@@ -148,17 +161,29 @@ class Task(models.Model):
         verbose_name_plural = "Задачи"
         
         
-class TaskTags(models.Model):
+class TaskTag(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задача")
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE, verbose_name="Тег")
     
     class Meta:
         verbose_name = "Теги задачи"
         verbose_name_plural = "Теги задач"
+        unique_together = ("task", "tag")
+       
         
-
-class Feedback(models.Model):
+class Response(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задача")
+    executor = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Исполнитель")
+    comment = models.CharField(max_length=120, null=True, blank=True, verbose_name="Коментарий")
+    
+    class Meta:
+        verbose_name = "Отклик"
+        verbose_name_plural = "Отклики"
+        unique_together = ("task", "executor")
+        
+        
+class Feedback(models.Model):
+    task = models.OneToOneField(Task, on_delete=models.CASCADE, verbose_name="Задача")
     number_stars = models.IntegerField(verbose_name="Количество звезд")
     comment = models.CharField(max_length=120, null=True, blank=True, verbose_name="Коментарий")
     
