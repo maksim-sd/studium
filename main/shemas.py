@@ -1,62 +1,80 @@
 from ninja import Schema
-from datetime import datetime, date
-from typing import Annotated
-
-
-class Auth(Schema):
-    username: str
-    password: str
+from datetime import datetime
+from typing import List
     
     
 class Registration(Schema):
     username: str
+    first_name: str
+    last_name: str
     password: str
     password2: str
     
     
 class UserOut(Schema):
     id: int
+    username: str
     first_name: str
     last_name: str
     
     
-class BalenceOut(Schema):
+class BalanceOut(Schema):
     id: int
-    student: UserOut
+    executor: UserOut
     number_points: int
     
     
 class СlassifierOut(Schema):
-    id: int
+    id: str
     name: str
 
 
 class ProductOut(Schema):
     id: int
-    category: СlassifierOut
+    category: СlassifierOut | None
     name: str
     description: str
+    stock: int
     price: int
-    product_status: СlassifierOut
+    product_status: str
 
     
-class PurchaseOut(Schema):
+class CartOut(Schema):
     id: int
-    student: UserOut
+    executor: UserOut
+
+
+class CartProductOut(Schema):
+    id: int
+    cart: CartOut
     product: ProductOut
-    price: int
-    purchase_status: СlassifierOut
+    quantity: int
     
+    
+class OrderOut(Schema):
+    id: int
+    executor: UserOut
+    total_amount: int | None
+    created_at: datetime
+    order_status: str
+    
+
+class OrderProductOut(Schema):
+    id: int
+    order: OrderOut
+    product: ProductOut
+    quantity: int
+    price: int
+    
+    
+class CartProductsIDIn(Schema):
+    list_id: List
+
 
 class ChatOut(Schema):
     id: int
     chat_status: СlassifierOut
-    datetime_creation: datetime
+    created_at: datetime
     
     
-# class ChatMessagesOut(Schema):
-#     id: int
-#     chat: ChatOut
-#     user: UserOut
-#     message: str
-#     file: Annotated[File, "Файл"]
+
