@@ -27,7 +27,7 @@ class Product(models.Model):
     STATUS_CHOICES = (
         ("A", "Появится в будущем"),
         ("B", "В наличии"),
-        ("C", "Отсутсвует")
+        ("C", "Отсутствует")
     )
     category_product = models.ForeignKey(CategoryProduct, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Категория товара")
     name = models.CharField(max_length=40, verbose_name="Название")
@@ -35,7 +35,7 @@ class Product(models.Model):
     stock = models.IntegerField(verbose_name="Запас")
     price = models.IntegerField(verbose_name="Цена")
     photo = models.ImageField(upload_to="images/", null=True, blank=True, verbose_name="Фото")
-    product_status = models.CharField(max_length=40, choices=STATUS_CHOICES, verbose_name="Статус товара")
+    product_status = models.CharField(max_length=1, choices=STATUS_CHOICES, verbose_name="Статус товара")
     
     def __str__(self):
         return self.name
@@ -76,15 +76,17 @@ class Order(models.Model):
         ("C", "Отменен")
     )
     executor = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Исполнитель")
-    total_amount = models.IntegerField(null=True, blank=True, verbose_name="Сумма заказа")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Дата и время заказа")
-    order_status = models.CharField(max_length=40, default="Оформлен", choices=STATUS_CHOICES, verbose_name="Статус заказа")
+    order_status = models.CharField(max_length=1, default="A", choices=STATUS_CHOICES, verbose_name="Статус заказа")
+    
+    @property
+    def total_amount(self):
+        return sum(i.get_amount() for i in self.products.all())
+    
+    total_amount.fget.short_description = 'Сумма заказа'
     
     def __str__(self):
         return f"Заказ {self.executor.username} | №{self.id}"
-    
-    def get_total_amount(self):
-        return sum(i for i in self.products.all())
     
     class Meta:
         verbose_name = "Заказ"
@@ -99,7 +101,7 @@ class OrderProduct(models.Model):
     price = models.IntegerField(verbose_name="Цена")
     
     def get_amount(self):
-        return self.product.price * self.quantity
+        return self.price * self.quantity
     
     class Meta:
         verbose_name = "Товар в заказе"
@@ -113,7 +115,7 @@ class Chat(models.Model):
         ("A", "Доступен"),
         ("B", "Недоступен")
     )
-    chat_status = models.CharField(max_length=40, choices=STATUS_CHOICES, verbose_name="Статус чата")
+    chat_status = models.CharField(max_length=1, default="A", choices=STATUS_CHOICES, verbose_name="Статус чата")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Дата и время создания")
     
     def __str__(self):
@@ -125,10 +127,10 @@ class Chat(models.Model):
         ordering = ["-created_at"]
         
 
-class ChatMessages(models.Model):
+class ChatMessage(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, verbose_name="Чат")
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
-    message = models.CharField( null=True, blank=True, max_length=120, verbose_name="Сообщение")
+    message = models.TextField( null=True, blank=True, verbose_name="Сообщение")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Дата и время сообщения")
     
     def __str__(self):
@@ -140,8 +142,8 @@ class ChatMessages(models.Model):
         ordering = ["-created_at"]
   
  
-class MessageFiles(models.Model):
-    chat_message = models.ForeignKey(ChatMessages, on_delete=models.CASCADE, verbose_name="Сообщение чата")
+class MessageFile(models.Model):
+    chat_message = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, verbose_name="Сообщение чата")
     file = models.FileField(null=True, blank=True, upload_to="files/", verbose_name="Файл")
 
     class Meta:
@@ -175,12 +177,12 @@ class Task(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="customer_set", verbose_name="Заказчик")
     moderator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="moderator_set", verbose_name="Модератор")
     executor = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="executor_set", verbose_name="Исполнитель")
-    task_status = models.CharField(max_length=40, choices=STATUS_CHOICES, verbose_name="Статус задачи")
+    task_status = models.CharField(max_length=1, default="A", choices=STATUS_CHOICES, verbose_name="Статус задачи")
     name = models.CharField(max_length=40, verbose_name="Название")
-    description = models.CharField(max_length=300,verbose_name="Описание")
-    type_reward = models.CharField(max_length=40, choices=TYPE_REWARD_CHOICES, verbose_name="Тип вознаграждения")
+    description = models.TextField(verbose_name="Описание")
+    type_reward = models.CharField(max_length=1, choices=TYPE_REWARD_CHOICES, verbose_name="Тип вознаграждения")
     amount_reward = models.IntegerField(null=True, blank=True, verbose_name="Сумма вознаграждения")
-    deadlines = models.ImageField(verbose_name="Сроки(количество дней)")
+    deadlines = models.IntegerField(null=True, blank=True, verbose_name="Сроки(количество дней)")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Дата и время создания")
     completed_at = models.DateTimeField(null=True, blank=True, verbose_name="Дата и время завершения")
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Чат")
@@ -208,7 +210,7 @@ class TaskTag(models.Model):
 class Response(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задача")
     executor = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Исполнитель")
-    comment = models.CharField(max_length=120, null=True, blank=True, verbose_name="Коментарий")
+    comment = models.TextField(null=True, blank=True, verbose_name="Коментарий")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Дата и время отклика")
     
     class Meta:
@@ -220,8 +222,8 @@ class Response(models.Model):
         
 class Feedback(models.Model):
     task = models.OneToOneField(Task, on_delete=models.CASCADE, verbose_name="Задача")
-    number_stars = models.DecimalField(max_digits=3, decimal_places=2, verbose_name="Количество звезд")
-    comment = models.CharField(max_length=120, null=True, blank=True, verbose_name="Коментарий")
+    number_stars = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], verbose_name="Количество звезд")
+    comment = models.TextField(null=True, blank=True, verbose_name="Коментарий")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Дата и время создания")
     
     class Meta:
