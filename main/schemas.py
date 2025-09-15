@@ -1,6 +1,7 @@
 from ninja import Schema, UploadedFile
 from datetime import datetime
 from typing import List
+from pydantic import Field
     
     
 class Registration(Schema):
@@ -24,6 +25,11 @@ class BalanceOut(Schema):
     number_points: int
     
     
+class CategoryProductOut(Schema):
+    id: int
+    name: str
+    
+    
 class ClassifierOut(Schema):
     id: str
     name: str
@@ -31,13 +37,13 @@ class ClassifierOut(Schema):
 
 class ProductOut(Schema):
     id: int
-    category: ClassifierOut | None
+    category_product: CategoryProductOut | None
     name: str
     description: str | None
     stock: int
     price: int
     photo: str | None
-    product_status: str
+    product_status: str = Field(alias="get_product_status_display")
 
     
 class CartOut(Schema):
@@ -57,7 +63,7 @@ class OrderOut(Schema):
     executor: UserOut
     total_amount: int | None
     created_at: datetime
-    order_status: str
+    order_status: str = Field(alias="get_order_status_display")
     
 
 class OrderProductOut(Schema):
@@ -74,7 +80,7 @@ class CartProductsIDIn(Schema):
 
 class ChatOut(Schema):
     id: int
-    chat_status: ClassifierOut
+    chat_status: str = Field(alias="get_chat_status_display")
     created_at: datetime
 
 
@@ -93,15 +99,17 @@ class ChatMessageOut(Schema):
     
     
 class ChatMessageIn(Schema):
+    id: int
     message: str | None
     files: List[UploadedFile] | None
     
     
 class TaskOut(Schema):
+    id: int
     customer: UserOut
     moderator: UserOut | None
     executor: UserOut | None
-    task_status: str
+    task_status: str = Field(alias="get_task_status_display")
     name: str
     description: str
     type_reward: str
@@ -118,6 +126,11 @@ class TaskIn(Schema):
     type_reward: str
     amount_reward: int | None
     deadlines: int | None
+    
+    
+class TagOut(Schema):
+    id: int
+    name: str
 
 
 class ResponseIn(Schema):
@@ -125,6 +138,7 @@ class ResponseIn(Schema):
     
 
 class ResponseOut(Schema):
+    id: int
     task: TaskOut
     executor: UserOut
     comment: str
@@ -137,6 +151,7 @@ class FeedbackIn(Schema):
     
     
 class FeedbackOut(Schema):
+    id: int
     task: TaskOut
     number_stars: float
     comment: str
