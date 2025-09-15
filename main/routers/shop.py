@@ -5,18 +5,18 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from .profile import BasicAuth
 from main.models import Balance, CategoryProduct, Cart, CartProduct, Product, Order, OrderProduct
-from main.schemas import ClassifierOut, ProductOut, CartProductOut, OrderOut, OrderProductOut, CartProductsIDIn
+from main.schemas import CategoryProductOut, ClassifierOut, ProductOut, CartProductOut, OrderOut, OrderProductOut, CartProductsIDIn
 
 
 router = Router(tags=["Магазин"])
 
 # Категория и товар
 
-@router.get("/categories/", auth=BasicAuth(), response=List[ClassifierOut], summary="Категории товара", tags=["Категория и товар"])
+@router.get("/categories/", auth=BasicAuth(), response=List[CategoryProductOut], summary="Категории товара", tags=["Категория и товар"])
 def get_categories(request):
     return CategoryProduct.objects.all()
 
-@router.get("/category/{int:id}/", auth=BasicAuth(), response=ClassifierOut, summary="Выбранная категория товара", tags=["Категория и товар"])
+@router.get("/category/{int:id}/", auth=BasicAuth(), response=CategoryProductOut, summary="Выбранная категория товара", tags=["Категория и товар"])
 def get_category(request, id:int):
     return get_object_or_404(CategoryProduct, id=id)
 

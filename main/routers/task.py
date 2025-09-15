@@ -8,7 +8,7 @@ from django.db import transaction
 from datetime import timedelta
 from .profile import BasicAuth
 from main.models import User, Balance, Chat, ChatMessage, MessageFile, Tag, Task, TaskTag, Feedback, Response
-from main.schemas import ClassifierOut, ChatOut, ChatMessageOut, MessageFileOut, ChatMessageIn, TaskOut, TaskIn, ResponseIn, ResponseOut, FeedbackIn, FeedbackOut
+from main.schemas import ClassifierOut, ChatOut, ChatMessageOut, MessageFileOut, ChatMessageIn, TaskOut, TaskIn, TagOut, ResponseIn, ResponseOut, FeedbackIn, FeedbackOut
 
 
 router = Router(tags=["Задача"])
@@ -232,15 +232,16 @@ def get_user_feedbacks(request, id:int):
         raise HttpError(403, "Данный тип пользователей не может иметь отзывы")
     return Feedback.objects.filter(task__executor=user)
 
-@router.get("/tags/", auth=BasicAuth(), response=List[ClassifierOut], summary="Теги", tags=["Тег"])
+@router.get("/tags/", auth=BasicAuth(), response=List[TagOut], summary="Теги", tags=["Тег"])
 def get_tags(request):
     return Tag.objects.all()
 
-@router.get("/tag/{int:id}/", auth=BasicAuth(), response=ClassifierOut, summary="Выбранный тег", tags=["Тег"])
+@router.get("/tag/{int:id}/", auth=BasicAuth(), response=TagOut, summary="Выбранный тег", tags=["Тег"])
 def get_tag(request, id:int):
     return get_object_or_404(Tag, id=id)
 
-@router.get("/{int:id}/tags/", auth=BasicAuth(), response=List[ClassifierOut], summary="Теги выбранной задачи", tags=["Тег"])
+@router.get("/{int:id}/tags/", auth=BasicAuth(), response=List[TagOut], summary="Теги выбранной задачи", tags=["Тег"])
 def get_task_tags(request, id:int):
     task = get_object_or_404(Task, id=id)
-    return TaskTag.objects.filter(task=task)
+    task_tags = TaskTag.objects.filter(task=task)
+    return [{"id": i.task.id, "name": i.task.name} for i in task_tags]
