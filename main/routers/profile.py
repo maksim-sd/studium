@@ -3,6 +3,7 @@ from ninja.security import HttpBasicAuth
 from ninja.errors import HttpError
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
+from django.middleware.csrf import get_token
 from django.db import transaction
 from main.models import User, Group, Balance
 from main.schemas import Registration, UserOut, BalanceOut
@@ -15,6 +16,10 @@ class BasicAuth(HttpBasicAuth):
     def authenticate(self, request, username, password):
         return authenticate(username=username, password=password)
     
+
+@router.get("/csrf-token/", summary="Получить csrf-token")
+def get_csrf_token(request):
+    return {"csrfToken": get_token(request)}
 
 @router.post("/registration/", summary="Регистрация для исполнителей")
 def post_registration(request, payload: Registration):

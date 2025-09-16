@@ -46,15 +46,15 @@ def get_chat_messages(request, id:int):
     tasks = Task.objects.filter(Q(customer=user) | Q(moderator=user) | Q(executor=user), chat=chat)
     if not tasks.exists():
         raise HttpError(403, "У текущего пользователя нет доступа к данному чату")
-    chat_messages = ChatMessage.objects.filter(chat=chat).prefetch_related("messagefiles_set")
+    chat_messages = ChatMessage.objects.filter(chat=chat).prefetch_related("messagefile_set")
     messages = [
         ChatMessageOut(
             id=msg.id,
-            chat=msg.chat,
+            chat_id=msg.chat.id,
             user=msg.user,
             message=msg.message,
             created_at=msg.created_at,
-            files=[MessageFileOut(id=file.id, file=file.file.url) for file in msg.messagefiles_set.all()]
+            files=[MessageFileOut(id=file.id, file=file.file.url) for file in msg.messagefile_set.all()]
         ) for msg in chat_messages
     ]
     return messages
@@ -66,17 +66,18 @@ def post_chat_message(request, id:int, payload:ChatMessageIn):
     tasks = Task.objects.filter(Q(customer=user) | Q(moderator=user) | Q(executor=user), chat=chat)
     if not tasks.exists():
         raise HttpError(403, "У текущего пользователя нет доступа к данному чату")
-    elif chat.chat_status == "Недоступен":
+    elif chat.chat_status == "UNAVAILABLE":
         raise HttpError(400, "Невозможно отправить сообщение, так как чат недоступен")
     elif not payload.message and not payload.files:
         raise HttpError(400, "Невозможно отправить пустое сообщение")
     MAX_SIZE_FILE = 2 * 1024 * 1024 * 1024
     with transaction.atomic():
         chat_message = ChatMessage.objects.create(chat=chat, user=user, message=payload.message)
-        for file in payload.files:
-            if file.size > MAX_SIZE_FILE:
-                raise HttpError(400, f"Файл {file.name} слишком большой {file.size}. Максимальный размер {MAX_SIZE_FILE}")
-            MessageFile.objects.create(chat_message=chat_message, file=file)
+        if payload.files:
+            for file in payload.files:
+                if file.size > MAX_SIZE_FILE:
+                    raise HttpError(400, f"Файл {file.name} слишком большой {file.size}. Максимальный размер {MAX_SIZE_FILE} байт")
+                MessageFile.objects.create(chat_message=chat_message, file=file)
     return {"message": f"Сообщение №{chat_message.id} успешно отправлено"}
 
 
@@ -84,7 +85,7 @@ def post_chat_message(request, id:int, payload:ChatMessageIn):
 def delete_chat_message(request, id:int):
     user = request.auth
     chat_message = get_object_or_404(ChatMessage, id=id, user=user)
-    if chat_message.chat.chat_status == "Недоступен":
+    if chat_message.chat.chat_status == "UNAVAILABLE":
         raise HttpError(400, "Невозможно удалить сообщение, так как чат недоступен")
     elif (timezone.now() - chat_message.created_at) > timedelta(hours=24):
         raise HttpError(400, "Невозможно удалить сообщение, так как прошло 24 часа")
@@ -102,16 +103,16 @@ def get_types_reward(request):
     return [{"id": id, "name": name} for id, name in Task.TYPE_REWARD_CHOICES]
 
 @router.get("/", auth=BasicAuth(), response=List[TaskOut], summary="Задачи")
-def get_tasks(request, task_status:str=Query(None, description="Статус задачи"), 
+def get_tasks(request, task_status_id:str=Query(None, description="ID Статуса задачи"), 
               search:str=Query(None, description="Поиск в названии и описании"), 
-              tags_id:List[int]=Query(None, description="Теги")):
+              tags_id:List[int]=Query(None, description="ID тегов")):
     tasks = Task.objects.all()
-    if task_status is not None:
-        tasks = tasks.filter(task_status=task_status)
-    if search is not None:
+    if task_status_id:
+        tasks = tasks.filter(task_status=task_status_id)
+    if search:
         tasks = tasks.filter(Q(name__iregex=search) | Q(description__iregex=search)).distinct()
-    if tags_id is not None:
-        tasks = tasks.filter(tasktag_set__tag__id__in=tags_id).distinct()
+    if tags_id:
+        tasks = tasks.filter(tags__id__in=tags_id).distinct()
     return tasks
 
 @router.get("/{int:id}/", auth=BasicAuth(), response=TaskOut, summary="Выбранная задача")
@@ -129,7 +130,7 @@ def post_task(request, payload: TaskIn):
     user = request.auth
     if not user.groups.filter(name="Заказчик").exists():
         raise HttpError(403, "Данный тип пользователей не может создавать задачи")
-    task = Task.objects.create(customer=user, task_status="A", **payload.dict())
+    task = Task.objects.create(customer=user, task_status="LOOKING_FOR_EXECUTOR", **payload.dict())
     return {"message": f"Задача №{task.id} успешно создана"}
 
 @router.post("/{int:id}/response/", auth=BasicAuth(), summary="Откликнуть на выбранную задачу", tags=["Отклик"])
@@ -138,8 +139,10 @@ def post_response(request, id:int, payload: ResponseIn):
     if not user.groups.filter(name="Исполнитель").exists():
         raise HttpError(403, "Данный тип пользователей не может откликаться на задачи")
     task = get_object_or_404(Task, id=id)
-    if task.task_status != "A":
+    if task.task_status != "LOOKING_FOR_EXECUTOR":
         raise HttpError(400, f"На задачу №{id} невозможно откликнуться")
+    if Response.objects.filter(task=task, executor=user).exists():
+       raise HttpError(400, f"Пользователь уже откликнулся на задачу №{id}") 
     response = Response.objects.create(task=task, executor=user, **payload.dict())
     return {"message": f"Отклик №{response.id} на задачу №{id} успешно зарегистрирован"}
 
@@ -149,7 +152,7 @@ def get_responses(request, id:int):
     if not user.groups.filter(name="Модератор").exists():
         raise HttpError(403, "Данный тип пользователей не может просматривать отклики")
     task = get_object_or_404(Task, id=id)
-    if task.task_status != "A":
+    if task.task_status != "LOOKING_FOR_EXECUTOR":
         raise HttpError(400, f"На задачу №{id} невозможно посмотреть отклики")
     responses = Response.objects.filter(task=task)
     return responses
@@ -161,11 +164,11 @@ def post_response_executor(request, id:int):
         raise HttpError(403, "Данный тип пользователей не может назначать исполнителей")
     response = get_object_or_404(Response, id=id)
     task = response.task
-    if task.task_status != "A":
+    if task.task_status != "LOOKING_FOR_EXECUTOR":
         raise HttpError(400, f"На задачу №{id} невозможно назначить исполнителя")
     task.moderator = user
     task.executor = response.executor
-    task.task_status = "B"
+    task.task_status = "IN_PROGRESS"
     chat = Chat.objects.create()
     task.chat = chat
     task.save()
@@ -179,15 +182,15 @@ def post_task_complete(request, id:int):
     task = get_object_or_404(Task, id=id)
     if task.customer != user:
         raise HttpError(403, f"Текущий пользователь не имеет прав для завершения задачи №{id}")
-    elif task.task_status != "B" or task.task_status == "C":
+    elif task.task_status != "IN_PROGRESS" or task.task_status == "COMPLETED":
         raise HttpError(400, f"Задачу №{id} невозможно завершить")
     with transaction.atomic():
-        task.task_status = "C"
+        task.task_status = "COMPLETED"
         task.completed_at = timezone.now()
-        task.chat.chat_status = "B"
+        task.chat.chat_status = "UNAVAILABLE"
         task.save()
         task.chat.save()
-        if task.type_reward == "A" and task.amount_reward is not None:
+        if task.type_reward == "POINTS" and task.amount_reward is not None:
             balance = get_object_or_404(Balance, executor=task.executor)
             balance.number_points += task.amount_reward
             balance.save()
@@ -201,11 +204,11 @@ def post_task_cancel(request, id:int):
     task = get_object_or_404(Task, id=id)
     if task.customer != user:
         raise HttpError(403, f"Текущий пользователь не имеет прав для отмены задачи №{id}")
-    elif task.task_status != "C" or task.task_status == "D":
+    elif task.task_status == "COMPLETED" or task.task_status == "CANCELED":
         raise HttpError(400, f"Задачу №{id} невозможно отменить")
     with transaction.atomic():
-        task.task_status = "D"
-        task.chat.chat_status = "B"
+        task.task_status = "CANCELED"
+        task.chat.chat_status = "UNAVAILABLE"
         task.save()
         task.chat.save()
     return {"message": f"Задача №{id} успешно отменена"}
@@ -218,7 +221,7 @@ def post_task_feedback(request, id:int, payload:FeedbackIn):
     task = get_object_or_404(Task, id=id)
     if task.customer != user:
         raise HttpError(403, f"Текущий пользователь не может оставить отзыв исполнителю задачи №{id}")
-    elif task.task_status != "C":
+    elif task.task_status != "COMPLETED":
         raise HttpError(400, f"Невозможно оставить отзыв, так как задача №{id} не завершена")
     elif Feedback.objects.filter(task=task).exists():
         raise HttpError(400, f"Отзыв на исполнителя задачи №{id} уже оставлен")

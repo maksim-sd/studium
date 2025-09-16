@@ -135,7 +135,7 @@ def post_order(request, payload:CartProductsIDIn):
         for cart_product in cart_products:
             if cart_product.quantity > cart_product.product.stock:
                 raise HttpError(400, F"Указанное количество товара №{cart_product.product.id} нет в наличии")
-            elif cart_product.product.product_status != "B":
+            elif cart_product.product.product_status != "AVAILABLE":
                 raise HttpError(400, F"Указанный товар №{cart_product.product.id} не доступен для продажи")
             OrderProduct.objects.create(order=order, product=cart_product.product, quantity=cart_product.quantity, price=cart_product.product.price)
             cart_product.product.stock -= cart_product.quantity
@@ -153,13 +153,13 @@ def patch_order_status(request, id_order:int, id_status:str):
     if not user.groups.filter(name="Модератор").exists():
         raise HttpError(403, "Недостаточно прав")
     order = get_object_or_404(Order, id=id_order)
-    if order.order_status == "C":
+    if order.order_status == "CANCELED":
         raise HttpError(400, "Нельзя изменить статус отмененного заказа №{id_order}")
     elif not id_status in [i[0] for i in Order.STATUS_CHOICES]:
         raise HttpError(404, f"Статус заказа №'{id_status}' не существует")
     order.order_status = id_status
     order.save()
-    if id_status == "C":
+    if id_status == "CANCELED":
         with transaction.atomic():
             order_products = OrderProduct.objects.filter(order=order)
             total_amount = sum(i.price * i.quantity for i in order_products)

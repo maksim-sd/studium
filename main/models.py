@@ -25,9 +25,9 @@ class CategoryProduct(models.Model):
 
 class Product(models.Model):
     STATUS_CHOICES = (
-        ("A", "Появится в будущем"),
-        ("B", "В наличии"),
-        ("C", "Отсутствует")
+        ("FUTURE", "Появится в будущем"),
+        ("AVAILABLE", "В наличии"),
+        ("UNAVAILABLE", "Отсутствует")
     )
     category_product = models.ForeignKey(CategoryProduct, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Категория товара")
     name = models.CharField(max_length=40, verbose_name="Название")
@@ -35,7 +35,7 @@ class Product(models.Model):
     stock = models.IntegerField(verbose_name="Запас")
     price = models.IntegerField(verbose_name="Цена")
     photo = models.ImageField(upload_to="images/", null=True, blank=True, verbose_name="Фото")
-    product_status = models.CharField(max_length=1, choices=STATUS_CHOICES, verbose_name="Статус товара")
+    product_status = models.CharField(max_length=30, choices=STATUS_CHOICES, verbose_name="Статус товара")
     
     def __str__(self):
         return self.name
@@ -71,13 +71,13 @@ class CartProduct(models.Model):
 
 class Order(models.Model):
     STATUS_CHOICES = (
-        ("A", "Оформлен"),
-        ("B", "Получен"),
-        ("C", "Отменен")
+        ("CREATED", "Оформлен"),
+        ("RECEIVED", "Получен"),
+        ("CANCELED", "Отменен")
     )
     executor = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Исполнитель")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Дата и время заказа")
-    order_status = models.CharField(max_length=1, default="A", choices=STATUS_CHOICES, verbose_name="Статус заказа")
+    order_status = models.CharField(max_length=30, default="A", choices=STATUS_CHOICES, verbose_name="Статус заказа")
     
     @property
     def total_amount(self):
@@ -112,10 +112,10 @@ class OrderProduct(models.Model):
 
 class Chat(models.Model):
     STATUS_CHOICES = (
-        ("A", "Доступен"),
-        ("B", "Недоступен")
+        ("AVAILABLE", "Доступен"),
+        ("UNAVAILABLE", "Недоступен")
     )
-    chat_status = models.CharField(max_length=1, default="A", choices=STATUS_CHOICES, verbose_name="Статус чата")
+    chat_status = models.CharField(max_length=30, default="A", choices=STATUS_CHOICES, verbose_name="Статус чата")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Дата и время создания")
     
     def __str__(self):
@@ -165,22 +165,23 @@ class Tag(models.Model):
 
 class Task(models.Model):
     STATUS_CHOICES = (
-        ("A", "Поиск исполнителя"),
-        ("B", "В работе"),
-        ("C", "Завершена"),
-        ("D", "Отменена")
+        ("LOOKING_FOR_EXECUTOR", "Поиск исполнителя"),
+        ("IN_PROGRESS", "В работе"),
+        ("COMPLETED", "Завершена"),
+        ("CANCELED", "Отменена")
     )
     TYPE_REWARD_CHOICES = (
-        ("A", "Бальное"),
-        ("B", "Денежное")
+        ("POINTS", "Бальное"),
+        ("CASH", "Денежное")
     )
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="customer_set", verbose_name="Заказчик")
     moderator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="moderator_set", verbose_name="Модератор")
     executor = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="executor_set", verbose_name="Исполнитель")
-    task_status = models.CharField(max_length=1, default="A", choices=STATUS_CHOICES, verbose_name="Статус задачи")
+    task_status = models.CharField(max_length=30, default="POINTS", choices=STATUS_CHOICES, verbose_name="Статус задачи")
     name = models.CharField(max_length=40, verbose_name="Название")
     description = models.TextField(verbose_name="Описание")
-    type_reward = models.CharField(max_length=1, choices=TYPE_REWARD_CHOICES, verbose_name="Тип вознаграждения")
+    tags = models.ManyToManyField('Tag', through='TaskTag', verbose_name="Теги")
+    type_reward = models.CharField(max_length=30, choices=TYPE_REWARD_CHOICES, verbose_name="Тип вознаграждения")
     amount_reward = models.IntegerField(null=True, blank=True, verbose_name="Сумма вознаграждения")
     deadlines = models.IntegerField(null=True, blank=True, verbose_name="Сроки(количество дней)")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Дата и время создания")

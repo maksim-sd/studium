@@ -1,6 +1,6 @@
-from ninja import Schema, UploadedFile
+from ninja import Schema, UploadedFile, File
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import Field
     
     
@@ -75,7 +75,7 @@ class OrderProductOut(Schema):
     
     
 class CartProductsIDIn(Schema):
-    list_id: List
+    list_id: List[int]
 
 
 class ChatOut(Schema):
@@ -91,7 +91,7 @@ class MessageFileOut(Schema):
 
 class ChatMessageOut(Schema):
     id: int
-    chat: ChatOut
+    chat_id: int
     user: UserOut
     message: str | None
     created_at: datetime
@@ -99,9 +99,8 @@ class ChatMessageOut(Schema):
     
     
 class ChatMessageIn(Schema):
-    id: int
-    message: str | None
-    files: List[UploadedFile] | None
+    message: str = None
+    files: File[List[UploadedFile]] = None
     
     
 class TaskOut(Schema):
@@ -113,8 +112,8 @@ class TaskOut(Schema):
     name: str
     description: str
     type_reward: str
-    amount_reward: int | None
-    deadlines: int | None
+    amount_reward: int = None
+    deadlines: int = None
     created_at: datetime
     completed_at: datetime | None
     chat: ChatOut | None
@@ -124,8 +123,8 @@ class TaskIn(Schema):
     name: str
     description: str
     type_reward: str
-    amount_reward: int | None
-    deadlines: int | None
+    amount_reward: int = None
+    deadlines: int = None
     
     
 class TagOut(Schema):
