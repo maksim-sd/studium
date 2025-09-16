@@ -100,7 +100,6 @@ class ChatMessageOut(Schema):
     
 class ChatMessageIn(Schema):
     message: str = None
-    files: File[List[UploadedFile]] = None
     
     
 class TaskOut(Schema):

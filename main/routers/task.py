@@ -1,5 +1,5 @@
 from typing import List
-from ninja import Router, Query
+from ninja import Router, Query, UploadedFile, File
 from ninja.errors import HttpError
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -60,7 +60,7 @@ def get_chat_messages(request, id:int):
     return messages
     
 @router.post("/chat/{int:id}/message/", auth=BasicAuth(), summary="Отправить сообщения в выбранный чат", tags=["Чат"])
-def post_chat_message(request, id:int, payload:ChatMessageIn):
+def post_chat_message(request, id:int, payload:ChatMessageIn, files: File[List[UploadedFile]]):
     user = request.auth
     chat = get_object_or_404(Chat, id=id)
     tasks = Task.objects.filter(Q(customer=user) | Q(moderator=user) | Q(executor=user), chat=chat)
@@ -68,13 +68,13 @@ def post_chat_message(request, id:int, payload:ChatMessageIn):
         raise HttpError(403, "У текущего пользователя нет доступа к данному чату")
     elif chat.chat_status == "UNAVAILABLE":
         raise HttpError(400, "Невозможно отправить сообщение, так как чат недоступен")
-    elif not payload.message and not payload.files:
+    elif not payload.message and not files:
         raise HttpError(400, "Невозможно отправить пустое сообщение")
-    MAX_SIZE_FILE = 2 * 1024 * 1024 * 1024
+    MAX_SIZE_FILE = int(0.5 * 1024 * 1024 * 1024)
     with transaction.atomic():
         chat_message = ChatMessage.objects.create(chat=chat, user=user, message=payload.message)
-        if payload.files:
-            for file in payload.files:
+        if files:
+            for file in files:
                 if file.size > MAX_SIZE_FILE:
                     raise HttpError(400, f"Файл {file.name} слишком большой {file.size}. Максимальный размер {MAX_SIZE_FILE} байт")
                 MessageFile.objects.create(chat_message=chat_message, file=file)
