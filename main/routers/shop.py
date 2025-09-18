@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from .profile import BasicAuth
 from main.models import Balance, CategoryProduct, Cart, CartProduct, Product, Order, OrderProduct
-from main.schemas import CategoryProductOut, ClassifierOut, ProductOut, CartProductOut, OrderOut, OrderProductOut, CartProductsIDIn
+from main.schemas import CategoryProductOut, ClassifierOut, ProductOut, CartProductOut, OrderOut, OrderProductOut, CartProductIDIn
 
 
 router = Router(tags=["Магазин"])
@@ -116,13 +116,13 @@ def get_order(request, id:int):
     return OrderProduct.objects.filter(order=order)
 
 @router.post("order/", auth=BasicAuth(), summary="Оформить заказ", tags=["Заказ"])
-def post_order(request, payload:CartProductsIDIn):
+def post_order(request, payload:CartProductIDIn):
     user = request.auth
     if not user.groups.filter(name="Исполнитель").exists():
         raise HttpError(403, "Данный тип пользователей не может оформлять заказы")
     cart = get_object_or_404(Cart, executor=user)
-    cart_products = CartProduct.objects.filter(id__in=payload.list_id, cart=cart)
-    if not cart_products.exists() or len(cart_products) != len(payload.list_id):
+    cart_products = CartProduct.objects.filter(id__in=payload.cart_product_id, cart=cart)
+    if not cart_products.exists() or len(cart_products) != len(payload.cart_product_id):
         raise HttpError(400, "Некорректно указаны id товаров")
     balance = get_object_or_404(Balance, executor=user)
     total_amount = sum(cart_product.product.price * cart_product.quantity for cart_product in cart_products)

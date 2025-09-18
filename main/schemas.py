@@ -74,8 +74,8 @@ class OrderProductOut(Schema):
     price: int
     
     
-class CartProductsIDIn(Schema):
-    list_id: List[int]
+class CartProductIDIn(Schema):
+    cart_product_id: List[int]
 
 
 class ChatOut(Schema):
