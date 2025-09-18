@@ -4,7 +4,7 @@ from .routers.shop import router as profile_shop
 from .routers.task import router as profile_task
 
 
-api = NinjaAPI(csrf=True)
+api = NinjaAPI(csrf=False)
 
 api.add_router("profile/", profile_router)
 api.add_router("shop/", profile_shop)
