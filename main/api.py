@@ -1,12 +1,10 @@
 from ninja import NinjaAPI
-from .routers.profile import router as profile_router
-from .routers.shop import router as profile_shop
-from .routers.task import router as profile_task
+from profile.router import router as profile_router
+from project_exchange.router import router as project_exchange_router 
+from shop.router import router as shop_router
 
+api = NinjaAPI()
 
-api = NinjaAPI(csrf=False)
-
-api.add_router("profile/", profile_router)
-api.add_router("shop/", profile_shop)
-api.add_router("task/", profile_task)
-
+api.add_router("/profile/", profile_router)
+api.add_router("/project_exchange", project_exchange_router)
+api.add_router("/shop/", shop_router)

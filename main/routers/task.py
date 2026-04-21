@@ -7,8 +7,8 @@ from django.db.models import Q
 from django.db import transaction
 from datetime import timedelta
 from .profile import BasicAuth
-from main.models import User, Balance, Chat, ChatMessage, MessageFile, Tag, Task, TaskTag, Feedback, Response
-from main.schemas import ClassifierOut, ChatOut, ChatMessageOut, MessageFileOut, ChatMessageIn, TaskOut, TaskIn, TagOut, ResponseIn, ResponseOut, FeedbackIn, FeedbackOut
+from profile.models import User, Balance, Chat, ChatMessage, MessageFile, Tag, Task, TaskTag, Feedback, Response
+from profile.schemas import ClassifierOut, ChatOut, ChatMessageOut, MessageFileOut, ChatMessageIn, TaskOut, TaskIn, TagOut, ResponseIn, ResponseOut, FeedbackIn, FeedbackOut
 
 
 router = Router(tags=["Задача"])
@@ -60,7 +60,7 @@ def get_chat_messages(request, id:int):
     return messages
     
 @router.post("/chat/{int:id}/message/", auth=BasicAuth(), summary="Отправить сообщения в выбранный чат", tags=["Чат"])
-def post_chat_message(request, id:int, payload:ChatMessageIn, files: File[List[UploadedFile]]):
+def post_chat_message(request, id:int, payload:ChatMessageIn, files: File[List[UploadedFile]]=None):
     user = request.auth
     chat = get_object_or_404(Chat, id=id)
     tasks = Task.objects.filter(Q(customer=user) | Q(moderator=user) | Q(executor=user), chat=chat)
@@ -72,7 +72,7 @@ def post_chat_message(request, id:int, payload:ChatMessageIn, files: File[List[U
         raise HttpError(400, "Невозможно отправить пустое сообщение")
     MAX_SIZE_FILE = int(0.5 * 1024 * 1024 * 1024)
     with transaction.atomic():
-        chat_message = ChatMessage.objects.create(chat=chat, user=user, message=payload.message)
+        chat_message = ChatMessage(chat=chat, user=user, message=payload.message)
         if files:
             for file in files:
                 if file.size > MAX_SIZE_FILE:
