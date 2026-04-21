@@ -4,8 +4,8 @@ from ninja.errors import HttpError
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from django.db import transaction
-from main.models import User, Group, Balance
-from main.schemas import Registration, UserOut, BalanceOut
+from profile.models import User, Group, Balance
+from profile.schemas import Registration, UserOut, BalanceOut
 
 
 router = Router(tags=["Профиль"])

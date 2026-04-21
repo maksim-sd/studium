@@ -1,0 +1,138 @@
+[
+{
+  "model": "auth.group",
+  "pk": 1,
+  "fields": {
+    "name": "Модератор",
+    "permissions": []
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 2,
+  "fields": {
+    "name": "Заказчик",
+    "permissions": []
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 3,
+  "fields": {
+    "name": "Исполнитель",
+    "permissions": []
+  }
+},
+{
+  "model": "profile.organization",
+  "pk": 1,
+  "fields": {
+    "full_name": "Забайкальский государственный университет",
+    "abbreviated_name": "ЗабГУ"
+  }
+},
+{
+  "model": "profile.organization",
+  "pk": 2,
+  "fields": {
+    "full_name": "Удоканская медь",
+    "abbreviated_name": "Удоканская медь"
+  }
+},
+{
+  "model": "profile.customuser",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$p4kDYRbX2N0r06XdxSUl20$scqccr+LkoQhqwHAzmr2NQ9b12yx9Crx8vMZ3RBkhXM=",
+    "last_login": "2026-03-16T02:04:37.507Z",
+    "is_superuser": true,
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-03-16T02:04:15.025Z",
+    "email": "admin@mail.ru",
+    "organization": null,
+    "last_name": "Админ",
+    "first_name": "Админ",
+    "patronymic": null,
+    "groups": [
+      1,
+      2,
+      3
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "profile.customuser",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$uO8lM5TG6QkbFENQfDoj9j$gHScFZY4qUkPsEWUmriC6lNw9Fmi7xsvKxWPT27HOGY=",
+    "last_login": null,
+    "is_superuser": false,
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-16T02:05:48.416Z",
+    "email": "maksim@mail.ru",
+    "organization": 1,
+    "last_name": "Степанов",
+    "first_name": "Максим",
+    "patronymic": "Дмитриевич",
+    "groups": [
+      3
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "profile.customuser",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$8SR4M2lSugpJVMagcRZKrr$1L0bWXjc9oKCS3olGb/pjWF52ZJOIa7EvJgpNs+Rf+E=",
+    "last_login": null,
+    "is_superuser": false,
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-16T02:08:00.275Z",
+    "email": "medb@mail.ru",
+    "organization": 2,
+    "last_name": "Иванов",
+    "first_name": "Иван",
+    "patronymic": "Иванович",
+    "groups": [
+      2
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "profile.customuser",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$ZgLgOTJfInH3YtPzDmdnZ6$XSX4OgU2FKzcH/+sLdSOPymnr+p6SMTeGASchY2m+UY=",
+    "last_login": null,
+    "is_superuser": false,
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-16T02:15:08.255Z",
+    "email": "zabg@mail.ru",
+    "organization": 1,
+    "last_name": "Яковлева",
+    "first_name": "Лидия",
+    "patronymic": "Леонидовна",
+    "groups": [
+      1
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "profile.executordata",
+  "pk": 1,
+  "fields": {
+    "executor": 2,
+    "faculty": "Энергетический",
+    "speciality": "Прикладная информатика в экономике",
+    "group": "ПИ-22"
+  }
+}
+]
