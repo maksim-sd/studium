@@ -12,7 +12,7 @@ class ClassifierOut(Schema):
 class CategoryProjectOut(Schema):
     id: int
     name: str
-    icon: str
+    icon: str | None = None
 
 
 class StatusesOut(Schema):

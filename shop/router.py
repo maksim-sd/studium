@@ -223,10 +223,10 @@ def post_order(request, payload:CartProductIDIn):
         raise HttpError(400, "Некорректно указаны id товаров")
     balance = get_object_or_404(Balance, executor=user)
     total_amount = sum(cart_product.product.price * cart_product.quantity for cart_product in cart_products)
-    if balance.number_points < total_amount:
+    if balance.number_of_points < total_amount:
         raise HttpError(400, "Недостаточно баллов для оформления заказа")
     with transaction.atomic():
-        balance.number_points -= total_amount
+        balance.number_of_points -= total_amount
         balance.save()
         order = Order.objects.create(executor=user)
         for cart_product in cart_products:
@@ -283,7 +283,7 @@ def patch_order_status(
             order_products = OrderProduct.objects.filter(order=order)
             total_amount = sum(i.price * i.quantity for i in order_products)
             balance = get_object_or_404(Balance, executor=order.executor)
-            balance.number_points += total_amount
+            balance.number_of_points += total_amount
             balance.save()
             for order_product in order_products:
                 order_product.product.stock += order_product.quantity
