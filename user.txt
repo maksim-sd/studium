@@ -1,0 +1,15 @@
+superuser:
+    admin@mail.ru
+    a12344321
+
+customer:
+    customer1@mail.ru
+    c12344321
+
+moderator:
+    moder1@mail.ru
+    m12344321
+
+executor:
+    executor1@mail.ru
+    e12344321

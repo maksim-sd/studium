@@ -1,6 +1,7 @@
-from ninja import Schema
 from datetime import datetime
 from typing import List
+
+from ninja import Schema
 from pydantic import Field
 
 

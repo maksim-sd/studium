@@ -3,9 +3,9 @@ from ninja import Router
 from ninja.errors import HttpError
 from django.shortcuts import get_object_or_404
 from django.db import transaction
-from .profile import BasicAuth
-from profile.models import Balance, CategoryProduct, Cart, CartProduct, Product, Order, OrderProduct
-from profile.schemas import CategoryProductOut, ClassifierOut, ProductOut, CartProductOut, OrderOut, OrderProductOut, CartProductIDIn
+from .user import BasicAuth
+from user.models import Balance, CategoryProduct, Cart, CartProduct, Product, Order, OrderProduct
+from user.schemas import CategoryProductOut, ClassifierOut, ProductOut, CartProductOut, OrderOut, OrderProductOut, CartProductIDIn
 
 
 router = Router(tags=["Магазин"])

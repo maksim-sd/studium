@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
-from .models import CategoryProject, Technology, Project, Chat, ChatMessages, MessageFiles, Feedback, Response, ProjectFiles
-from profile.models import CustomUser
+from .models import CategoryProject, Technology, Project, Chat, ChatMessages, MessageFiles, Feedback, Response, ProjectFiles, ChatUsers
+from user.models import CustomUser
 
 
 @admin.register(CategoryProject)
@@ -10,7 +10,6 @@ class CategoryProjectAdmin(admin.ModelAdmin):
     list_display = ("id", "name")
     list_display_links = ("name",)
     search_fields = ("name",)
-    ordering = ("name",)
 
 
 @admin.register(Technology)
@@ -18,16 +17,14 @@ class TechnologyAdmin(admin.ModelAdmin):
     list_display = ("id", "name")
     list_display_links = ("name",)
     search_fields = ("name",)
-    ordering = ("name",)
 
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "project_status", "customer", "category_project", "cash_reward", "number_of_points", "due_date", "created_at", "completed_at")
+    list_display = ("id", "name", "project_status", "category_project", "cash_reward", "created_at")
     list_display_links = ("name",)
     filter_horizontal = ("moderators", "executors", "technologies")
     search_fields = ("name",)
-    ordering = ("-id",)
     list_filter = ("category_project", "project_status") 
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -67,7 +64,6 @@ class ChatAdmin(admin.ModelAdmin):
     list_display = ("id", "project")
     list_display_links = ("project",)
     search_fields = ("project",)
-    ordering = ("-id",)
     
 
 @admin.register(ChatMessages)
@@ -75,8 +71,6 @@ class ChatMessagesAdmin(admin.ModelAdmin):
     list_display = ("id", "chat", "user", "message", "created_at")
     list_display_links = ("chat",)
     search_fields = ("user", "message",)
-    ordering = ("-id",)
-    
     
     
 @admin.register(MessageFiles)
@@ -84,7 +78,6 @@ class MessageFilesAdmin(admin.ModelAdmin):
     list_display = ("id", "chat_message", "file")
     list_display_links = ("chat_message",)
     search_fields = ("chat_message",)
-    ordering = ("-id",)
     
    
 @admin.register(Response)
@@ -114,7 +107,6 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_display = ("id", "project", "number_stars", "comment", "created_at")
     list_display_links = ("project",)
     search_fields = ("project", "comment")
-    ordering = ("-id",)
     list_filter = ("number_stars",) 
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -132,4 +124,10 @@ class ProjectFilesAdmin(admin.ModelAdmin):
     list_display = ("id", "project", "file")
     list_display_links = ("project",)
     search_fields = ("project",)
-    ordering = ("-id",)
+
+
+@admin.register(ChatUsers)
+class ChatUsersAdmin(admin.ModelAdmin):
+    list_display = ("id", "chat", "user", "last_read_message_id")
+    list_display_links = ("chat",)
+    search_fields = ("user",)
