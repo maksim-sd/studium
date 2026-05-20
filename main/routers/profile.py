@@ -4,8 +4,8 @@ from ninja.errors import HttpError
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from django.db import transaction
-from profile.models import User, Group, Balance
-from profile.schemas import Registration, UserOut, BalanceOut
+from user.models import User, Group, Balance
+from user.schemas import Registration, UserOut, BalanceOut
 
 
 router = Router(tags=["Профиль"])
@@ -30,11 +30,11 @@ def post_registration(request, payload: Registration):
     return {"message": "Пользователь успешно зарегистрирован"}
 
 @router.get("/", auth=BasicAuth(), response=UserOut, summary="Профиль текущего пользователя")
-def get_my_profile(request):
+def get_my_user(request):
     return request.auth
 
 @router.get("/{int:id}/", auth=BasicAuth(), response=UserOut, summary="Профиль выбранного пользователя")
-def get_profile(request, id:int):
+def get_user(request, id:int):
     return get_object_or_404(User, id=id)
 
 @router.get("/balance/", auth=BasicAuth(), response=BalanceOut, summary="Баланс текущего пользователя")

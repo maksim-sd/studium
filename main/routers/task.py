@@ -6,9 +6,9 @@ from django.utils import timezone
 from django.db.models import Q
 from django.db import transaction
 from datetime import timedelta
-from .profile import BasicAuth
-from profile.models import User, Balance, Chat, ChatMessage, MessageFile, Tag, Task, TaskTag, Feedback, Response
-from profile.schemas import ClassifierOut, ChatOut, ChatMessageOut, MessageFileOut, ChatMessageIn, TaskOut, TaskIn, TagOut, ResponseIn, ResponseOut, FeedbackIn, FeedbackOut
+from .user import BasicAuth
+from user.models import User, Balance, Chat, ChatMessage, MessageFile, Tag, Task, TaskTag, Feedback, Response
+from user.schemas import ClassifierOut, ChatOut, ChatMessageOut, MessageFileOut, ChatMessageIn, TaskOut, TaskIn, TagOut, ResponseIn, ResponseOut, FeedbackIn, FeedbackOut
 
 
 router = Router(tags=["Задача"])

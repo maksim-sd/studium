@@ -1,7 +1,7 @@
-from ninja import Schema
 from datetime import datetime, date
 from typing import List
-from pydantic import Field
+
+from ninja import Schema
 
 
 class ClassifierOut(Schema):
@@ -9,9 +9,16 @@ class ClassifierOut(Schema):
     name: str
 
 
+class CategoryProjectOut(Schema):
+    id: int
+    name: str
+    icon: str
+
+
 class StatusesOut(Schema):
     id: str
     name: str
+
 
 class CustomUserOut(Schema):
     id: int
@@ -19,28 +26,63 @@ class CustomUserOut(Schema):
     first_name: str
 
 
+class CustomerUserOut(Schema):
+    id: int
+    last_name: str
+    first_name: str
+    organization_id: int
+
+
+class ExecutorListOut(Schema):
+    id: int
+    last_name: str
+    first_name: str
+    patronymic: str | None = None
+    study_group: str | None = None
+
+
+class ModeratorListOut(Schema):
+    id: int
+    last_name: str
+    first_name: str
+    patronymic: str | None = None
+
+
 class ProjectOut(Schema):
     id: int
-    project_status: str = Field(alias="get_project_status_display")
+    project_status: str 
     category_project_id: int | None = None
-    technologies_id: List[int] | None = None
+    technologies_id: List[int] = []
     name: str
     description: str
     cash_reward: bool
+    number_of_points: int
 
-    @staticmethod
-    def resolve_technologies_id(obj):
-        return [i.id for i in obj.technologies.all()]
+
+class ProjectCompletedOut(Schema):
+    id: int
+    project_status: str 
+    category_project_id: int | None = None
+    technologies_id: List[int] = []
+    name: str
+    description: str
+    cash_reward: bool
+    number_of_points: int
+    number_stars: int | None = None
+    comment: str | None = None
+
+
+class ProjectFileOut(Schema):
+    id: int
+    file: str
 
 
 class ProjectDetailsOut(Schema):
     id: int
-    customer: CustomUserOut
-    moderators: List[CustomUserOut]
-    executors: List[CustomUserOut]
+    customer: CustomerUserOut
     project_status: str
     category_project_id: int | None
-    technologies_id: List[int] 
+    technologies_id: List[int] = [] 
     name: str
     description: str
     cash_reward: bool
@@ -48,12 +90,12 @@ class ProjectDetailsOut(Schema):
     due_date: date
     created_at: datetime
     completed_at: datetime | None
-    files: List[str] | None
+    files: List[ProjectFileOut] = []
 
 
 class ProjectIn(Schema):
     category_project_id: int | None = None
-    technologies_id: List[int] | None = None
+    technologies_id: List[int] = []
     name: str
     description: str
     cash_reward: bool
@@ -76,10 +118,11 @@ class ResponsesListIdIn(Schema):
     responses_id: List[int]
 
 
-class ProjectPublishIn(Schema):
+class ProjectChangeIn(Schema):
     new_category_project_id: int | None = None
     new_technologies_id: List[int] | None = None
     delete_technologies_id: List[int] | None = None
+    delete_files_id: List[int] | None = None
     new_name: str | None = None
     new_description: str | None = None
     new_cash_reward: bool | None = None
@@ -92,17 +135,24 @@ class FeedbackIn(Schema):
     comment: str | None = None
 
 
-class FeedbackOut(Schema):
+class LastMessageOut(Schema):
     id: int
-    project_id: int
-    number_stars: int
-    comment: str | None = None
+    user: CustomUserOut
+    message: str | None = None
     created_at: datetime
-    
+    files_are_attached: bool
+
+
+class ProjectChatOut(Schema):
+    id: int
+    name: str
+
 
 class ChatOut(Schema):
     id: int
-    project: ProjectOut
+    project: ProjectChatOut
+    unread_count: int | None = None
+    last_message: LastMessageOut
 
 
 class MessageFileOut(Schema):
@@ -116,8 +166,20 @@ class ChatMessageOut(Schema):
     user: CustomUserOut
     message: str | None = None
     created_at: datetime
-    files: List[MessageFileOut] | None = None
+    changed: bool
+    files: List[MessageFileOut] = []
     
     
 class ChatMessageIn(Schema):
     message: str | None = None
+
+
+class ChatMessageUpdateIn(Schema):
+    new_message:str | None = None
+    delete_files_id: List[int] | None = None
+
+
+class ProjectParticipantsOut(Schema):
+    customer: CustomerUserOut
+    moderators: List[CustomUserOut] | None = []
+    executors: List[CustomUserOut] | None = []

@@ -1,5 +1,6 @@
 from django.db import models
-from profile.models import CustomUser
+
+from user.models import CustomUser
        
 
 class CategoryProduct(models.Model):
@@ -11,7 +12,7 @@ class CategoryProduct(models.Model):
     class Meta:
         verbose_name = "Категория товара"
         verbose_name_plural = "Категории товара"
-        ordering = ["name"]
+        ordering = ("name",)
        
 
 class Product(models.Model):
@@ -20,7 +21,13 @@ class Product(models.Model):
         ("AVAILABLE", "В наличии"),
         ("UNAVAILABLE", "Отсутствует")
     )
-    category_product = models.ForeignKey(CategoryProduct, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Категория товара")
+    category_product = models.ForeignKey(
+        CategoryProduct,
+        on_delete=models.CASCADE,
+        null=True, 
+        blank=True, 
+        verbose_name="Категория товара"
+    )
     name = models.CharField(max_length=40, verbose_name="Наименование")
     description = models.CharField(max_length=300, null=True, blank=True, verbose_name="Описание")
     stock = models.IntegerField(verbose_name="Запас")
@@ -34,7 +41,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
-        ordering = ["name"]
+        ordering = ("name",)
  
  
 class Cart(models.Model):
@@ -46,6 +53,7 @@ class Cart(models.Model):
     class Meta:
         verbose_name = "Корзина"
         verbose_name_plural = "Корзины"
+        ordering = ("executor",)  
         
 
 class CartProduct(models.Model):
@@ -60,7 +68,7 @@ class CartProduct(models.Model):
         verbose_name = "Товары в корзине"
         verbose_name_plural = "Товары в корзинах"
         unique_together = ("cart", "product")
-        ordering = ["-id"]
+        ordering = ("cart", "product") 
         
 
 class Order(models.Model):
@@ -71,7 +79,12 @@ class Order(models.Model):
     )
     executor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name="Исполнитель")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата и время заказа")
-    order_status = models.CharField(max_length=30, default="CREATED", choices=STATUS_CHOICES, verbose_name="Статус заказа")
+    order_status = models.CharField(
+        max_length=30, 
+        default="CREATED", 
+        choices=STATUS_CHOICES, 
+        verbose_name="Статус заказа"
+    )
     
     @property
     def total_amount(self):
@@ -85,7 +98,7 @@ class Order(models.Model):
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
-        ordering = ["-created_at"]
+        ordering = ("-id",)
 
 
 class OrderProduct(models.Model):
@@ -104,6 +117,4 @@ class OrderProduct(models.Model):
         verbose_name = "Товар в заказе"
         verbose_name_plural = "Товары в заказах"
         unique_together = ("order", "product")
-        ordering = ["-id"]
-
-
+        ordering = ("order", "product")
