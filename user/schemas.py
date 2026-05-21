@@ -47,7 +47,3 @@ class RequestOut(Schema):
 
 class RequestIn(Schema):
     message: str 
-
-
-class StudyGroupOut(Schema):
-    study_group: str 

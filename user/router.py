@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.db.models import Avg
 
 from .models import Organization, CustomUser, ExecutorData, Balance, Request
-from .schemas import GroupOut, OrganizationOut, UserOut, BalanceOut, RequestOut, RequestIn, StudyGroupOut
+from .schemas import GroupOut, OrganizationOut, UserOut, BalanceOut, RequestOut, RequestIn
 from project_exchange.models import Feedback, Project
 
 
@@ -34,7 +34,7 @@ class BasicAuth(HttpBasicAuth):
         return user
     
 
-def create_user_out(user:object):
+def create_user_out(user:CustomUser):
     user_out = UserOut(
         id=user.id,
         last_name=user.last_name,
@@ -45,11 +45,7 @@ def create_user_out(user:object):
     )
     return user_out
 
-
-@router.get("/", auth=BasicAuth(), response=UserOut, summary="Профиль текущего пользователя")
-def get_current_user(request):
-    user = request.auth
-    user_out = create_user_out(user)
+def create_user_out_private(user:CustomUser, user_out:UserOut):
     user_out.organization_id = user.organization.id if user.organization else None
     user_out.patronymic = user.patronymic
     if user.groups.filter(name=EXECUTOR).exists():
@@ -64,23 +60,21 @@ def get_current_user(request):
     return user_out
 
 
+@router.get("/", auth=BasicAuth(), response=UserOut, summary="Профиль текущего пользователя")
+def get_current_user(request):
+    user = request.auth
+    user_out = create_user_out(user)
+    user_out = create_user_out_private(user, user_out)
+    return user_out
+
+
 @router.get("/{int:id_user}/", auth=BasicAuth(), response=UserOut, summary="Профиль выбранного пользователя")
 def get_user(request, id_user:int=Path(..., description="ID пользователя")):
     current_user = request.auth
     user = get_object_or_404(CustomUser, id=id_user)
     user_out = create_user_out(user)
     if current_user.groups.filter(name=MODERATOR).exists() or current_user == user:
-        user_out.organization_id = user.organization.id if user.organization else None
-        user_out.patronymic = user.patronymic
-        if user.groups.filter(name=EXECUTOR).exists():
-            executor_data = ExecutorData.objects.filter(executor=user).first()
-            if executor_data:
-                user_out.faculty = executor_data.faculty
-                user_out.specialty = executor_data.specialty
-                user_out.study_group = executor_data.study_group
-            projects = Project.objects.filter(executors=user)
-            feedbacks = Feedback.objects.filter(project__in=projects).aggregate(avg=Avg("number_stars"))
-            user_out.average_rating = feedbacks["avg"] or 0
+        user_out = create_user_out_private(user, user_out)
     return user_out
 
 
@@ -94,10 +88,10 @@ def get_organizations(request):
     return Organization.objects.all()
 
 
-@router.get("/study_groups/", auth=BasicAuth(), response=List[StudyGroupOut], summary="Все учебные группы")
+@router.get("/study_groups/", auth=BasicAuth(), summary="Все учебные группы")
 def get_study_groups(request):
-    groups = ExecutorData.objects.values_list('study_group', flat=True)
-    return [{'study_group': i} for i in set(groups)]
+    groups = list(ExecutorData.objects.order_by().values_list('study_group', flat=True).distinct())
+    return groups
 
 
 @router.get("/balance/", auth=BasicAuth(), response=BalanceOut, summary="Баланс текущего пользователя")

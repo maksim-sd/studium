@@ -77,6 +77,17 @@ class ProjectFileOut(Schema):
     file: str
 
 
+class ProjectPermissionsSchema(Schema):
+    change: bool
+    publish: bool
+    complete: bool
+    cancel: bool
+    leave_respond: bool
+    view_responses: bool
+    view_participants: bool
+    leave_feedback: bool
+
+
 class ProjectDetailsOut(Schema):
     id: int
     customer: CustomerUserOut
@@ -91,6 +102,7 @@ class ProjectDetailsOut(Schema):
     created_at: datetime
     completed_at: datetime | None
     files: List[ProjectFileOut] = []
+    permission: ProjectPermissionsSchema
 
 
 class ProjectIn(Schema):

@@ -109,6 +109,40 @@ def get_projects(
     return projects_out
 
 
+@router.get("/responses/", auth=BasicAuth(), response=List[ProjectOut], summary="Отклики текущего пользователя")
+def get_responses(
+    request, 
+    search:str=Query(None, description="Название или описание проекта"),
+    category_id:List[int]=Query(None, description="ID категории / категорий проекта"),
+    technologies_id:List[int]=Query(None, description="ID технологии / технологий проекта")
+):
+    user = request.auth
+    if not user.groups.filter(name=EXECUTOR).exists():
+        raise HttpError(400, "Данный пользователь не может иметь отклики")
+    responses = Response.objects.filter(executor=user).values_list("project_id", flat=True)
+    projects = Project.objects.filter(project_status="LOOKING_FOR_EXECUTOR", id__in=responses)
+    if search:
+        projects = projects.filter(Q(name__iregex=search) | Q(description__iregex=search))
+    if category_id:
+        projects = projects.filter(category_project__id__in=category_id)
+    if technologies_id:
+        projects = projects.filter(technologies__id__in=technologies_id).distinct()
+    projects_out = []
+    for project in projects:
+        project_out=ProjectOut(
+            id=project.id,
+            project_status=project.get_project_status_display,
+            category_project_id=project.category_project_id,
+            technologies_id=[tech.id for tech in project.technologies.all()],
+            name=project.name,
+            description=project.description,
+            cash_reward=project.cash_reward,
+            number_of_points=project.number_of_points
+        )
+        projects_out.append(project_out)
+    return projects_out
+
+
 @router.get("/moderation/", auth=BasicAuth(), response=List[ProjectOut], summary="Проекты, требующие модерации")
 def get_projects_moderation(
     request, 
@@ -271,14 +305,90 @@ def get_projects_user_history(request, id_user:int = Path(..., description="ID �
     return projects_out
 
 
+def permission_change_project(user:CustomUser, project:Project):
+    if user == project.customer and project.project_status == "UNDER_INSPECTION":
+        return True
+    elif user in project.moderators.all() and project.project_status not in ("IN_PROGRESS", "COMPLETED", "CANCELED"):
+        return True
+    return False
+
+
+def permission_publish_project(user:CustomUser, project:Project):
+    if not user.groups.filter(name=MODERATOR).exists():
+        return False
+    elif project.project_status != "UNDER_INSPECTION":
+        return False
+    return True
+
+
+def permission_complete_project(user:CustomUser, project:Project):
+    if project.customer != user:
+        return False
+    elif project.project_status != "IN_PROGRESS":
+        return False
+    return True
+
+
+def permission_cancel_project(user:CustomUser, project:Project):
+    if project.customer != user and not user.groups.filter(name=MODERATOR).exists():
+        return False
+    elif project.project_status in ("IN_PROGRESS", "COMPLETED", "CANCELED"):
+        return False
+    return True
+
+
+def permission_leave_respond_project(user:CustomUser, project:Project):
+    if not user.groups.filter(name=EXECUTOR).exists():
+        return False
+    elif project.project_status != "LOOKING_FOR_EXECUTOR":
+        return False
+    elif Response.objects.filter(project=project, executor=user).exists():
+       return False
+    return True
+
+
+def permission_view_responses_project(user:CustomUser, project:Project):
+    if not user.groups.filter(name=MODERATOR).exists():
+        return False
+    elif project.project_status != "LOOKING_FOR_EXECUTOR":
+        return False
+    return True
+
+
+def permission_view_participants_project(user:CustomUser, project:Project):
+    if user != project.customer and user not in project.moderators.all() and user not in project.executors.all():
+        return False
+    return True
+
+
+def permission_leave_feedback_project(user:CustomUser, project:Project):
+    if project.customer != user:
+        return False
+    elif project.project_status != "COMPLETED":
+        return False
+    elif Feedback.objects.filter(project=project).exists():
+        return False
+    return True
+
 @router.get("/{int:id_project}/", auth=BasicAuth(), response=ProjectDetailsOut, summary="Подробнее о выбранном проекте")
 def get_project(request, id_project:int = Path(..., description="ID проекта")):
+    user = request.auth
     project = get_object_or_404(
         Project.objects
         .select_related("customer", "category_project")
         .prefetch_related("technologies", "files"),
         id=id_project
     )
+    permission = {
+        "change": permission_change_project(user, project),
+        "publish": permission_publish_project(user, project),
+        "complete": permission_complete_project(user, project),
+        "cancel": permission_cancel_project(user, project),
+        "leave_respond": permission_leave_respond_project(user, project),
+        "view_responses": permission_view_responses_project(user, project),
+        "view_participants": permission_view_participants_project(user, project),
+        "leave_feedback": permission_leave_feedback_project(user, project),
+    }
     project_detail_out = ProjectDetailsOut(
         id=project.id,
         customer=project.customer,
@@ -292,7 +402,8 @@ def get_project(request, id_project:int = Path(..., description="ID проект
         due_date=project.due_date,
         created_at=project.created_at,
         completed_at=project.completed_at,
-        files=[ProjectFileOut(id=file.id, file=file.file.url) for file in project.files.all()]   
+        files=[ProjectFileOut(id=file.id, file=file.file.url) for file in project.files.all()], 
+        permission=permission 
     )
     return project_detail_out
 
@@ -311,8 +422,8 @@ def get_project_participants(request, id_project:int = Path(..., description="ID
         .prefetch_related("moderators", "executors"),
         id=id_project
     )
-    if user != project.customer and user not in project.moderators.all() and user not in project.executors.all():
-        raise HttpError(403, "Недостаточно прав")
+    if not permission_view_participants_project(user, project):
+        raise HttpError(400, "Недоступно")
     participants_out = ProjectParticipantsOut(
         customer=project.customer,
         moderators=project.moderators,
@@ -354,14 +465,8 @@ def put_project(
 ):
     user = request.auth
     project = get_object_or_404(id_project)
-    if user in project.customer and project.project_status != "UNDER_INSPECTION":
-        raise HttpError(403, "Недостаточно прав")
-    elif user not in project.moderators.all() and project.project_status == "IN_PROGRESS":
-        raise HttpError(403, "Недостаточно прав")
-    elif not user.groups.filter(name=MODERATOR).exists():
-        raise HttpError(403, "Недостаточно прав")
-    elif project.project_status in ("COMPLETED", "CANCELED"):
-        raise HttpError(400, "Невозможно изменить завершенный или отмененный проект")
+    if not permission_change_project(user, project):
+        raise HttpError(400, "Недоступно")
     with transaction.atomic():
         data = payload.dict()
         if data["new_category_project_id"]:
@@ -408,13 +513,11 @@ def put_project_publish(
     new_files:List[UploadedFile] = File(None, description="Список новых файлов проекта")
 ):
     user = request.auth
-    if not user.groups.filter(name=MODERATOR).exists():
-        raise HttpError(403, "Недостаточно прав")
+    project = get_object_or_404(id_project)
+    if not permission_publish_project(user, project):
+        raise HttpError(400, "Недоступно")
     with transaction.atomic():
         data = payload.dict()
-        project = get_object_or_404(id_project)
-        if project.project_status != "UNDER_INSPECTION":
-            raise HttpError(400, "Проект не находится в статусе проверки")
         if data["new_category_project_id"]:
             project.category_project_id = data["new_category_project_id"]
         if data["new_name"]:
@@ -457,10 +560,8 @@ def put_project_publish(
 def post_project_complete(request, id_project:int = Path(..., description="ID проекта")):
     user = request.auth
     project = get_object_or_404(Project, id=id_project)
-    if project.customer != user:
-        raise HttpError(403, "Недостаточно прав")
-    elif project.project_status != "IN_PROGRESS":
-        raise HttpError(400, "Проект не находится в статусе работы")
+    if not permission_complete_project(user, project):
+        raise HttpError(400, "Недоступно")
     with transaction.atomic():
         project.project_status = "COMPLETED"
         project.completed_at = timezone.now()
@@ -480,12 +581,8 @@ def post_project_complete(request, id_project:int = Path(..., description="ID п
 def post_project_feedback(request, payload:FeedbackIn, id_project:int = Path(..., description="ID проекта")):
     user = request.auth
     project = get_object_or_404(Project, id=id_project)
-    if project.customer != user:
-        raise HttpError(403, "Только заказчик проекта может выполнить данную операцию")
-    elif project.project_status != "COMPLETED":
-        raise HttpError(400, "Проект не завершен")
-    elif Feedback.objects.filter(project=project).exists():
-        raise HttpError(400, "Отзыв уже оставлен")
+    if not permission_leave_feedback_project(user, project):
+        raise HttpError(400, "Недоступно")
     Feedback.objects.create(project=project, **payload.dict())
     return {"detail": "Отзыв оставлен"}
 
@@ -494,10 +591,8 @@ def post_project_feedback(request, payload:FeedbackIn, id_project:int = Path(...
 def post_project_cancel(request, id_project:int = Path(..., description="ID проекта")):
     user = request.auth
     project = get_object_or_404(Project, id=id_project)
-    if project.customer != user:
-        raise HttpError(403, "Недостаточно прав")
-    elif project.project_status == "COMPLETED" or project.project_status == "CANCELED":
-        raise HttpError(400, "Проект уже завершен или отменен")
+    if not permission_cancel_project(user, project):
+        raise HttpError(400, "Недоступно")
     with transaction.atomic():
         project.project_status = "CANCELED"
         project.save()
@@ -515,15 +610,25 @@ def post_project_cancel(request, id_project:int = Path(..., description="ID пр
 )
 def post_response(request, payload:ResponseIn, id_project:int = Path(..., description="ID проекта")):
     user = request.auth
-    if not user.groups.filter(name=EXECUTOR).exists():
-        raise HttpError(403, "Недостаточно прав")
     project = get_object_or_404(Project, id=id_project)
-    if project.project_status != "LOOKING_FOR_EXECUTOR":
-        raise HttpError(400, "Проект не находится в статусе поиск исполнителя")
-    if Response.objects.filter(project=project, executor=user).exists():
-       raise HttpError(400, "Пользователь уже откликнулся на проект") 
-    response = Response.objects.create(project=project, executor=user, **payload.dict())
+    if not permission_leave_respond_project(user, project):
+        raise HttpError(400, "Недоступно")
+    Response.objects.create(project=project, executor=user, **payload.dict())
     return {"detail": "Отклик зарегистрирован"}
+
+
+@router.get(
+    "/{int:id_project}/response/quantity/", 
+    auth=BasicAuth(), 
+    summary="Количество откликов на выбранный проект", 
+    tags=["Отклик и назначение"]
+)
+def post_response_quantity(request, id_project:int = Path(..., description="ID проекта")):
+    user = request.auth
+    if not user.groups.filter(name=MODERATOR).exists():
+        raise HttpError(403, "Недостаточно прав")
+    responses_quantity = Response.objects.filter(project=id_project).count()
+    return responses_quantity
 
 
 @router.get(
@@ -533,11 +638,9 @@ def post_response(request, payload:ResponseIn, id_project:int = Path(..., descri
 )
 def get_responses(request, id_project:int = Path(..., description="ID проекта")):
     user = request.auth
-    if not user.groups.filter(name=MODERATOR).exists():
-        raise HttpError(403, "Недостаточно прав")
     project = get_object_or_404(Project, id=id_project)
-    if project.project_status != "LOOKING_FOR_EXECUTOR":
-        raise HttpError(400, "Проект не находится в статусе поиск исполнителя")
+    if not permission_view_responses_project(user, project):
+        raise HttpError(400, "Недоступно")
     responses = Response.objects.filter(project=project)
     return responses
 
