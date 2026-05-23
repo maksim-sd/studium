@@ -30,7 +30,7 @@ class CustomerUserOut(Schema):
     id: int
     last_name: str
     first_name: str
-    organization_id: int
+    organization_id: int | None = None
 
 
 class ExecutorListOut(Schema):

@@ -1,0 +1,2938 @@
+[
+{
+  "model": "user.organization",
+  "pk": 1,
+  "fields": {
+    "full_name": "Забайкальский государственный университет",
+    "abbreviated_name": "ЗабГУ"
+  }
+},
+{
+  "model": "user.organization",
+  "pk": 2,
+  "fields": {
+    "full_name": "ООО 'ТехноСтрой'",
+    "abbreviated_name": "ТехноСтрой"
+  }
+},
+{
+  "model": "user.organization",
+  "pk": 3,
+  "fields": {
+    "full_name": "ИП Иванов А.А.",
+    "abbreviated_name": "ИП Иванов"
+  }
+},
+{
+  "model": "user.organization",
+  "pk": 4,
+  "fields": {
+    "full_name": "ООО 'АйТи Решения'",
+    "abbreviated_name": "АйТи Решения"
+  }
+},
+{
+  "model": "user.organization",
+  "pk": 5,
+  "fields": {
+    "full_name": "Самозанятый Петров С.С.",
+    "abbreviated_name": "Самозанятый Петров"
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 1,
+  "fields": {
+    "name": "Заказчик"
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 2,
+  "fields": {
+    "name": "Исполнитель"
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 3,
+  "fields": {
+    "name": "Модератор"
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": true,
+    "email": "admin@mail.ru",
+    "organization": null,
+    "last_name": "Администратор",
+    "first_name": "Системный",
+    "patronymic": null,
+    "photo": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-01-01T00:00:00Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "customer1@mail.ru",
+    "organization": 2,
+    "last_name": "Смирнов",
+    "first_name": "Алексей",
+    "patronymic": "Владимирович",
+    "photo": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-01-15T10:00:00Z",
+    "groups": [1],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "customer2@mail.ru",
+    "organization": 3,
+    "last_name": "Козлова",
+    "first_name": "Екатерина",
+    "patronymic": "Дмитриевна",
+    "photo": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-01-20T10:00:00Z",
+    "groups": [1],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "customer3@mail.ru",
+    "organization": 4,
+    "last_name": "Морозова",
+    "first_name": "Ирина",
+    "patronymic": null,
+    "photo": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-02-01T10:00:00Z",
+    "groups": [1],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "executor1@mail.ru",
+    "organization": 1,
+    "last_name": "Петров",
+    "first_name": "Иван",
+    "patronymic": "Сергеевич",
+    "photo": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-02-01T10:00:00Z",
+    "groups": [2],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "executor2@mail.ru",
+    "organization": 1,
+    "last_name": "Сидорова",
+    "first_name": "Мария",
+    "patronymic": "Алексеевна",
+    "photo": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-02-05T10:00:00Z",
+    "groups": [2],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "executor3@mail.ru",
+    "organization": 1,
+    "last_name": "Михайлов",
+    "first_name": "Дмитрий",
+    "patronymic": "Андреевич",
+    "photo": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-02-10T10:00:00Z",
+    "groups": [2],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 8,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "executor4@mail.ru",
+    "organization": 1,
+    "last_name": "Федорова",
+    "first_name": "Анна",
+    "patronymic": "Павловна",
+    "photo": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-02-15T10:00:00Z",
+    "groups": [2],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 9,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "executor5@mail.ru",
+    "organization": 1,
+    "last_name": "Николаев",
+    "first_name": "Сергей",
+    "patronymic": null,
+    "photo": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-02-20T10:00:00Z",
+    "groups": [2],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 10,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "moderator1@mail.ru",
+    "organization": 1,
+    "last_name": "Морозов",
+    "first_name": "Андрей",
+    "patronymic": "Викторович",
+    "photo": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-03-01T10:00:00Z",
+    "groups": [3],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 11,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "moderator2@mail.ru",
+    "organization": 1,
+    "last_name": "Новикова",
+    "first_name": "Ольга",
+    "patronymic": "Игоревна",
+    "photo": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-03-05T10:00:00Z",
+    "groups": [3],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 12,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "moderator3@mail.ru",
+    "organization": 1,
+    "last_name": "Кузнецов",
+    "first_name": "Павел",
+    "patronymic": "Сергеевич",
+    "photo": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-03-10T10:00:00Z",
+    "groups": [3],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 13,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "moderator4@mail.ru",
+    "organization": 1,
+    "last_name": "Васильева",
+    "first_name": "Татьяна",
+    "patronymic": "Александровна",
+    "photo": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-03-15T10:00:00Z",
+    "groups": [3],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.customuser",
+  "pk": 14,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$abc123def456$a12344321_hash",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "moderator5@mail.ru",
+    "organization": 1,
+    "last_name": "Соколов",
+    "first_name": "Денис",
+    "patronymic": null,
+    "photo": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-03-20T10:00:00Z",
+    "groups": [3],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.executordata",
+  "pk": 1,
+  "fields": {
+    "executor": 5,
+    "faculty": "Информационных технологий",
+    "specialty": "Программная инженерия",
+    "study_group": "ПИ-21-1"
+  }
+},
+{
+  "model": "user.executordata",
+  "pk": 2,
+  "fields": {
+    "executor": 6,
+    "faculty": "Информационных технологий",
+    "specialty": "Прикладная информатика",
+    "study_group": "ПИ-21-2"
+  }
+},
+{
+  "model": "user.executordata",
+  "pk": 3,
+  "fields": {
+    "executor": 7,
+    "faculty": "Физико-технический",
+    "specialty": "Информационные системы",
+    "study_group": "ИС-21-1"
+  }
+},
+{
+  "model": "user.executordata",
+  "pk": 4,
+  "fields": {
+    "executor": 8,
+    "faculty": "Информационных технологий",
+    "specialty": "Программная инженерия",
+    "study_group": "ПИ-21-3"
+  }
+},
+{
+  "model": "user.executordata",
+  "pk": 5,
+  "fields": {
+    "executor": 9,
+    "faculty": "Математический",
+    "specialty": "Фундаментальная информатика",
+    "study_group": "ФИ-21-1"
+  }
+},
+{
+  "model": "user.balance",
+  "pk": 1,
+  "fields": {
+    "executor": 5,
+    "number_of_points": 150
+  }
+},
+{
+  "model": "user.balance",
+  "pk": 2,
+  "fields": {
+    "executor": 6,
+    "number_of_points": 230
+  }
+},
+{
+  "model": "user.balance",
+  "pk": 3,
+  "fields": {
+    "executor": 7,
+    "number_of_points": 85
+  }
+},
+{
+  "model": "user.balance",
+  "pk": 4,
+  "fields": {
+    "executor": 8,
+    "number_of_points": 310
+  }
+},
+{
+  "model": "user.balance",
+  "pk": 5,
+  "fields": {
+    "executor": 9,
+    "number_of_points": 45
+  }
+},
+{
+  "model": "user.request",
+  "pk": 1,
+  "fields": {
+    "user": 5,
+    "message": "Не могу найти свои проекты в личном кабинете",
+    "request_status": "REVIEWED",
+    "answer": "Проверьте фильтры на странице проектов",
+    "created_at": "2025-04-01T09:00:00Z"
+  }
+},
+{
+  "model": "user.request",
+  "pk": 2,
+  "fields": {
+    "user": 2,
+    "message": "Как изменить данные организации?",
+    "request_status": "UNDER_CONSIDERATION",
+    "answer": null,
+    "created_at": "2025-04-05T10:00:00Z"
+  }
+},
+{
+  "model": "user.request",
+  "pk": 3,
+  "fields": {
+    "user": 10,
+    "message": "Модератор не может назначить исполнителя",
+    "request_status": "UNDER_CONSIDERATION",
+    "answer": null,
+    "created_at": "2025-04-08T14:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.categoryproject",
+  "pk": 1,
+  "fields": {
+    "name": "Веб-разработка",
+    "icon": ""
+  }
+},
+{
+  "model": "project_exchange.categoryproject",
+  "pk": 2,
+  "fields": {
+    "name": "Мобильная разработка",
+    "icon": ""
+  }
+},
+{
+  "model": "project_exchange.categoryproject",
+  "pk": 3,
+  "fields": {
+    "name": "Дизайн",
+    "icon": ""
+  }
+},
+{
+  "model": "project_exchange.categoryproject",
+  "pk": 4,
+  "fields": {
+    "name": "Искусственный интеллект",
+    "icon": ""
+  }
+},
+{
+  "model": "project_exchange.categoryproject",
+  "pk": 5,
+  "fields": {
+    "name": "Кибербезопасность",
+    "icon": ""
+  }
+},
+{
+  "model": "project_exchange.categoryproject",
+  "pk": 6,
+  "fields": {
+    "name": "DevOps",
+    "icon": ""
+  }
+},
+{
+  "model": "project_exchange.categoryproject",
+  "pk": 7,
+  "fields": {
+    "name": "Тестирование",
+    "icon": ""
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 1,
+  "fields": {
+    "name": "Python"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 2,
+  "fields": {
+    "name": "Django"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 3,
+  "fields": {
+    "name": "React"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 4,
+  "fields": {
+    "name": "JavaScript"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 5,
+  "fields": {
+    "name": "Kotlin"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 6,
+  "fields": {
+    "name": "Swift"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 7,
+  "fields": {
+    "name": "Figma"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 8,
+  "fields": {
+    "name": "Adobe Photoshop"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 9,
+  "fields": {
+    "name": "TensorFlow"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 10,
+  "fields": {
+    "name": "PyTorch"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 11,
+  "fields": {
+    "name": "Docker"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 12,
+  "fields": {
+    "name": "Kubernetes"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 13,
+  "fields": {
+    "name": "PostgreSQL"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 14,
+  "fields": {
+    "name": "MongoDB"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 15,
+  "fields": {
+    "name": "Git"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 16,
+  "fields": {
+    "name": "Vue.js"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 17,
+  "fields": {
+    "name": "Angular"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 18,
+  "fields": {
+    "name": "Java"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 19,
+  "fields": {
+    "name": "C++"
+  }
+},
+{
+  "model": "project_exchange.technology",
+  "pk": 20,
+  "fields": {
+    "name": "Redis"
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 1,
+  "fields": {
+    "customer": 2,
+    "project_status": "LOOKING_FOR_EXECUTOR",
+    "category_project": 1,
+    "name": "Интернет-магазин для одежды",
+    "description": "Разработать полноценный интернет-магазин с корзиной, личным кабинетом и интеграцией платежных систем.",
+    "cash_reward": true,
+    "number_of_points": 500,
+    "due_date": "2025-08-15",
+    "created_at": "2025-04-01T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 2,
+  "fields": {
+    "customer": 2,
+    "project_status": "LOOKING_FOR_EXECUTOR",
+    "category_project": 2,
+    "name": "Мобильное приложение для доставки еды",
+    "description": "Создать кроссплатформенное мобильное приложение для заказа еды из ресторанов.",
+    "cash_reward": true,
+    "number_of_points": 800,
+    "due_date": "2025-09-30",
+    "created_at": "2025-04-05T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 3,
+  "fields": {
+    "customer": 3,
+    "project_status": "LOOKING_FOR_EXECUTOR",
+    "category_project": 3,
+    "name": "Дизайн лендинга для стартапа",
+    "description": "Разработать современный дизайн лендинга для tech-стартапа.",
+    "cash_reward": false,
+    "number_of_points": 300,
+    "due_date": "2025-06-20",
+    "created_at": "2025-04-10T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 4,
+  "fields": {
+    "customer": 2,
+    "project_status": "LOOKING_FOR_EXECUTOR",
+    "category_project": 4,
+    "name": "Чат-бот с ИИ для техподдержки",
+    "description": "Разработать телеграм-бота на базе нейросети для автоматической поддержки клиентов.",
+    "cash_reward": true,
+    "number_of_points": 1000,
+    "due_date": "2025-07-10",
+    "created_at": "2025-03-20T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 5,
+  "fields": {
+    "customer": 2,
+    "project_status": "LOOKING_FOR_EXECUTOR",
+    "category_project": 5,
+    "name": "Аудит безопасности веб-приложения",
+    "description": "Провести полный аудит безопасности корпоративного веб-приложения.",
+    "cash_reward": true,
+    "number_of_points": 1200,
+    "due_date": "2025-06-15",
+    "created_at": "2025-03-25T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 6,
+  "fields": {
+    "customer": 3,
+    "project_status": "LOOKING_FOR_EXECUTOR",
+    "category_project": 6,
+    "name": "Настройка CI/CD пайплайна",
+    "description": "Настроить автоматическую сборку и деплой проекта.",
+    "cash_reward": true,
+    "number_of_points": 600,
+    "due_date": "2025-06-10",
+    "created_at": "2025-04-12T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 7,
+  "fields": {
+    "customer": 4,
+    "project_status": "IN_PROGRESS",
+    "category_project": 1,
+    "name": "Портал для фрилансеров",
+    "description": "Разработать веб-портал для поиска заказов фрилансерами.",
+    "cash_reward": false,
+    "number_of_points": 400,
+    "due_date": "2025-10-01",
+    "created_at": "2025-04-12T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 8,
+  "fields": {
+    "customer": 2,
+    "project_status": "IN_PROGRESS",
+    "category_project": 4,
+    "name": "Нейросеть для генерации текстов",
+    "description": "Разработать легковесную нейросеть для генерации коротких текстов.",
+    "cash_reward": true,
+    "number_of_points": 1800,
+    "due_date": "2025-10-15",
+    "created_at": "2025-04-10T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 9,
+  "fields": {
+    "customer": 4,
+    "project_status": "IN_PROGRESS",
+    "category_project": 3,
+    "name": "UX/UI дизайн для мобильного банка",
+    "description": "Разработать дизайн интерфейса мобильного банковского приложения.",
+    "cash_reward": true,
+    "number_of_points": 700,
+    "due_date": "2025-08-20",
+    "created_at": "2025-04-08T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 10,
+  "fields": {
+    "customer": 2,
+    "project_status": "IN_PROGRESS",
+    "category_project": 5,
+    "name": "VPN сервис с нуля",
+    "description": "Разработка собственного VPN-сервиса с современным шифрованием.",
+    "cash_reward": true,
+    "number_of_points": 2000,
+    "due_date": "2025-11-30",
+    "created_at": "2025-04-03T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 11,
+  "fields": {
+    "customer": 3,
+    "project_status": "IN_PROGRESS",
+    "category_project": 6,
+    "name": "Миграция в облако AWS",
+    "description": "Перенести инфраструктуру компании в облако AWS.",
+    "cash_reward": true,
+    "number_of_points": 1500,
+    "due_date": "2025-09-15",
+    "created_at": "2025-04-01T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 12,
+  "fields": {
+    "customer": 4,
+    "project_status": "IN_PROGRESS",
+    "category_project": 7,
+    "name": "Автотестирование API",
+    "description": "Написать автотесты для REST API на pytest.",
+    "cash_reward": false,
+    "number_of_points": 450,
+    "due_date": "2025-07-01",
+    "created_at": "2025-04-15T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 13,
+  "fields": {
+    "customer": 2,
+    "project_status": "COMPLETED",
+    "category_project": 1,
+    "name": "Сайт-портфолио для фотографа",
+    "description": "Разработка сайта-портфолио с галереей и формой обратной связи.",
+    "cash_reward": true,
+    "number_of_points": 200,
+    "due_date": "2025-03-01",
+    "created_at": "2025-02-01T09:00:00Z",
+    "completed_at": "2025-02-28T18:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 14,
+  "fields": {
+    "customer": 4,
+    "project_status": "COMPLETED",
+    "category_project": 2,
+    "name": "Приложение для учета расходов",
+    "description": "Разработать мобильное приложение для учета личных финансов.",
+    "cash_reward": false,
+    "number_of_points": 350,
+    "due_date": "2025-03-15",
+    "created_at": "2025-02-10T09:00:00Z",
+    "completed_at": "2025-03-14T17:30:00Z"
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 15,
+  "fields": {
+    "customer": 3,
+    "project_status": "COMPLETED",
+    "category_project": 1,
+    "name": "Блог о путешествиях",
+    "description": "Создать блог на WordPress с уникальным дизайном.",
+    "cash_reward": false,
+    "number_of_points": 150,
+    "due_date": "2025-02-28",
+    "created_at": "2025-02-01T09:00:00Z",
+    "completed_at": "2025-02-27T16:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 16,
+  "fields": {
+    "customer": 2,
+    "project_status": "COMPLETED",
+    "category_project": 4,
+    "name": "Система распознавания эмоций",
+    "description": "Разработать ИИ для распознавания эмоций по фото.",
+    "cash_reward": true,
+    "number_of_points": 1500,
+    "due_date": "2025-04-15",
+    "created_at": "2025-03-01T09:00:00Z",
+    "completed_at": "2025-04-10T12:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 17,
+  "fields": {
+    "customer": 4,
+    "project_status": "CANCELED",
+    "category_project": 2,
+    "name": "Игровое приложение на Unity",
+    "description": "Разработать мобильную игру жанра \"три в ряд\".",
+    "cash_reward": false,
+    "number_of_points": 500,
+    "due_date": "2025-09-01",
+    "created_at": "2025-03-15T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 18,
+  "fields": {
+    "customer": 3,
+    "project_status": "CANCELED",
+    "category_project": 5,
+    "name": "Блокчейн-платформа",
+    "description": "Разработать простую блокчейн-платформу для голосования.",
+    "cash_reward": true,
+    "number_of_points": 2500,
+    "due_date": "2025-12-01",
+    "created_at": "2025-04-05T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 19,
+  "fields": {
+    "customer": 2,
+    "project_status": "UNDER_INSPECTION",
+    "category_project": 3,
+    "name": "Разработка брендбука",
+    "description": "Создать брендбук для IT-компании.",
+    "cash_reward": true,
+    "number_of_points": 400,
+    "due_date": "2025-05-20",
+    "created_at": "2025-04-14T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 20,
+  "fields": {
+    "customer": 4,
+    "project_status": "UNDER_INSPECTION",
+    "category_project": 6,
+    "name": "Мониторинг-система на Prometheus",
+    "description": "Развернуть мониторинг для серверов.",
+    "cash_reward": true,
+    "number_of_points": 550,
+    "due_date": "2025-06-10",
+    "created_at": "2025-04-16T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project",
+  "pk": 21,
+  "fields": {
+    "customer": 3,
+    "project_status": "UNDER_INSPECTION",
+    "category_project": 7,
+    "name": "Нагрузочное тестирование",
+    "description": "Провести нагрузочное тестирование веб-приложения.",
+    "cash_reward": true,
+    "number_of_points": 350,
+    "due_date": "2025-05-25",
+    "created_at": "2025-04-17T09:00:00Z",
+    "completed_at": null
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 1,
+  "fields": {
+    "project": 1,
+    "technology": 1
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 2,
+  "fields": {
+    "project": 1,
+    "technology": 2
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 3,
+  "fields": {
+    "project": 1,
+    "technology": 13
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 4,
+  "fields": {
+    "project": 1,
+    "technology": 15
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 5,
+  "fields": {
+    "project": 2,
+    "technology": 5
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 6,
+  "fields": {
+    "project": 2,
+    "technology": 6
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 7,
+  "fields": {
+    "project": 2,
+    "technology": 14
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 8,
+  "fields": {
+    "project": 3,
+    "technology": 7
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 9,
+  "fields": {
+    "project": 3,
+    "technology": 8
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 10,
+  "fields": {
+    "project": 4,
+    "technology": 1
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 11,
+  "fields": {
+    "project": 4,
+    "technology": 9
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 12,
+  "fields": {
+    "project": 4,
+    "technology": 10
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 13,
+  "fields": {
+    "project": 5,
+    "technology": 11
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 14,
+  "fields": {
+    "project": 5,
+    "technology": 12
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 15,
+  "fields": {
+    "project": 5,
+    "technology": 15
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 16,
+  "fields": {
+    "project": 6,
+    "technology": 11
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 17,
+  "fields": {
+    "project": 6,
+    "technology": 12
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 18,
+  "fields": {
+    "project": 7,
+    "technology": 1
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 19,
+  "fields": {
+    "project": 7,
+    "technology": 2
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 20,
+  "fields": {
+    "project": 7,
+    "technology": 3
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 21,
+  "fields": {
+    "project": 8,
+    "technology": 1
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 22,
+  "fields": {
+    "project": 8,
+    "technology": 9
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 23,
+  "fields": {
+    "project": 8,
+    "technology": 10
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 24,
+  "fields": {
+    "project": 9,
+    "technology": 7
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 25,
+  "fields": {
+    "project": 10,
+    "technology": 1
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 26,
+  "fields": {
+    "project": 10,
+    "technology": 11
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 27,
+  "fields": {
+    "project": 10,
+    "technology": 12
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 28,
+  "fields": {
+    "project": 11,
+    "technology": 11
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 29,
+  "fields": {
+    "project": 11,
+    "technology": 12
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 30,
+  "fields": {
+    "project": 12,
+    "technology": 1
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 31,
+  "fields": {
+    "project": 12,
+    "technology": 15
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 32,
+  "fields": {
+    "project": 13,
+    "technology": 3
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 33,
+  "fields": {
+    "project": 13,
+    "technology": 4
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 34,
+  "fields": {
+    "project": 14,
+    "technology": 5
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 35,
+  "fields": {
+    "project": 14,
+    "technology": 15
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 36,
+  "fields": {
+    "project": 15,
+    "technology": 2
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 37,
+  "fields": {
+    "project": 15,
+    "technology": 4
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 38,
+  "fields": {
+    "project": 16,
+    "technology": 1
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 39,
+  "fields": {
+    "project": 16,
+    "technology": 9
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 40,
+  "fields": {
+    "project": 17,
+    "technology": 5
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 41,
+  "fields": {
+    "project": 18,
+    "technology": 1
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 42,
+  "fields": {
+    "project": 19,
+    "technology": 7
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 43,
+  "fields": {
+    "project": 19,
+    "technology": 8
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 44,
+  "fields": {
+    "project": 20,
+    "technology": 11
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 45,
+  "fields": {
+    "project": 20,
+    "technology": 12
+  }
+},
+{
+  "model": "project_exchange.project_technologies",
+  "pk": 46,
+  "fields": {
+    "project": 21,
+    "technology": 1
+  }
+},
+{
+  "model": "project_exchange.project_moderators",
+  "pk": 1,
+  "fields": {
+    "project": 7,
+    "customuser": 10
+  }
+},
+{
+  "model": "project_exchange.project_moderators",
+  "pk": 2,
+  "fields": {
+    "project": 7,
+    "customuser": 11
+  }
+},
+{
+  "model": "project_exchange.project_moderators",
+  "pk": 3,
+  "fields": {
+    "project": 8,
+    "customuser": 12
+  }
+},
+{
+  "model": "project_exchange.project_moderators",
+  "pk": 4,
+  "fields": {
+    "project": 8,
+    "customuser": 13
+  }
+},
+{
+  "model": "project_exchange.project_moderators",
+  "pk": 5,
+  "fields": {
+    "project": 9,
+    "customuser": 10
+  }
+},
+{
+  "model": "project_exchange.project_moderators",
+  "pk": 6,
+  "fields": {
+    "project": 10,
+    "customuser": 11
+  }
+},
+{
+  "model": "project_exchange.project_moderators",
+  "pk": 7,
+  "fields": {
+    "project": 10,
+    "customuser": 12
+  }
+},
+{
+  "model": "project_exchange.project_moderators",
+  "pk": 8,
+  "fields": {
+    "project": 11,
+    "customuser": 13
+  }
+},
+{
+  "model": "project_exchange.project_moderators",
+  "pk": 9,
+  "fields": {
+    "project": 11,
+    "customuser": 14
+  }
+},
+{
+  "model": "project_exchange.project_moderators",
+  "pk": 10,
+  "fields": {
+    "project": 12,
+    "customuser": 10
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 1,
+  "fields": {
+    "project": 7,
+    "customuser": 5
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 2,
+  "fields": {
+    "project": 7,
+    "customuser": 6
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 3,
+  "fields": {
+    "project": 8,
+    "customuser": 7
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 4,
+  "fields": {
+    "project": 8,
+    "customuser": 8
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 5,
+  "fields": {
+    "project": 9,
+    "customuser": 6
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 6,
+  "fields": {
+    "project": 10,
+    "customuser": 5
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 7,
+  "fields": {
+    "project": 10,
+    "customuser": 9
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 8,
+  "fields": {
+    "project": 11,
+    "customuser": 7
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 9,
+  "fields": {
+    "project": 11,
+    "customuser": 8
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 10,
+  "fields": {
+    "project": 12,
+    "customuser": 5
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 11,
+  "fields": {
+    "project": 13,
+    "customuser": 6
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 12,
+  "fields": {
+    "project": 13,
+    "customuser": 7
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 13,
+  "fields": {
+    "project": 14,
+    "customuser": 8
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 14,
+  "fields": {
+    "project": 15,
+    "customuser": 5
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 15,
+  "fields": {
+    "project": 16,
+    "customuser": 7
+  }
+},
+{
+  "model": "project_exchange.project_executors",
+  "pk": 16,
+  "fields": {
+    "project": 16,
+    "customuser": 9
+  }
+},
+{
+  "model": "project_exchange.chat",
+  "pk": 1,
+  "fields": {
+    "project": 7
+  }
+},
+{
+  "model": "project_exchange.chat",
+  "pk": 2,
+  "fields": {
+    "project": 8
+  }
+},
+{
+  "model": "project_exchange.chat",
+  "pk": 3,
+  "fields": {
+    "project": 9
+  }
+},
+{
+  "model": "project_exchange.chat",
+  "pk": 4,
+  "fields": {
+    "project": 10
+  }
+},
+{
+  "model": "project_exchange.chat",
+  "pk": 5,
+  "fields": {
+    "project": 11
+  }
+},
+{
+  "model": "project_exchange.chat",
+  "pk": 6,
+  "fields": {
+    "project": 12
+  }
+},
+{
+  "model": "project_exchange.chat",
+  "pk": 7,
+  "fields": {
+    "project": 13
+  }
+},
+{
+  "model": "project_exchange.chat",
+  "pk": 8,
+  "fields": {
+    "project": 14
+  }
+},
+{
+  "model": "project_exchange.chat",
+  "pk": 9,
+  "fields": {
+    "project": 15
+  }
+},
+{
+  "model": "project_exchange.chat",
+  "pk": 10,
+  "fields": {
+    "project": 16
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 1,
+  "fields": {
+    "chat": 1,
+    "user": 4,
+    "message": "Здравствуйте, когда планируете начать работу?",
+    "created_at": "2025-04-13T10:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 2,
+  "fields": {
+    "chat": 1,
+    "user": 5,
+    "message": "Здравствуйте! Можем начать хоть завтра. Нужны уточнения по ТЗ.",
+    "created_at": "2025-04-13T10:30:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 3,
+  "fields": {
+    "chat": 1,
+    "user": 4,
+    "message": "Отлично, отправляю ТЗ в личку. Когда сможете сделать первый прототип?",
+    "created_at": "2025-04-13T11:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 4,
+  "fields": {
+    "chat": 1,
+    "user": 5,
+    "message": "Через 2 недели покажу первую версию.",
+    "created_at": "2025-04-13T11:15:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 5,
+  "fields": {
+    "chat": 1,
+    "user": 10,
+    "message": "Коллеги, просьба присылать промежуточные отчеты.",
+    "created_at": "2025-04-13T12:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 6,
+  "fields": {
+    "chat": 2,
+    "user": 2,
+    "message": "Привет! Как продвигается разработка нейросети?",
+    "created_at": "2025-04-11T09:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 7,
+  "fields": {
+    "chat": 2,
+    "user": 7,
+    "message": "Обучаем модель, результаты пока средние.",
+    "created_at": "2025-04-11T09:30:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 8,
+  "fields": {
+    "chat": 2,
+    "user": 12,
+    "message": "Нужно увеличить качество данных.",
+    "created_at": "2025-04-11T10:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 9,
+  "fields": {
+    "chat": 2,
+    "user": 7,
+    "message": "Понял, сейчас работаем над этим.",
+    "created_at": "2025-04-11T10:15:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 10,
+  "fields": {
+    "chat": 3,
+    "user": 4,
+    "message": "Нужны правки по дизайну, смените цветовую гамму.",
+    "created_at": "2025-04-09T10:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 11,
+  "fields": {
+    "chat": 3,
+    "user": 6,
+    "message": "Понял, сделаю. Покажите пример какую именно гамму хотите.",
+    "created_at": "2025-04-09T10:20:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 12,
+  "fields": {
+    "chat": 3,
+    "user": 4,
+    "message": "Светлые тона с акцентами синего.",
+    "created_at": "2025-04-09T10:35:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 13,
+  "fields": {
+    "chat": 4,
+    "user": 2,
+    "message": "Когда будет готов VPN?",
+    "created_at": "2025-04-04T09:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 14,
+  "fields": {
+    "chat": 4,
+    "user": 5,
+    "message": "Бета-версия через месяц.",
+    "created_at": "2025-04-04T09:45:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 15,
+  "fields": {
+    "chat": 4,
+    "user": 11,
+    "message": "Следим за дедлайнами, ребята!",
+    "created_at": "2025-04-04T10:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 16,
+  "fields": {
+    "chat": 4,
+    "user": 9,
+    "message": "Не переживайте, успеем.",
+    "created_at": "2025-04-04T10:15:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 17,
+  "fields": {
+    "chat": 5,
+    "user": 3,
+    "message": "Как успехи с миграцией в AWS?",
+    "created_at": "2025-04-02T10:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 18,
+  "fields": {
+    "chat": 5,
+    "user": 7,
+    "message": "Переносим базы данных, все идет по плану.",
+    "created_at": "2025-04-02T10:30:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 19,
+  "fields": {
+    "chat": 5,
+    "user": 13,
+    "message": "Отличная работа!",
+    "created_at": "2025-04-02T11:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 20,
+  "fields": {
+    "chat": 6,
+    "user": 4,
+    "message": "Тесты уже пишете?",
+    "created_at": "2025-04-16T09:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 21,
+  "fields": {
+    "chat": 6,
+    "user": 5,
+    "message": "Да, покрыли 70% эндпоинтов.",
+    "created_at": "2025-04-16T09:20:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 22,
+  "fields": {
+    "chat": 7,
+    "user": 2,
+    "message": "Сайт работает отлично, спасибо за работу!",
+    "created_at": "2025-02-20T15:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 23,
+  "fields": {
+    "chat": 7,
+    "user": 6,
+    "message": "Рады помочь! Если нужны доработки, обращайтесь.",
+    "created_at": "2025-02-20T15:30:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 24,
+  "fields": {
+    "chat": 8,
+    "user": 4,
+    "message": "Спасибо за приложение!",
+    "created_at": "2025-03-14T10:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 25,
+  "fields": {
+    "chat": 8,
+    "user": 8,
+    "message": "Пожалуйста! Ждем новых проектов.",
+    "created_at": "2025-03-14T10:15:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 26,
+  "fields": {
+    "chat": 9,
+    "user": 3,
+    "message": "Спасибо за блог, получилось круто!",
+    "created_at": "2025-02-25T12:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 27,
+  "fields": {
+    "chat": 9,
+    "user": 5,
+    "message": "Пожалуйста! Если что-то нужно будет добавить, пишите.",
+    "created_at": "2025-02-25T12:20:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 28,
+  "fields": {
+    "chat": 10,
+    "user": 2,
+    "message": "Отличная работа с ИИ!",
+    "created_at": "2025-04-10T14:00:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.chatmessages",
+  "pk": 29,
+  "fields": {
+    "chat": 10,
+    "user": 7,
+    "message": "Спасибо, было интересно.",
+    "created_at": "2025-04-10T14:15:00Z",
+    "changed": false
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 1,
+  "fields": {
+    "project": 1,
+    "executor": 5,
+    "comment": "Готов взяться за проект, есть опыт в разработке интернет-магазинов.",
+    "created_at": "2025-04-02T10:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 2,
+  "fields": {
+    "project": 1,
+    "executor": 6,
+    "comment": "Интересный проект, могу помочь.",
+    "created_at": "2025-04-02T11:30:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 3,
+  "fields": {
+    "project": 1,
+    "executor": 7,
+    "comment": "Сделаю качественно и в срок!",
+    "created_at": "2025-04-03T09:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 4,
+  "fields": {
+    "project": 1,
+    "executor": 9,
+    "comment": "Могу взяться, но нужна подробная документация.",
+    "created_at": "2025-04-03T14:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 5,
+  "fields": {
+    "project": 2,
+    "executor": 6,
+    "comment": "Разрабатывал похожее приложение, опыт есть.",
+    "created_at": "2025-04-06T10:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 6,
+  "fields": {
+    "project": 2,
+    "executor": 8,
+    "comment": "Могу взяться, но цена обсуждаема.",
+    "created_at": "2025-04-07T14:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 7,
+  "fields": {
+    "project": 3,
+    "executor": 7,
+    "comment": "Дизайнер с 3-летним стажем, сделаю круто.",
+    "created_at": "2025-04-11T09:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 8,
+  "fields": {
+    "project": 3,
+    "executor": 8,
+    "comment": "Могу предложить несколько вариантов дизайна.",
+    "created_at": "2025-04-11T10:30:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 9,
+  "fields": {
+    "project": 4,
+    "executor": 5,
+    "comment": "Опыт с нейросетями есть, могу помочь.",
+    "created_at": "2025-03-21T09:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 10,
+  "fields": {
+    "project": 4,
+    "executor": 9,
+    "comment": "Интересная задача!",
+    "created_at": "2025-03-22T11:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 11,
+  "fields": {
+    "project": 5,
+    "executor": 6,
+    "comment": "Специализируюсь на безопасности, могу провести аудит.",
+    "created_at": "2025-03-26T10:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 12,
+  "fields": {
+    "project": 5,
+    "executor": 7,
+    "comment": "Есть сертификаты по безопасности.",
+    "created_at": "2025-03-27T09:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 13,
+  "fields": {
+    "project": 6,
+    "executor": 5,
+    "comment": "Настраивал CI/CD на GitLab, есть опыт.",
+    "created_at": "2025-04-13T10:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 14,
+  "fields": {
+    "project": 6,
+    "executor": 8,
+    "comment": "Могу помочь с настройкой.",
+    "created_at": "2025-04-14T14:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.response",
+  "pk": 15,
+  "fields": {
+    "project": 6,
+    "executor": 9,
+    "comment": "DevOps инженер, опыт 2 года.",
+    "created_at": "2025-04-15T09:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.feedback",
+  "pk": 1,
+  "fields": {
+    "project": 13,
+    "number_stars": 5,
+    "comment": "Отличная работа! Сайт работает без ошибок, все в срок.",
+    "created_at": "2025-03-01T10:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.feedback",
+  "pk": 2,
+  "fields": {
+    "project": 14,
+    "number_stars": 4,
+    "comment": "Хорошее приложение, но были небольшие задержки.",
+    "created_at": "2025-03-16T11:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.feedback",
+  "pk": 3,
+  "fields": {
+    "project": 15,
+    "number_stars": 5,
+    "comment": "Всё отлично, спасибо!",
+    "created_at": "2025-03-01T12:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.feedback",
+  "pk": 4,
+  "fields": {
+    "project": 16,
+    "number_stars": 3,
+    "comment": null,
+    "created_at": "2025-04-11T10:00:00Z"
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 1,
+  "fields": {
+    "chat": 1,
+    "user": 4,
+    "last_read_message_id": 5
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 2,
+  "fields": {
+    "chat": 1,
+    "user": 5,
+    "last_read_message_id": 5
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 3,
+  "fields": {
+    "chat": 1,
+    "user": 6,
+    "last_read_message_id": 4
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 4,
+  "fields": {
+    "chat": 1,
+    "user": 10,
+    "last_read_message_id": 5
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 5,
+  "fields": {
+    "chat": 2,
+    "user": 2,
+    "last_read_message_id": 9
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 6,
+  "fields": {
+    "chat": 2,
+    "user": 7,
+    "last_read_message_id": 9
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 7,
+  "fields": {
+    "chat": 2,
+    "user": 8,
+    "last_read_message_id": 8
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 8,
+  "fields": {
+    "chat": 2,
+    "user": 12,
+    "last_read_message_id": 9
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 9,
+  "fields": {
+    "chat": 3,
+    "user": 4,
+    "last_read_message_id": 12
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 10,
+  "fields": {
+    "chat": 3,
+    "user": 6,
+    "last_read_message_id": 12
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 11,
+  "fields": {
+    "chat": 3,
+    "user": 10,
+    "last_read_message_id": 11
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 12,
+  "fields": {
+    "chat": 4,
+    "user": 2,
+    "last_read_message_id": 16
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 13,
+  "fields": {
+    "chat": 4,
+    "user": 5,
+    "last_read_message_id": 16
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 14,
+  "fields": {
+    "chat": 4,
+    "user": 9,
+    "last_read_message_id": 15
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 15,
+  "fields": {
+    "chat": 4,
+    "user": 11,
+    "last_read_message_id": 16
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 16,
+  "fields": {
+    "chat": 5,
+    "user": 3,
+    "last_read_message_id": 19
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 17,
+  "fields": {
+    "chat": 5,
+    "user": 7,
+    "last_read_message_id": 19
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 18,
+  "fields": {
+    "chat": 5,
+    "user": 8,
+    "last_read_message_id": 18
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 19,
+  "fields": {
+    "chat": 5,
+    "user": 13,
+    "last_read_message_id": 19
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 20,
+  "fields": {
+    "chat": 6,
+    "user": 4,
+    "last_read_message_id": 21
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 21,
+  "fields": {
+    "chat": 6,
+    "user": 5,
+    "last_read_message_id": 21
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 22,
+  "fields": {
+    "chat": 6,
+    "user": 10,
+    "last_read_message_id": 20
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 23,
+  "fields": {
+    "chat": 7,
+    "user": 2,
+    "last_read_message_id": 23
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 24,
+  "fields": {
+    "chat": 7,
+    "user": 6,
+    "last_read_message_id": 23
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 25,
+  "fields": {
+    "chat": 7,
+    "user": 7,
+    "last_read_message_id": 22
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 26,
+  "fields": {
+    "chat": 8,
+    "user": 4,
+    "last_read_message_id": 25
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 27,
+  "fields": {
+    "chat": 8,
+    "user": 8,
+    "last_read_message_id": 25
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 28,
+  "fields": {
+    "chat": 9,
+    "user": 3,
+    "last_read_message_id": 27
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 29,
+  "fields": {
+    "chat": 9,
+    "user": 5,
+    "last_read_message_id": 27
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 30,
+  "fields": {
+    "chat": 10,
+    "user": 2,
+    "last_read_message_id": 29
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 31,
+  "fields": {
+    "chat": 10,
+    "user": 7,
+    "last_read_message_id": 29
+  }
+},
+{
+  "model": "project_exchange.chatusers",
+  "pk": 32,
+  "fields": {
+    "chat": 10,
+    "user": 9,
+    "last_read_message_id": 28
+  }
+},
+{
+  "model": "shop.categoryproduct",
+  "pk": 1,
+  "fields": {
+    "name": "Ноутбуки"
+  }
+},
+{
+  "model": "shop.categoryproduct",
+  "pk": 2,
+  "fields": {
+    "name": "Мыши"
+  }
+},
+{
+  "model": "shop.categoryproduct",
+  "pk": 3,
+  "fields": {
+    "name": "Клавиатуры"
+  }
+},
+{
+  "model": "shop.categoryproduct",
+  "pk": 4,
+  "fields": {
+    "name": "Мониторы"
+  }
+},
+{
+  "model": "shop.categoryproduct",
+  "pk": 5,
+  "fields": {
+    "name": "Наушники"
+  }
+},
+{
+  "model": "shop.categoryproduct",
+  "pk": 6,
+  "fields": {
+    "name": "Веб-камеры"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 1,
+  "fields": {
+    "category_product": 1,
+    "name": "Ноутбук Lenovo ThinkPad",
+    "description": "Мощный ноутбук для разработки",
+    "stock": 10,
+    "price": 75000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 2,
+  "fields": {
+    "category_product": 1,
+    "name": "MacBook Pro 14",
+    "description": null,
+    "stock": 5,
+    "price": 150000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 3,
+  "fields": {
+    "category_product": 1,
+    "name": "ASUS ROG Zephyrus",
+    "description": "Игровой ноутбук",
+    "stock": 3,
+    "price": 120000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 4,
+  "fields": {
+    "category_product": 2,
+    "name": "Logitech MX Master 3",
+    "description": "Беспроводная мышь",
+    "stock": 15,
+    "price": 8000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 5,
+  "fields": {
+    "category_product": 2,
+    "name": "Razer DeathAdder",
+    "description": "Игровая мышь",
+    "stock": 20,
+    "price": 5000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 6,
+  "fields": {
+    "category_product": 2,
+    "name": "Defender Ergo",
+    "description": null,
+    "stock": 0,
+    "price": 1500,
+    "photo": "",
+    "product_status": "UNAVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 7,
+  "fields": {
+    "category_product": 3,
+    "name": "Logitech K380",
+    "description": "Компактная клавиатура",
+    "stock": 8,
+    "price": 4000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 8,
+  "fields": {
+    "category_product": 3,
+    "name": "Razer BlackWidow",
+    "description": "Механическая клавиатура",
+    "stock": 6,
+    "price": 12000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 9,
+  "fields": {
+    "category_product": 4,
+    "name": "Dell UltraSharp U2720Q",
+    "description": "4K монитор",
+    "stock": 4,
+    "price": 45000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 10,
+  "fields": {
+    "category_product": 4,
+    "name": "AOC 24G2U",
+    "description": "Игровой монитор 144Hz",
+    "stock": 7,
+    "price": 22000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 11,
+  "fields": {
+    "category_product": 4,
+    "name": "Samsung Odyssey G7",
+    "description": null,
+    "stock": 0,
+    "price": 55000,
+    "photo": "",
+    "product_status": "FUTURE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 12,
+  "fields": {
+    "category_product": 5,
+    "name": "Sony WH-1000XM5",
+    "description": "Шумоподавление",
+    "stock": 12,
+    "price": 30000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 13,
+  "fields": {
+    "category_product": 5,
+    "name": "JBL Tune 510BT",
+    "description": "Беспроводные наушники",
+    "stock": 25,
+    "price": 5000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 14,
+  "fields": {
+    "category_product": 6,
+    "name": "Logitech C920",
+    "description": "HD веб-камера",
+    "stock": 9,
+    "price": 6000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": 15,
+  "fields": {
+    "category_product": 6,
+    "name": "Razer Kiyo",
+    "description": "Со встроенной подсветкой",
+    "stock": 3,
+    "price": 9000,
+    "photo": "",
+    "product_status": "AVAILABLE"
+  }
+},
+{
+  "model": "shop.cart",
+  "pk": 1,
+  "fields": {
+    "executor": 5
+  }
+},
+{
+  "model": "shop.cart",
+  "pk": 2,
+  "fields": {
+    "executor": 6
+  }
+},
+{
+  "model": "shop.cart",
+  "pk": 3,
+  "fields": {
+    "executor": 7
+  }
+},
+{
+  "model": "shop.cart",
+  "pk": 4,
+  "fields": {
+    "executor": 8
+  }
+},
+{
+  "model": "shop.cart",
+  "pk": 5,
+  "fields": {
+    "executor": 9
+  }
+},
+{
+  "model": "shop.cartproduct",
+  "pk": 1,
+  "fields": {
+    "cart": 1,
+    "product": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.cartproduct",
+  "pk": 2,
+  "fields": {
+    "cart": 1,
+    "product": 4,
+    "quantity": 2
+  }
+},
+{
+  "model": "shop.cartproduct",
+  "pk": 3,
+  "fields": {
+    "cart": 2,
+    "product": 2,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.cartproduct",
+  "pk": 4,
+  "fields": {
+    "cart": 2,
+    "product": 12,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.cartproduct",
+  "pk": 5,
+  "fields": {
+    "cart": 3,
+    "product": 5,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.cartproduct",
+  "pk": 6,
+  "fields": {
+    "cart": 4,
+    "product": 7,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.cartproduct",
+  "pk": 7,
+  "fields": {
+    "cart": 4,
+    "product": 8,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.cartproduct",
+  "pk": 8,
+  "fields": {
+    "cart": 4,
+    "product": 13,
+    "quantity": 2
+  }
+},
+{
+  "model": "shop.cartproduct",
+  "pk": 9,
+  "fields": {
+    "cart": 5,
+    "product": 9,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 1,
+  "fields": {
+    "executor": 5,
+    "created_at": "2025-04-10T10:00:00Z",
+    "order_status": "RECEIVED"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 2,
+  "fields": {
+    "executor": 6,
+    "created_at": "2025-04-05T14:30:00Z",
+    "order_status": "CREATED"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 3,
+  "fields": {
+    "executor": 7,
+    "created_at": "2025-03-25T09:15:00Z",
+    "order_status": "CANCELED"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 4,
+  "fields": {
+    "executor": 8,
+    "created_at": "2025-04-12T11:00:00Z",
+    "order_status": "CREATED"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 5,
+  "fields": {
+    "executor": 5,
+    "created_at": "2025-04-01T16:20:00Z",
+    "order_status": "RECEIVED"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 6,
+  "fields": {
+    "executor": 9,
+    "created_at": "2025-04-08T12:00:00Z",
+    "order_status": "CREATED"
+  }
+},
+{
+  "model": "shop.orderproduct",
+  "pk": 1,
+  "fields": {
+    "order": 1,
+    "product": 1,
+    "quantity": 1,
+    "price": 75000
+  }
+},
+{
+  "model": "shop.orderproduct",
+  "pk": 2,
+  "fields": {
+    "order": 1,
+    "product": 4,
+    "quantity": 2,
+    "price": 8000
+  }
+},
+{
+  "model": "shop.orderproduct",
+  "pk": 3,
+  "fields": {
+    "order": 2,
+    "product": 2,
+    "quantity": 1,
+    "price": 150000
+  }
+},
+{
+  "model": "shop.orderproduct",
+  "pk": 4,
+  "fields": {
+    "order": 3,
+    "product": 5,
+    "quantity": 1,
+    "price": 5000
+  }
+},
+{
+  "model": "shop.orderproduct",
+  "pk": 5,
+  "fields": {
+    "order": 4,
+    "product": 7,
+    "quantity": 1,
+    "price": 4000
+  }
+},
+{
+  "model": "shop.orderproduct",
+  "pk": 6,
+  "fields": {
+    "order": 4,
+    "product": 8,
+    "quantity": 1,
+    "price": 12000
+  }
+},
+{
+  "model": "shop.orderproduct",
+  "pk": 7,
+  "fields": {
+    "order": 5,
+    "product": 9,
+    "quantity": 1,
+    "price": 45000
+  }
+},
+{
+  "model": "shop.orderproduct",
+  "pk": 8,
+  "fields": {
+    "order": 5,
+    "product": 13,
+    "quantity": 1,
+    "price": 5000
+  }
+},
+{
+  "model": "shop.orderproduct",
+  "pk": 9,
+  "fields": {
+    "order": 6,
+    "product": 12,
+    "quantity": 1,
+    "price": 30000
+  }
+}
+]

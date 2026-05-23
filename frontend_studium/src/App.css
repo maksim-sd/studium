@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Onest:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-onest: "Onest", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
+}
+
+body {
+    @apply font-montserrat;
+    font-size: 16px;
+    color: #000;
+    background-color: #fff;
+}
+
+@media (max-width: 927px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+#root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}

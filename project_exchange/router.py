@@ -5,7 +5,7 @@ from datetime import timedelta
 from ninja import Router, UploadedFile, Query, File, Path
 from ninja.errors import HttpError
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Value
+from django.db.models import Q
 from django.db.models.functions import Concat
 from django.db import transaction
 
@@ -464,7 +464,7 @@ def put_project(
     new_files:List[UploadedFile] = File(None, description="Список новых файлов проекта")
 ):
     user = request.auth
-    project = get_object_or_404(id_project)
+    project = get_object_or_404(Project, id=id_project)
     if not permission_change_project(user, project):
         raise HttpError(400, "Недоступно")
     with transaction.atomic():
@@ -513,7 +513,7 @@ def put_project_publish(
     new_files:List[UploadedFile] = File(None, description="Список новых файлов проекта")
 ):
     user = request.auth
-    project = get_object_or_404(id_project)
+    project = get_object_or_404(Project, id=id_project)
     if not permission_publish_project(user, project):
         raise HttpError(400, "Недоступно")
     with transaction.atomic():
