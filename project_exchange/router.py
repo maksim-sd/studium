@@ -29,6 +29,7 @@ from .schemas import (
     StatusesOut, 
     ProjectOut,
     ProjectCompletedOut,
+    ProjectResponseOut,
     ProjectChatOut, 
     ProjectDetailsOut,
     ProjectParticipantsOut,
@@ -109,8 +110,13 @@ def get_projects(
     return projects_out
 
 
-@router.get("/responses/", auth=BasicAuth(), response=List[ProjectOut], summary="Отклики текущего пользователя")
-def get_responses(
+@router.get(
+    "/responses/", 
+    auth=BasicAuth(), 
+    response=List[ProjectResponseOut], 
+    summary="Проекты на которые откликнулся текущий пользователь"
+)
+def get_responses_user(
     request, 
     search:str=Query(None, description="Название или описание проекта"),
     category_id:List[int]=Query(None, description="ID категории / категорий проекта"),
@@ -119,28 +125,33 @@ def get_responses(
     user = request.auth
     if not user.groups.filter(name=EXECUTOR).exists():
         raise HttpError(400, "Данный пользователь не может иметь отклики")
-    responses = Response.objects.filter(executor=user).values_list("project_id", flat=True)
-    projects = Project.objects.filter(project_status="LOOKING_FOR_EXECUTOR", id__in=responses)
+    responses = (Response.objects.filter(executor=user, project__project_status="LOOKING_FOR_EXECUTOR")
+                 .select_related('project')
+                 .prefetch_related('project__technologies', 'project__category_project')
+    )
     if search:
-        projects = projects.filter(Q(name__iregex=search) | Q(description__iregex=search))
+        responses = responses.filter(Q(project__name__iregex=search) | Q(project__description__iregex=search))
     if category_id:
-        projects = projects.filter(category_project__id__in=category_id)
+        responses = responses.filter(project__category_project__id__in=category_id)
     if technologies_id:
-        projects = projects.filter(technologies__id__in=technologies_id).distinct()
-    projects_out = []
-    for project in projects:
-        project_out=ProjectOut(
+        responses = responses.filter(project__technologies__id__in=technologies_id).distinct()
+    projects_response_out = []
+    for response in responses:
+        project = response.project
+        project_response_out = ProjectResponseOut(
             id=project.id,
-            project_status=project.get_project_status_display,
+            project_status=project.get_project_status_display(),
             category_project_id=project.category_project_id,
             technologies_id=[tech.id for tech in project.technologies.all()],
             name=project.name,
             description=project.description,
             cash_reward=project.cash_reward,
-            number_of_points=project.number_of_points
+            number_of_points=project.number_of_points,
+            response_comment=response.comment,
+            response_create_at=response.created_at
         )
-        projects_out.append(project_out)
-    return projects_out
+        projects_response_out.append(project_response_out)
+    return projects_response_out
 
 
 @router.get("/moderation/", auth=BasicAuth(), response=List[ProjectOut], summary="Проекты, требующие модерации")

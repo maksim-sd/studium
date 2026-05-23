@@ -1,26 +1,29 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+
+from unfold.admin import ModelAdmin
+
 from .models import CategoryProject, Technology, Project, Chat, ChatMessages, MessageFiles, Feedback, Response, ProjectFiles, ChatUsers
 from user.models import CustomUser
 
 
 @admin.register(CategoryProject)
-class CategoryProjectAdmin(admin.ModelAdmin):
+class CategoryProjectAdmin(ModelAdmin):
     list_display = ("id", "name")
     list_display_links = ("name",)
     search_fields = ("name",)
 
 
 @admin.register(Technology)
-class TechnologyAdmin(admin.ModelAdmin):
+class TechnologyAdmin(ModelAdmin):
     list_display = ("id", "name")
     list_display_links = ("name",)
     search_fields = ("name",)
 
 
 @admin.register(Project)
-class ProjectAdmin(admin.ModelAdmin):
+class ProjectAdmin(ModelAdmin):
     list_display = ("id", "name", "project_status", "category_project", "cash_reward", "created_at")
     list_display_links = ("name",)
     filter_horizontal = ("moderators", "executors", "technologies")
@@ -60,28 +63,28 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 @admin.register(Chat)
-class ChatAdmin(admin.ModelAdmin):
+class ChatAdmin(ModelAdmin):
     list_display = ("id", "project")
     list_display_links = ("project",)
     search_fields = ("project",)
     
 
 @admin.register(ChatMessages)
-class ChatMessagesAdmin(admin.ModelAdmin):
+class ChatMessagesAdmin(ModelAdmin):
     list_display = ("id", "chat", "user", "message", "created_at")
     list_display_links = ("chat",)
     search_fields = ("user", "message",)
     
     
 @admin.register(MessageFiles)
-class MessageFilesAdmin(admin.ModelAdmin):
+class MessageFilesAdmin(ModelAdmin):
     list_display = ("id", "chat_message", "file")
     list_display_links = ("chat_message",)
     search_fields = ("chat_message",)
     
    
 @admin.register(Response)
-class ResponseAdmin(admin.ModelAdmin):
+class ResponseAdmin(ModelAdmin):
     list_display = ("id", "project", "executor", "comment", "created_at")
     list_display_links = ("project",)
 
@@ -103,7 +106,7 @@ class ResponseAdmin(admin.ModelAdmin):
     
      
 @admin.register(Feedback)
-class FeedbackAdmin(admin.ModelAdmin):
+class FeedbackAdmin(ModelAdmin):
     list_display = ("id", "project", "number_stars", "comment", "created_at")
     list_display_links = ("project",)
     search_fields = ("project", "comment")
@@ -120,14 +123,14 @@ class FeedbackAdmin(admin.ModelAdmin):
 
 
 @admin.register(ProjectFiles)
-class ProjectFilesAdmin(admin.ModelAdmin):
+class ProjectFilesAdmin(ModelAdmin):
     list_display = ("id", "project", "file")
     list_display_links = ("project",)
     search_fields = ("project",)
 
 
 @admin.register(ChatUsers)
-class ChatUsersAdmin(admin.ModelAdmin):
+class ChatUsersAdmin(ModelAdmin):
     list_display = ("id", "chat", "user", "last_read_message_id")
     list_display_links = ("chat",)
     search_fields = ("user",)

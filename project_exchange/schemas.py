@@ -72,6 +72,19 @@ class ProjectCompletedOut(Schema):
     comment: str | None = None
 
 
+class ProjectResponseOut(Schema):
+    id: int
+    project_status: str 
+    category_project_id: int | None = None
+    technologies_id: List[int] = []
+    name: str
+    description: str
+    cash_reward: bool
+    number_of_points: int
+    response_comment: str | None = None
+    response_create_at: datetime
+
+
 class ProjectFileOut(Schema):
     id: int
     file: str

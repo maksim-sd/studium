@@ -129,7 +129,7 @@ class MessageFiles(models.Model):
         
 class Response(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name="Проект")
-    executor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name="Исполнитель")
+    executor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="executor_responses", verbose_name="Исполнитель")
     comment = models.TextField(null=True, blank=True, verbose_name="Комментарий")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата и время отклика")
 
