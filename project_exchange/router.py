@@ -86,7 +86,7 @@ def get_projects(
     category_id:List[int]=Query(None, description="ID категории / категорий проекта"),
     technologies_id:List[int]=Query(None, description="ID технологии / технологий проекта")
 ):
-    projects = Project.objects.all()
+    projects = Project.objects.ordered_by_status()
     projects = projects.filter(project_status="LOOKING_FOR_EXECUTOR")
     if search:
         projects = projects.filter(Q(name__iregex=search) | Q(description__iregex=search))
@@ -164,7 +164,7 @@ def get_projects_moderation(
     user = request.auth
     if not user.groups.filter(name=MODERATOR).exists():
         raise HttpError(403, "Недостаточно прав")
-    projects = Project.objects.all()
+    projects = Project.objects.ordered_by_status()
     projects = projects.filter(Q(project_status="UNDER_INSPECTION") | Q(project_status="LOOKING_FOR_EXECUTOR"))
     if search:
         projects = projects.filter(Q(name__iregex=search) | Q(description__iregex=search))
@@ -196,7 +196,7 @@ def get_projects_moderation(
 )
 def get_projects_active(request):
     user = request.auth
-    projects = Project.objects.filter(
+    projects = Project.objects.ordered_by_status().filter(
         Q(customer=user) | Q(moderators=user) | Q(executors=user),
         project_status__in=[
             "IN_PROGRESS",
@@ -228,7 +228,7 @@ def get_projects_active(request):
 )
 def get_projects_user_active(request, id_user:int = Path(..., description="ID пользователя")):
     user = get_object_or_404(CustomUser, id=id_user)
-    projects = Project.objects.filter(
+    projects = Project.objects.ordered_by_status().filter(
         Q(customer=user) | Q(moderators=user) | Q(executors=user),
         project_status__in=[
             "IN_PROGRESS",
@@ -260,7 +260,7 @@ def get_projects_user_active(request, id_user:int = Path(..., description="ID п
 )
 def get_projects_history(request):
     user = request.auth
-    projects = Project.objects.filter(
+    projects = Project.objects.ordered_by_status().filter(
         Q(customer=user) | Q(moderators=user) | Q(executors=user),
         project_status="COMPLETED"
     )
@@ -292,7 +292,7 @@ def get_projects_history(request):
 )
 def get_projects_user_history(request, id_user:int = Path(..., description="ID пользователя")):
     user = get_object_or_404(CustomUser, id=id_user)
-    projects = Project.objects.filter(
+    projects = Project.objects.ordered_by_status().filter(
         Q(customer=user) | Q(moderators=user) | Q(executors=user),
         project_status="COMPLETED"
     )
@@ -879,15 +879,16 @@ def get_user_chats(request):
                 id=project.id,
                 name=project.name
             ),
-            unread_count=unread_count,
-            last_message=LastMessageOut(
+            unread_count=unread_count
+        )
+        if last_message:
+            chat_out.last_message=LastMessageOut(
                 id=last_message.id,
                 user=last_message.user,
                 message=last_message.message,
                 created_at=last_message.created_at,
                 files_are_attached=last_message.files.exists()
             )
-        )
         chats_out.append(chat_out)
     return chats_out
 

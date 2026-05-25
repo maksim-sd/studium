@@ -2,262 +2,428 @@
 {% load i18n %}
 
 {% block content %}
-
 <style>
-  .stat-card { border-radius: 0.75rem; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; border: 1px solid; }
-  .stat-card .stat-num   { font-size: 1.5rem; font-weight: 700; line-height: 1; }
-  .stat-card .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; color: #6b7280; }
+.page-title   { font-size:1.6rem; font-weight:600; color:#111827; }
+.dark .page-title { color:#f3f4f6; }
+.section-title { font-size:1.15rem; font-weight:600; color:#111827; }
+.dark .section-title { color:#f3f4f6; }
+.section-desc  { font-size:0.9rem; font-weight:500; color:#6b7280; margin-top:0.2rem; }
+.dark .section-desc { color:#9ca3af; }
+.label-text    { font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; }
+.body-text     { font-size:0.95rem; font-weight:500; color:#374151; }
+.dark .body-text { color:#d1d5db; }
+.small-text    { font-size:0.82rem; font-weight:500; color:#6b7280; }
+.dark .small-text { color:#9ca3af; }
 
-  .stat-gray   { background:#f9fafb; border-color:#e5e7eb; }
-  .stat-yellow { background:#fefce8; border-color:#fde68a; }
-  .stat-blue   { background:#eff6ff; border-color:#bfdbfe; }
-  .stat-violet { background:#f5f3ff; border-color:#ddd6fe; }
-  .stat-green  { background:#f0fdf4; border-color:#bbf7d0; }
-  .stat-red    { background:#fff1f2; border-color:#fecdd3; }
+.stat-card { border-radius:0.75rem; padding:1rem; display:flex; flex-direction:column; gap:0.6rem; border:1px solid; }
+.stat-num  { font-size:1.75rem; font-weight:700; line-height:1; }
+.stat-lbl  { font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-top:0.15rem; }
+.sc-gray   .stat-lbl { color:#6b7280; } .dark .sc-gray   .stat-lbl { color:#9ca3af; }
+.sc-yellow .stat-lbl { color:#d97706; } .dark .sc-yellow .stat-lbl { color:#fbbf24; }
+.sc-blue   .stat-lbl { color:#3b82f6; } .dark .sc-blue   .stat-lbl { color:#60a5fa; }
+.sc-violet .stat-lbl { color:#7c3aed; } .dark .sc-violet .stat-lbl { color:#a78bfa; }
+.sc-green  .stat-lbl { color:#16a34a; } .dark .sc-green  .stat-lbl { color:#4ade80; }
+.sc-red    .stat-lbl { color:#dc2626; } .dark .sc-red    .stat-lbl { color:#f87171; }
 
-  .stat-gray   .stat-num  { color:#111827; } .stat-gray   .stat-icon { color:#9ca3af; }
-  .stat-yellow .stat-num  { color:#d97706; } .stat-yellow .stat-icon { color:#d97706; }
-  .stat-blue   .stat-num  { color:#3b82f6; } .stat-blue   .stat-icon { color:#3b82f6; }
-  .stat-violet .stat-num  { color:#7c3aed; } .stat-violet .stat-icon { color:#7c3aed; }
-  .stat-green  .stat-num  { color:#16a34a; } .stat-green  .stat-icon { color:#16a34a; }
-  .stat-red    .stat-num  { color:#dc2626; } .stat-red    .stat-icon { color:#dc2626; }
+.sc-gray   { background:#f9fafb; border-color:#e5e7eb; }
+.sc-yellow { background:#fefce8; border-color:#fde68a; }
+.sc-blue   { background:#eff6ff; border-color:#bfdbfe; }
+.sc-violet { background:#f5f3ff; border-color:#ddd6fe; }
+.sc-green  { background:#f0fdf4; border-color:#bbf7d0; }
+.sc-red    { background:#fff1f2; border-color:#fecdd3; }
 
-  .dark .stat-gray   { background:#1f2937; border-color:#374151; }
-  .dark .stat-yellow { background:rgba(120,80,0,.18);   border-color:rgba(251,191,36,.3); }
-  .dark .stat-blue   { background:rgba(30,64,175,.18);  border-color:rgba(96,165,250,.3); }
-  .dark .stat-violet { background:rgba(76,29,149,.18);  border-color:rgba(167,139,250,.3); }
-  .dark .stat-green  { background:rgba(6,78,59,.18);    border-color:rgba(74,222,128,.3); }
-  .dark .stat-red    { background:rgba(127,29,29,.18);  border-color:rgba(252,165,165,.3); }
+.sc-gray   .stat-num { color:#111827; } .sc-gray   .si { color:#9ca3af; }
+.sc-yellow .stat-num { color:#d97706; } .sc-yellow .si { color:#d97706; }
+.sc-blue   .stat-num { color:#3b82f6; } .sc-blue   .si { color:#3b82f6; }
+.sc-violet .stat-num { color:#7c3aed; } .sc-violet .si { color:#7c3aed; }
+.sc-green  .stat-num { color:#16a34a; } .sc-green  .si { color:#16a34a; }
+.sc-red    .stat-num { color:#dc2626; } .sc-red    .si { color:#dc2626; }
 
-  .dark .stat-gray   .stat-num  { color:#f3f4f6; } .dark .stat-gray   .stat-icon { color:#6b7280; }
-  .dark .stat-yellow .stat-num  { color:#fbbf24; } .dark .stat-yellow .stat-icon { color:#fbbf24; }
-  .dark .stat-blue   .stat-num  { color:#60a5fa; } .dark .stat-blue   .stat-icon { color:#60a5fa; }
-  .dark .stat-violet .stat-num  { color:#a78bfa; } .dark .stat-violet .stat-icon { color:#a78bfa; }
-  .dark .stat-green  .stat-num  { color:#4ade80; } .dark .stat-green  .stat-icon { color:#4ade80; }
-  .dark .stat-red    .stat-num  { color:#f87171; } .dark .stat-red    .stat-icon { color:#f87171; }
-  .dark .stat-card   .stat-label { color:#9ca3af; }
+.dark .sc-gray   { background:#1f2937; border-color:#374151; }
+.dark .sc-yellow { background:rgba(120,80,0,.18);  border-color:rgba(251,191,36,.3); }
+.dark .sc-blue   { background:rgba(30,64,175,.18); border-color:rgba(96,165,250,.3); }
+.dark .sc-violet { background:rgba(76,29,149,.18); border-color:rgba(167,139,250,.3); }
+.dark .sc-green  { background:rgba(6,78,59,.18);   border-color:rgba(74,222,128,.3); }
+.dark .sc-red    { background:rgba(127,29,29,.18); border-color:rgba(252,165,165,.3); }
 
-  .data-table { border-radius:0.75rem; overflow:hidden; border:1px solid #e5e7eb; background:#fff; }
-  .dark .data-table { border-color:#4b5563; background:#111827; }
+.dark .sc-gray   .stat-num { color:#f3f4f6; } .dark .sc-gray   .si { color:#6b7280; }
+.dark .sc-yellow .stat-num { color:#fbbf24; } .dark .sc-yellow .si { color:#fbbf24; }
+.dark .sc-blue   .stat-num { color:#60a5fa; } .dark .sc-blue   .si { color:#60a5fa; }
+.dark .sc-violet .stat-num { color:#a78bfa; } .dark .sc-violet .si { color:#a78bfa; }
+.dark .sc-green  .stat-num { color:#4ade80; } .dark .sc-green  .si { color:#4ade80; }
+.dark .sc-red    .stat-num { color:#f87171; } .dark .sc-red    .si { color:#f87171; }
 
-  .t-head { border-bottom:1px solid #e5e7eb; background:#f9fafb; }
-  .dark .t-head { border-color:#374151; background:#1f2937; }
-  .t-head-cell { padding:0.6rem 1rem; font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; }
-  .t-head-cell.center { text-align:center; }
-  .c-default { color:#6b7280; } .dark .c-default { color:#9ca3af; }
-  .c-yellow  { color:#d97706; } .c-blue   { color:#3b82f6; }
-  .c-violet  { color:#7c3aed; } .c-green  { color:#16a34a; }
+.period-wrap {
+  display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;
+  background:#f9fafb; border:1px solid #e5e7eb; border-radius:0.75rem; padding:0.55rem 0.875rem;
+}
+.dark .period-wrap { background:#1f2937; border-color:#374151; }
+.period-sep { width:1px; height:1.2rem; background:#e5e7eb; flex-shrink:0; }
+.dark .period-sep { background:#374151; }
+.date-input {
+  border:1px solid #d1d5db; border-radius:0.5rem; padding:0.3rem 0.55rem;
+  font-size:0.8rem; font-weight:500; color:#111827; background:#fff; outline:none;
+  transition:border-color .15s; min-width:8.5rem;
+}
+.dark .date-input { background:#1f2937; border-color:#4b5563; color:#e5e7eb; color-scheme:dark; }
+.date-input:focus { border-color:#6366f1; box-shadow:0 0 0 2px rgba(99,102,241,.15); }
+.dark .date-input:focus { border-color:#818cf8; }
+.period-btn {
+  padding:0.3rem 0.85rem; border-radius:0.45rem; font-size:0.8rem; font-weight:500;
+  background:transparent; color:#6b7280; border:1px solid #d1d5db; cursor:pointer;
+  transition:all .15s; text-decoration:none; display:inline-block; white-space:nowrap;
+}
+.dark .period-btn { color:#9ca3af; border-color:#4b5563; }
+.period-btn:hover { background:#f3f4f6; color:#111827; }
+.dark .period-btn:hover { background:#374151; color:#f3f4f6; }
+.period-btn.is-active { background:#6366f1; color:#fff; border-color:#6366f1; font-weight:600; }
+.period-badge {
+  display:inline-flex; align-items:center; gap:0.3rem;
+  background:#ede9fe; color:#6d28d9; border-radius:0.375rem;
+  padding:0.2rem 0.55rem; font-size:0.73rem; font-weight:600;
+}
+.dark .period-badge { background:rgba(109,40,217,.2); color:#a78bfa; }
 
-  .t-row { border-bottom:1px solid #f3f4f6; }
-  .t-row:last-child { border-bottom:none; }
-  .dark .t-row { border-color:#1f2937; }
+.dt { border-radius:0.75rem; overflow:hidden; border:1px solid #e5e7eb; background:#fff; }
+.dark .dt { border-color:#4b5563; background:#111827; }
+.dt-head { border-bottom:1px solid #e5e7eb; background:#f9fafb; }
+.dark .dt-head { border-color:#374151; background:#1f2937; }
+.dt-hc { padding:0.6rem 1rem; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; }
+.dt-hc.ctr { text-align:center; }
+.c-def { color:#6b7280; } .dark .c-def { color:#9ca3af; }
+.c-yel { color:#d97706; } .c-blu { color:#3b82f6; }
+.c-vio { color:#7c3aed; } .c-grn { color:#16a34a; }
+.c-tel { color:#0d9488; }
+.t-row { border-bottom:1px solid #f3f4f6; }
+.t-row:last-child { border-bottom:none; }
+.dark .t-row { border-color:#1f2937; }
+.t-cell { padding:0.8rem 1rem; }
+.t-cell.ctr { display:flex; align-items:center; justify-content:center; }
+.org-sum { display:grid; align-items:center; cursor:pointer; list-style:none; transition:background .15s; }
+.org-sum::-webkit-details-marker { display:none; }
+.org-sum:hover { background:#f9fafb; }
+.dark .org-sum:hover { background:rgba(55,65,81,.4); }
+.arr { width:0.6rem; height:0.6rem; flex-shrink:0; color:#d1d5db; transition:transform .2s; }
+.dark .arr { color:#4b5563; }
+details[open] .arr { transform:rotate(90deg); }
+.nm { font-size:0.95rem; font-weight:600; color:#111827; }
+.dark .nm { color:#e5e7eb; }
+.nv { font-size:0.95rem; font-weight:600; color:#374151; }
+.dark .nv { color:#d1d5db; }
+.nd { font-size:0.95rem; color:#d1d5db; }
+.dark .nd { color:#4b5563; }
+.sub-wrap { border-top:1px solid #e5e7eb; background:#f9fafb; }
+.dark .sub-wrap { border-color:#374151; background:rgba(31,41,55,.5); }
+.sub-hd { display:grid; border-bottom:1px solid #e5e7eb; padding:0.45rem 1rem; }
+.dark .sub-hd { border-color:#374151; }
+.sub-hc { font-size:0.75rem; font-weight:600; color:#9ca3af; }
+.sub-hc.ctr { text-align:center; }
+.sub-row { display:grid; padding:0.6rem 1rem; border-bottom:1px solid #f3f4f6; transition:background .1s; }
+.sub-row:last-child { border-bottom:none; }
+.dark .sub-row { border-color:rgba(55,65,81,.4); }
+.sub-row:hover { background:rgba(255,255,255,.7); }
+.dark .sub-row:hover { background:rgba(55,65,81,.25); }
 
-  .org-summary { display:grid; align-items:center; cursor:pointer; list-style:none; transition:background .15s; }
-  .org-summary::-webkit-details-marker { display:none; }
-  .org-summary:hover { background:#f9fafb; }
-  .dark .org-summary:hover { background:rgba(55,65,81,.4); }
+.b    { display:inline-flex; align-items:center; justify-content:center; min-width:1.9rem; height:1.6rem; padding:0 0.55rem; border-radius:0.375rem; font-size:0.85rem; font-weight:700; }
+.bs   { display:inline-flex; align-items:center; justify-content:center; min-width:1.5rem; height:1.35rem; padding:0 0.4rem; border-radius:0.25rem; font-size:0.8rem; font-weight:700; }
+.b-y,.bs.b-y { background:rgba(217,119,6,.12);  color:#b45309; }
+.b-b,.bs.b-b { background:rgba(59,130,246,.12); color:#2563eb; }
+.b-v,.bs.b-v { background:rgba(124,58,237,.12); color:#7c3aed; }
+.b-g,.bs.b-g { background:rgba(22,163,74,.12);  color:#15803d; }
+.b-t,.bs.b-t { background:rgba(13,148,136,.12); color:#0d9488; }
+.dark .b-y,.dark .bs.b-y { background:rgba(251,191,36,.15);  color:#fbbf24; }
+.dark .b-b,.dark .bs.b-b { background:rgba(96,165,250,.15);  color:#60a5fa; }
+.dark .b-v,.dark .bs.b-v { background:rgba(167,139,250,.15); color:#a78bfa; }
+.dark .b-g,.dark .bs.b-g { background:rgba(74,222,128,.15);  color:#4ade80; }
+.dark .b-t,.dark .bs.b-t { background:rgba(45,212,191,.15);  color:#2dd4bf; }
 
-  .t-cell { padding:0.85rem 1rem; }
-  .t-cell.center { text-align:center; display:flex; align-items:center; justify-content:center; }
-
-  .org-arrow { width:0.65rem; height:0.65rem; flex-shrink:0; color:#d1d5db; transition:transform .2s; }
-  .dark .org-arrow { color:#4b5563; }
-  details[open] .org-arrow { transform:rotate(90deg); }
-
-  .name-text   { font-size:0.9rem; font-weight:600; color:#111827; }
-  .dark .name-text { color:#e5e7eb; }
-  .num-text    { font-size:0.9rem; font-weight:600; color:#374151; }
-  .dark .num-text { color:#d1d5db; }
-  .dash-text   { font-size:0.9rem; color:#d1d5db; }
-  .dark .dash-text { color:#4b5563; }
-
-  .badge    { display:inline-flex; align-items:center; justify-content:center; min-width:1.75rem; height:1.5rem; padding:0 0.5rem; border-radius:0.375rem; font-size:0.8rem; font-weight:700; }
-  .badge-sm { display:inline-flex; align-items:center; justify-content:center; min-width:1.4rem;  height:1.25rem; padding:0 0.35rem; border-radius:0.25rem; font-size:0.75rem; font-weight:700; }
-
-  .badge-yellow, .badge-sm.badge-yellow { background:rgba(217,119,6,.12);  color:#b45309; }
-  .badge-blue,   .badge-sm.badge-blue   { background:rgba(59,130,246,.12); color:#2563eb; }
-  .badge-violet, .badge-sm.badge-violet { background:rgba(124,58,237,.12); color:#7c3aed; }
-  .badge-green,  .badge-sm.badge-green  { background:rgba(22,163,74,.12);  color:#15803d; }
-
-  .dark .badge-yellow, .dark .badge-sm.badge-yellow { background:rgba(251,191,36,.15);  color:#fbbf24; }
-  .dark .badge-blue,   .dark .badge-sm.badge-blue   { background:rgba(96,165,250,.15);  color:#60a5fa; }
-  .dark .badge-violet, .dark .badge-sm.badge-violet { background:rgba(167,139,250,.15); color:#a78bfa; }
-  .dark .badge-green,  .dark .badge-sm.badge-green  { background:rgba(74,222,128,.15);  color:#4ade80; }
-
-  .sub-wrap { border-top:1px solid #e5e7eb; background:#f9fafb; }
-  .dark .sub-wrap { border-color:#374151; background:rgba(31,41,55,.5); }
-
-  .sub-head { display:grid; border-bottom:1px solid #e5e7eb; padding:0.5rem 1rem; }
-  .dark .sub-head { border-color:#374151; }
-  .sub-head-cell { font-size:0.7rem; font-weight:500; color:#9ca3af; }
-  .sub-head-cell.center { text-align:center; }
-
-  .sub-row { display:grid; padding:0.65rem 1rem; border-bottom:1px solid #f3f4f6; transition:background .1s; }
-  .sub-row:last-child { border-bottom:none; }
-  .dark .sub-row { border-color:rgba(55,65,81,.4); }
-  .sub-row:hover { background:rgba(255,255,255,.7); }
-  .dark .sub-row:hover { background:rgba(55,65,81,.25); }
-
-  .user-name { font-size:0.875rem; color:#374151; }
-  .dark .user-name { color:#d1d5db; }
-
-  .exec-cols { grid-template-columns: 2fr 1fr 1fr 1fr; }
-  .exec-row-cols { grid-template-columns: 2fr 1fr 1fr 1fr; display:grid; align-items:center; }
-  .exec-row-cols { border-bottom:1px solid #f3f4f6; transition:background .1s; }
-  .exec-row-cols:last-child { border-bottom:none; }
-  .dark .exec-row-cols { border-color:#1f2937; }
-  .exec-row-cols:hover { background:#f9fafb; }
-  .dark .exec-row-cols:hover { background:rgba(55,65,81,.3); }
+.chart-card {
+  border-radius:0.75rem; border:1px solid #e5e7eb; background:#fff;
+  padding:1.5rem; display:flex; flex-direction:column; align-items:center; gap:1.5rem;
+}
+.dark .chart-card { border-color:#4b5563; background:#111827; }
+.chart-body { display:flex; align-items:center; justify-content:center; gap:2.5rem; width:100%; flex-wrap:wrap; }
+.chart-canvas-wrap { flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.chart-list { display:flex; flex-direction:column; gap:0.6rem; min-width:0; flex:1; max-width:320px; }
+.chart-list-row { display:flex; align-items:center; gap:0.6rem; }
+.chart-dot { width:0.7rem; height:0.7rem; border-radius:50%; flex-shrink:0; }
+.chart-label { font-size:0.9rem; font-weight:500; color:#374151; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dark .chart-label { color:#d1d5db; }
+.chart-count { font-size:0.9rem; font-weight:700; color:#111827; }
+.dark .chart-count { color:#f3f4f6; }
+.chart-pct { font-size:0.82rem; font-weight:500; color:#9ca3af; min-width:2.5rem; text-align:right; }
 </style>
 
 <div class="flex flex-col gap-8 mb-8">
 
-    <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Статистика проектов</h1>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Общая аналитика по организациям и исполнителям</p>
+  <div>
+    <h1 class="page-title">Статистика проектов</h1>
+    <p class="section-desc">Аналитика по организациям, исполнителям, категориям и технологиям</p>
+  </div>
+
+  <form method="get" action="" id="period-form">
+    <div class="period-wrap">
+      <span class="label-text c-def">Период</span>
+      <div class="period-sep"></div>
+      <a href="?all_time=1" id="btn-all" class="period-btn {% if all_time == '1' %}is-active{% endif %}">За всё время</a>
+      <div class="period-sep"></div>
+      <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+        <input type="date" name="date_from" id="date_from" class="date-input" value="{{ date_from }}">
+        <span class="small-text">—</span>
+        <input type="date" name="date_to" id="date_to" class="date-input" value="{{ date_to }}">
+        <input type="hidden" name="all_time" value="0">
+        <button type="submit" id="btn-apply" class="period-btn {% if all_time != '1' %}is-active{% endif %}">Применить</button>
+      </div>
+      {% if all_time != "1" and date_from and date_to %}
+      <span class="period-badge">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5"/></svg>
+        {{ date_from }} — {{ date_to }}
+      </span>
+      {% endif %}
     </div>
+  </form>
+  <script>
+  (function(){
+    var from=document.getElementById('date_from'),to=document.getElementById('date_to'),
+        apply=document.getElementById('btn-apply'),all=document.getElementById('btn-all');
+    if(!from)return;
+    [from,to].forEach(function(el){
+      el.addEventListener('input',function(){
+        apply.classList.add('is-active'); all.classList.remove('is-active');
+      });
+    });
+  })();
+  </script>
 
-    <div>
-        <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Общая статистика</p>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-
-            <div class="stat-card stat-gray">
-                <svg class="stat-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v8.25m19.5 0A2.25 2.25 0 0 1 19.5 16.5h-15a2.25 2.25 0 0 1-2.25-2.25"/></svg>
-                <div><div class="stat-num">{{ global_stats.total_projects }}</div><div class="stat-label">Всего</div></div>
-            </div>
-
-            <div class="stat-card stat-yellow">
-                <svg class="stat-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
-                <div><div class="stat-num">{{ global_stats.under_inspection }}</div><div class="stat-label">На проверке</div></div>
-            </div>
-
-            <div class="stat-card stat-blue">
-                <svg class="stat-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-                <div><div class="stat-num">{{ global_stats.looking_for_executor }}</div><div class="stat-label">Поиск исполнителя</div></div>
-            </div>
-
-            <div class="stat-card stat-violet">
-                <svg class="stat-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                <div><div class="stat-num">{{ global_stats.in_progress }}</div><div class="stat-label">В работе</div></div>
-            </div>
-
-            <div class="stat-card stat-green">
-                <svg class="stat-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                <div><div class="stat-num">{{ global_stats.completed }}</div><div class="stat-label">Завершено</div></div>
-            </div>
-
-            <div class="stat-card stat-red">
-                <svg class="stat-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                <div><div class="stat-num">{{ global_stats.canceled }}</div><div class="stat-label">Отменено</div></div>
-            </div>
-
-        </div>
+  <div>
+    <div class="mb-3">
+      <p class="section-title">Общая статистика</p>
+      <p class="section-desc">Суммарное распределение всех проектов по статусам за выбранный период</p>
     </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div class="stat-card sc-gray">
+        <svg class="si w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v8.25m19.5 0A2.25 2.25 0 0 1 19.5 16.5h-15a2.25 2.25 0 0 1-2.25-2.25"/></svg>
+        <div><div class="stat-num">{{ global_stats.total_projects }}</div><div class="stat-lbl">Всего</div></div>
+      </div>
+      <div class="stat-card sc-yellow">
+        <svg class="si w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
+        <div><div class="stat-num">{{ global_stats.under_inspection }}</div><div class="stat-lbl">На проверке</div></div>
+      </div>
+      <div class="stat-card sc-blue">
+        <svg class="si w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+        <div><div class="stat-num">{{ global_stats.looking_for_executor }}</div><div class="stat-lbl">Поиск исполнителя</div></div>
+      </div>
+      <div class="stat-card sc-violet">
+        <svg class="si w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+        <div><div class="stat-num">{{ global_stats.in_progress }}</div><div class="stat-lbl">В работе</div></div>
+      </div>
+      <div class="stat-card sc-green">
+        <svg class="si w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+        <div><div class="stat-num">{{ global_stats.completed }}</div><div class="stat-lbl">Завершено</div></div>
+      </div>
+      <div class="stat-card sc-red">
+        <svg class="si w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+        <div><div class="stat-num">{{ global_stats.canceled }}</div><div class="stat-lbl">Отменено</div></div>
+      </div>
+    </div>
+  </div>
 
-    <div>
-        <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Организации</p>
-
-        <div class="data-table">
-            <div class="t-head" style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
-                <div class="t-head-cell c-default">Организация</div>
-                <div class="t-head-cell c-default center">Всего</div>
-                <div class="t-head-cell c-yellow center">На проверка</div>
-                <div class="t-head-cell c-blue center">Поиск исполнителя</div>
-                <div class="t-head-cell c-violet center">В работе</div>
-                <div class="t-head-cell c-green center">Завершено</div>
+  <div>
+    <div class="mb-3">
+      <p class="section-title">По организациям</p>
+      <p class="section-desc">Статистика проектов в разрезе организаций-заказчиков за выбранный период. Нажмите на строку, чтобы раскрыть список заказчиков</p>
+    </div>
+    <div class="dt">
+      <div class="dt-head" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
+        <div class="dt-hc c-def">Организация</div>
+        <div class="dt-hc c-def ctr">Всего</div>
+        <div class="dt-hc c-yel ctr">На проверке</div>
+        <div class="dt-hc c-blu ctr">Поиск исполнителя</div>
+        <div class="dt-hc c-vio ctr">В работе</div>
+        <div class="dt-hc c-grn ctr">Завершено</div>
+      </div>
+      {% for item in organization_data %}
+      <div class="t-row">
+        <details>
+          <summary class="org-sum" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
+            <div class="t-cell" style="display:flex;align-items:center;gap:0.45rem;">
+              <svg class="arr" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+              <span class="nm">{{ item.organization.full_name }}</span>
             </div>
-
-            {% for item in organization_data %}
-            <div class="t-row">
-                <details class="group">
-                    <summary class="org-summary" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
-                        <div class="t-cell" style="display:flex; align-items:center; gap:0.5rem;">
-                            <svg class="org-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
-                            <span class="name-text">{{ item.organization.abbreviated_name }}</span>
-                        </div>
-                        <div class="t-cell center"><span class="num-text">{{ item.organization.total_projects }}</span></div>
-                        <div class="t-cell center">
-                            {% if item.organization.under_inspection > 0 %}<span class="badge badge-yellow">{{ item.organization.under_inspection }}</span>{% else %}<span class="dash-text">—</span>{% endif %}
-                        </div>
-                        <div class="t-cell center">
-                            {% if item.organization.looking_for_executor > 0 %}<span class="badge badge-blue">{{ item.organization.looking_for_executor }}</span>{% else %}<span class="dash-text">—</span>{% endif %}
-                        </div>
-                        <div class="t-cell center">
-                            {% if item.organization.in_progress > 0 %}<span class="badge badge-violet">{{ item.organization.in_progress }}</span>{% else %}<span class="dash-text">—</span>{% endif %}
-                        </div>
-                        <div class="t-cell center">
-                            {% if item.organization.completed > 0 %}<span class="badge badge-green">{{ item.organization.completed }}</span>{% else %}<span class="dash-text">—</span>{% endif %}
-                        </div>
-                    </summary>
-
-                    <div class="sub-wrap">
-                        <div class="sub-head" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
-                            <div class="sub-head-cell">Сотрудник</div>
-                            <div class="sub-head-cell center">Всего</div>
-                            <div class="sub-head-cell c-yellow center">Проверка</div>
-                            <div class="sub-head-cell c-blue center">Поиск</div>
-                            <div class="sub-head-cell c-violet center">В работе</div>
-                            <div class="sub-head-cell c-green center">Готово</div>
-                        </div>
-                        {% for user in item.users %}
-                        <div class="sub-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
-                            <div style="display:flex; align-items:center;"><span class="user-name">{{ user.last_name }} {{ user.first_name }}</span></div>
-                            <div style="display:flex; align-items:center; justify-content:center;"><span class="num-text" style="font-size:0.875rem;">{{ user.total_projects }}</span></div>
-                            <div style="display:flex; align-items:center; justify-content:center;">
-                                {% if user.under_inspection > 0 %}<span class="badge-sm badge-yellow">{{ user.under_inspection }}</span>{% else %}<span class="dash-text">—</span>{% endif %}
-                            </div>
-                            <div style="display:flex; align-items:center; justify-content:center;">
-                                {% if user.looking_for_executor > 0 %}<span class="badge-sm badge-blue">{{ user.looking_for_executor }}</span>{% else %}<span class="dash-text">—</span>{% endif %}
-                            </div>
-                            <div style="display:flex; align-items:center; justify-content:center;">
-                                {% if user.in_progress > 0 %}<span class="badge-sm badge-violet">{{ user.in_progress }}</span>{% else %}<span class="dash-text">—</span>{% endif %}
-                            </div>
-                            <div style="display:flex; align-items:center; justify-content:center;">
-                                {% if user.completed > 0 %}<span class="badge-sm badge-green">{{ user.completed }}</span>{% else %}<span class="dash-text">—</span>{% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </details>
+            <div class="t-cell ctr"><span class="nv">{{ item.organization.total_projects }}</span></div>
+            <div class="t-cell ctr">{% if item.organization.under_inspection > 0 %}<span class="b b-y">{{ item.organization.under_inspection }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+            <div class="t-cell ctr">{% if item.organization.looking_for_executor > 0 %}<span class="b b-b">{{ item.organization.looking_for_executor }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+            <div class="t-cell ctr">{% if item.organization.in_progress > 0 %}<span class="b b-v">{{ item.organization.in_progress }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+            <div class="t-cell ctr">{% if item.organization.completed > 0 %}<span class="b b-g">{{ item.organization.completed }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+          </summary>
+          <div class="sub-wrap">
+            <div class="sub-hd" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
+              <div class="sub-hc">Заказчик</div>
+              <div class="sub-hc ctr">Всего</div>
+              <div class="sub-hc c-yel ctr">На проверке</div>
+              <div class="sub-hc c-blu ctr">Поиск исполнителя</div>
+              <div class="sub-hc c-vio ctr">В работе</div>
+              <div class="sub-hc c-grn ctr">Завершено</div>
+            </div>
+            {% for user in item.users %}
+            <div class="sub-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
+              <div style="display:flex;align-items:center;"><span class="body-text">{{ user.last_name }} {{ user.first_name }}</span></div>
+              <div style="display:flex;align-items:center;justify-content:center;"><span class="nv" style="font-size:0.875rem;">{{ user.total_projects }}</span></div>
+              <div style="display:flex;align-items:center;justify-content:center;">{% if user.under_inspection > 0 %}<span class="bs b-y">{{ user.under_inspection }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+              <div style="display:flex;align-items:center;justify-content:center;">{% if user.looking_for_executor > 0 %}<span class="bs b-b">{{ user.looking_for_executor }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+              <div style="display:flex;align-items:center;justify-content:center;">{% if user.in_progress > 0 %}<span class="bs b-v">{{ user.in_progress }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+              <div style="display:flex;align-items:center;justify-content:center;">{% if user.completed > 0 %}<span class="bs b-g">{{ user.completed }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
             </div>
             {% endfor %}
-        </div>
+          </div>
+        </details>
+      </div>
+      {% endfor %}
     </div>
+  </div>
 
-    <div>
-        <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Исполнители</p>
-
-        <div class="data-table">
-            <div class="t-head exec-cols" style="display:grid;">
-                <div class="t-head-cell c-default">Исполнитель</div>
-                <div class="t-head-cell c-default center">Всего</div>
-                <div class="t-head-cell c-violet center">В работе</div>
-                <div class="t-head-cell c-green center">Завершено</div>
-            </div>
-
-            {% for executor in executors %}
-            <div class="exec-row-cols exec-cols t-row">
-                <div class="t-cell" style="display:flex; align-items:center;">
-                    <span class="name-text">{{ executor.last_name }} {{ executor.first_name }}</span>
-                </div>
-                <div class="t-cell center">
-                    <span class="num-text">{{ executor.total }}</span>
-                </div>
-                <div class="t-cell center">
-                    {% if executor.in_progress > 0 %}<span class="badge badge-violet">{{ executor.in_progress }}</span>{% else %}<span class="dash-text">—</span>{% endif %}
-                </div>
-                <div class="t-cell center">
-                    {% if executor.completed > 0 %}<span class="badge badge-green">{{ executor.completed }}</span>{% else %}<span class="dash-text">—</span>{% endif %}
-                </div>
-            </div>
-            {% empty %}
-            <div style="padding:2rem 1rem; text-align:center;">
-                <span style="font-size:0.875rem; color:#9ca3af;">Нет данных об исполнителях</span>
-            </div>
-            {% endfor %}
-        </div>
+  <div>
+    <div class="mb-3">
+      <p class="section-title">По исполнителям</p>
+      <p class="section-desc">Активность исполнителей: количество откликов, текущих и завершённых проектов</p>
     </div>
+    <div class="dt">
+      <div class="dt-head" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;">
+        <div class="dt-hc c-def">Исполнитель</div>
+        <div class="dt-hc c-tel ctr">Откликов</div>
+        <div class="dt-hc c-vio ctr">В работе</div>
+        <div class="dt-hc c-grn ctr">Завершено</div>
+      </div>
+      {% for executor in executors %}
+      <div class="t-row" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;align-items:center;">
+        <div class="t-cell"><span class="nm">{{ executor.last_name }} {{ executor.first_name }}</span></div>
+        <div class="t-cell ctr">{% if executor.total_responses > 0 %}<span class="b b-t">{{ executor.total_responses }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+        <div class="t-cell ctr">{% if executor.in_progress > 0 %}<span class="b b-v">{{ executor.in_progress }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+        <div class="t-cell ctr">{% if executor.completed > 0 %}<span class="b b-g">{{ executor.completed }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+      </div>
+      {% empty %}
+      <div style="padding:1.5rem 1rem;text-align:center;"><span class="small-text">Нет данных за выбранный период</span></div>
+      {% endfor %}
+    </div>
+  </div> 
+  <div>
+    <div class="mb-3">
+      <p class="section-title">По категориям</p>
+      <p class="section-desc">Какие категории проектов наиболее популярны за выбранный период</p>
+    </div>
+    <div class="chart-card">
+      <div class="chart-body">
+        <div class="chart-canvas-wrap">
+          <canvas id="cat-chart" width="280" height="280" style="max-width:280px;max-height:280px;"></canvas>
+        </div>
+        <div class="chart-list">
+          {% for cat in categories %}
+          <div class="chart-list-row">
+            <span class="chart-dot cat-dot-{{ forloop.counter0 }}"></span>
+            <span class="chart-label" title="{{ cat.name }}">{{ cat.name }}</span>
+            <span class="chart-count">{{ cat.total }}</span>
+            <span class="chart-pct">{{ cat.pct }}%</span>
+          </div>
+          {% empty %}
+          <p class="small-text">Нет данных</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="mb-3">
+      <p class="section-title">По технологиям</p>
+      <p class="section-desc">Какие технологии чаще всего используются в проектах за выбранный период</p>
+    </div>
+    <div class="chart-card">
+      <div class="chart-body">
+        <div class="chart-list">
+          {% for tech in technologies %}
+          <div class="chart-list-row">
+            <span class="chart-dot tech-dot-{{ forloop.counter0 }}"></span>
+            <span class="chart-label" title="{{ tech.name }}">{{ tech.name }}</span>
+            <span class="chart-count">{{ tech.total }}</span>
+            <span class="chart-pct">{{ tech.pct }}%</span>
+          </div>
+          {% empty %}
+          <p class="small-text">Нет данных</p>
+          {% endfor %}
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="tech-chart" width="280" height="280" style="max-width:280px;max-height:280px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 
 </div>
+
+<script id="cat-data" type="application/json">
+[{% for cat in categories %}{"name":"{{ cat.name|escapejs }}","total":{{ cat.total }},"pct":{{ cat.pct }}}{% if not forloop.last %},{% endif %}{% endfor %}]
+</script>
+<script id="tech-data" type="application/json">
+[{% for tech in technologies %}{"name":"{{ tech.name|escapejs }}","total":{{ tech.total }},"pct":{{ tech.pct }}}{% if not forloop.last %},{% endif %}{% endfor %}]
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+
+var CAT_DATA  = JSON.parse(document.getElementById('cat-data').textContent);
+var TECH_DATA = JSON.parse(document.getElementById('tech-data').textContent);
+
+var CAT_PALETTE  = ["#3b0764","#6b21a8","#7c3aed","#a855f7","#c084fc","#d8b4fe"];
+var TECH_PALETTE = ["#3b0764","#6b21a8","#7c3aed","#a855f7","#c084fc","#d8b4fe"];
+
+function colorDots(prefix, palette) {
+  palette.forEach(function(color, i) {
+    var dots = document.querySelectorAll('.' + prefix + '-dot-' + i);
+    dots.forEach(function(el){ el.style.background = color; });
+  });
+}
+
+function buildChart(canvasId, data, palette) {
+  var el = document.getElementById(canvasId);
+  if (!el || !data.length) return;
+  var isDark = document.documentElement.classList.contains('dark');
+  new Chart(el, {
+    type: 'pie',
+    data: {
+      labels: data.map(function(d){ return d.name; }),
+      datasets: [{
+        data:            data.map(function(d){ return d.total; }),
+        backgroundColor: data.map(function(_, i){ return palette[i % palette.length]; }),
+        borderColor:     isDark ? '#111827' : '#fff',
+        borderWidth: 3,
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: false,
+      animation: { duration: 500 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var sum = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
+              var pct = sum > 0 ? Math.round(ctx.parsed / sum * 100) : 0;
+              return ' ' + ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+            }
+          }
+        }
+      }
+    },
+  });
+}
+
+colorDots('cat',  CAT_PALETTE);
+colorDots('tech', TECH_PALETTE);
+buildChart('cat-chart',  CAT_DATA,  CAT_PALETTE);
+buildChart('tech-chart', TECH_DATA, TECH_PALETTE);
+</script>
 
 {% endblock %}

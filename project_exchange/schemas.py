@@ -177,7 +177,7 @@ class ChatOut(Schema):
     id: int
     project: ProjectChatOut
     unread_count: int | None = None
-    last_message: LastMessageOut
+    last_message: LastMessageOut | None = None
 
 
 class MessageFileOut(Schema):

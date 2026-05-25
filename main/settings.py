@@ -84,12 +84,12 @@ TEMPLATES = [
     },
 ]
 
+from django.templatetags.static import static
 
 UNFOLD = {
     "SITE_HEADER": "Стадиум",
     "SITE_SUBHEADER": "Панель управления",
     "DASHBOARD_CALLBACK": "project_exchange.views.dashboard_callback",
-
     "SIDEBAR": {
         "navigation": [
             {
@@ -283,10 +283,6 @@ TIME_ZONE = 'Asia/Chita'
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
 
 
 # Default primary key field type
@@ -297,7 +293,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
-STATIC_ROOT = BASE_DIR / 'static'
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  
+]
 
 AUTH_USER_MODEL = 'user.CustomUser'

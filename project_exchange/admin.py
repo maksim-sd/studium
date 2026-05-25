@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Case, IntegerField, When
 
 from unfold.admin import ModelAdmin
 
@@ -28,7 +29,25 @@ class ProjectAdmin(ModelAdmin):
     list_display_links = ("name",)
     filter_horizontal = ("moderators", "executors", "technologies")
     search_fields = ("name",)
-    list_filter = ("category_project", "project_status") 
+    list_filter = ("category_project", "project_status")
+
+    STATUS_ORDER = (
+        "IN_PROGRESS",
+        "LOOKING_FOR_EXECUTOR",
+        "UNDER_INSPECTION",
+        "COMPLETED",
+        "CANCELED",
+    )    
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(
+            status_order=Case(
+                *[When(project_status=j, then=i) for i, j in enumerate(self.STATUS_ORDER)],
+                default=len(self.STATUS_ORDER),
+                output_field=IntegerField()
+            )
+        ).order_by("status_order", "-created_at") 
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "customer":
