@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -32,6 +34,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'user',
+    'unfold',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -69,7 +72,7 @@ ROOT_URLCONF = 'main.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,6 +83,161 @@ TEMPLATES = [
         },
     },
 ]
+
+from django.templatetags.static import static
+
+UNFOLD = {
+    "SITE_HEADER": "Стадиум",
+    "SITE_SUBHEADER": "Панель управления",
+    "DASHBOARD_CALLBACK": "project_exchange.views.dashboard_callback",
+    "SIDEBAR": {
+        "navigation": [
+            {
+                "title": "Навигация",
+                "items": [
+                    {
+                        "title": "Дашборд",
+                        "icon": "dashboard",
+                        "link": reverse_lazy("admin:index"),
+                    },
+                ]
+            },
+            {
+                "title": "Пользователь",
+                "collapsible": True,
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Пользователи",
+                        "icon": "people",
+                        "link": reverse_lazy("admin:user_customuser_changelist"),
+                    },
+                    {
+                        "title": "Группы пользователей",
+                        "icon": "groups",
+                        "link": reverse_lazy("admin:user_usergroups_changelist"),
+                    },
+                    {
+                        "title": "Организации",
+                        "icon": "enterprise",
+                        "link": reverse_lazy("admin:user_organization_changelist"),
+                    },
+                    {
+                        "title": "Данные исполнителей",
+                        "icon": "school",
+                        "link": reverse_lazy("admin:user_executordata_changelist"),
+                    },
+                    {
+                        "title": "Балансы",
+                        "icon": "account_balance_wallet",
+                        "link": reverse_lazy("admin:user_balance_changelist"),
+                    },
+                    {
+                        "title": "Обращения",
+                        "icon": "chat_info",
+                        "link": reverse_lazy("admin:user_request_changelist"),
+                    },
+                ],
+            },
+
+            {
+                "title": "Биржа проектов",
+                "collapsible": True,
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Проекты",
+                        "icon": "task",
+                        "link": reverse_lazy("admin:project_exchange_project_changelist"),
+                    },
+                    {
+                        "title": "Файлы проектов",
+                        "icon": "file_present",
+                        "link": reverse_lazy("admin:project_exchange_projectfiles_changelist"),
+                    },
+                    {
+                        "title": "Категории проектов",
+                        "icon": "category",
+                        "link": reverse_lazy("admin:project_exchange_categoryproject_changelist"),
+                    },
+                    {
+                        "title": "Технологии проектов",
+                        "icon": "stacks",
+                        "link": reverse_lazy("admin:project_exchange_technology_changelist"),
+                    },
+                    {
+                        "title": "Отклики",
+                        "icon": "add_comment",
+                        "link": reverse_lazy("admin:project_exchange_response_changelist"),
+                    },
+                    {
+                        "title": "Отзывы",
+                        "icon": "thumbs_up_down",
+                        "link": reverse_lazy("admin:project_exchange_feedback_changelist"),
+                    },
+                    {
+                        "title": "Чат",
+                        "icon": "chat",
+                        "link": reverse_lazy("admin:project_exchange_chat_changelist"),
+                    },
+                    {
+                        "title": "Сообщения чатов",
+                        "icon": "mail",
+                        "link": reverse_lazy("admin:project_exchange_chatmessages_changelist"),
+                    },
+                    {
+                        "title": "Файлы сообщений",
+                        "icon": "attach_email",
+                        "link": reverse_lazy("admin:project_exchange_messagefiles_changelist"),
+                    },
+                    {
+                        "title": "Пользователи чатов",
+                        "icon": "3p",
+                        "link": reverse_lazy("admin:project_exchange_chatusers_changelist"),
+                    },
+                ],
+            },
+
+            {
+                "title": "Магазин",
+                "collapsible": True,
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Товары",
+                        "icon": "package_2",
+                        "link": reverse_lazy("admin:shop_product_changelist"),
+                    },
+                    {
+                        "title": "Категории товаров",
+                        "icon": "category",
+                        "link": reverse_lazy("admin:shop_categoryproduct_changelist"),
+                    },
+                    {
+                        "title": "Корзины",
+                        "icon": "shopping_cart",
+                        "link": reverse_lazy("admin:shop_cart_changelist"),
+                    },
+                    {
+                        "title": "Товары в корзинах",
+                        "icon": "shopping_cart_checkout",
+                        "link": reverse_lazy("admin:shop_cartproduct_changelist"),
+                    },
+                    {
+                        "title": "Заказы",
+                        "icon": "receipt",
+                        "link": reverse_lazy("admin:shop_order_changelist"),
+                    },
+                    {
+                        "title": "Товары в заказах",
+                        "icon": "receipt_long",
+                        "link": reverse_lazy("admin:shop_orderproduct_changelist"),
+                    },
+                ],
+            }
+        ],
+    },
+}
 
 WSGI_APPLICATION = 'main.wsgi.application'
 
@@ -121,15 +279,10 @@ LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'Asia/Chita'
 
-USE_I18N = True
 
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
 
 
 # Default primary key field type
@@ -139,5 +292,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  
+]
 
 AUTH_USER_MODEL = 'user.CustomUser'

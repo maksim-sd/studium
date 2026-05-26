@@ -2,7 +2,10 @@ from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.forms import UserChangeForm
+
+from unfold.admin import ModelAdmin
+from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
+
 from .models import Balance, Organization, ExecutorData, CustomUser, UserGroups, Request
 
 
@@ -10,15 +13,18 @@ admin.site.unregister(Group)
 
 
 @admin.register(Organization)
-class OrganizationAdmin(admin.ModelAdmin):
+class OrganizationAdmin(ModelAdmin):
     list_display = ("id", "full_name", "abbreviated_name")
     list_display_links = ("full_name",)
     search_fields = ("full_name", "abbreviated_name")
 
 
 @admin.register(CustomUser)
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(ModelAdmin, UserAdmin):
     form = UserChangeForm
+    add_form = UserCreationForm
+    change_password_form = AdminPasswordChangeForm
+
     
     fieldsets = (
         (None, {"fields": ("email", "password")}),
@@ -58,7 +64,7 @@ class CustomUserAdmin(UserAdmin):
 
 
 @admin.register(UserGroups)
-class UserGroupsAdmin(admin.ModelAdmin):
+class UserGroupsAdmin(ModelAdmin):
     list_display = ("id", "name")
     list_display_links = ("name",)
     filter_horizontal = ('permissions',) 
@@ -72,7 +78,7 @@ class UserGroupsAdmin(admin.ModelAdmin):
 
 
 @admin.register(ExecutorData)
-class ExecutorDataAdmin(admin.ModelAdmin):
+class ExecutorDataAdmin(ModelAdmin):
     list_display = ("id", "executor", "faculty", "specialty", "study_group")
     list_display_links = ("executor",)
     search_fields = ("executor",)
@@ -90,7 +96,7 @@ class ExecutorDataAdmin(admin.ModelAdmin):
 
 
 @admin.register(Balance)
-class BalanceAdmin(admin.ModelAdmin):
+class BalanceAdmin(ModelAdmin):
     list_display = ("id", "executor", "number_of_points")
     list_display_links = ("executor",)
     search_fields = ("executor",)
@@ -107,7 +113,7 @@ class BalanceAdmin(admin.ModelAdmin):
     
 
 @admin.register(Request)
-class RequestAdmin(admin.ModelAdmin):
+class RequestAdmin(ModelAdmin):
     list_display = ("id", "user", "request_status", "created_at")
     list_display_links = ("user",)
     search_fields = ("user", "message")

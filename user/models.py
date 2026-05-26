@@ -49,7 +49,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(unique=True) 
-    organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.CASCADE, verbose_name="Организация")
+    organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.SET_NULL, verbose_name="Организация")
     last_name = models.CharField(max_length=40, verbose_name="Фамилия")
     first_name = models.CharField(max_length=40, verbose_name="Имя")
     patronymic = models.CharField(max_length=80, blank=True, null=True, verbose_name="Отчество")

@@ -72,6 +72,19 @@ class ProjectCompletedOut(Schema):
     comment: str | None = None
 
 
+class ProjectResponseOut(Schema):
+    id: int
+    project_status: str 
+    category_project_id: int | None = None
+    technologies_id: List[int] = []
+    name: str
+    description: str
+    cash_reward: bool
+    number_of_points: int
+    response_comment: str | None = None
+    response_create_at: datetime
+
+
 class ProjectFileOut(Schema):
     id: int
     file: str
@@ -164,7 +177,7 @@ class ChatOut(Schema):
     id: int
     project: ProjectChatOut
     unread_count: int | None = None
-    last_message: LastMessageOut
+    last_message: LastMessageOut | None = None
 
 
 class MessageFileOut(Schema):

@@ -5,15 +5,6 @@ from django.db.models import Case, IntegerField, Max, When
 
 from user.models import CustomUser
 
- 
-STATUS_ORDER = (
-    "IN_PROGRESS",
-    "LOOKING_FOR_EXECUTOR",
-    "UNDER_INSPECTION",
-    "COMPLETED",
-    "CANCELED",
-)
-
 
 class CategoryProject(models.Model):
     name = models.CharField(max_length=60, verbose_name="Наименование")
@@ -40,13 +31,34 @@ class Technology(models.Model):
         ordering = ("name",)
 
 
+class ProjectManager(models.Manager):
+    STATUS_ORDER = (
+        "IN_PROGRESS",
+        "LOOKING_FOR_EXECUTOR",
+        "UNDER_INSPECTION",
+        "COMPLETED",
+        "CANCELED",
+    )
+
+    def ordered_by_status(self):
+        return self.annotate(
+            status_order=Case(
+                *[When(project_status=j, then=i) for i, j in enumerate(self.STATUS_ORDER)],
+                default=len(self.STATUS_ORDER),
+                output_field=IntegerField()
+            )
+        ).order_by("status_order", "-created_at")
+
+
 class Project(models.Model):
+    objects = ProjectManager()
+    
     STATUS_CHOICES = (
         ("UNDER_INSPECTION", "На проверке"),
         ("LOOKING_FOR_EXECUTOR", "Поиск исполнителя"),
         ("IN_PROGRESS", "В работе"),
-        ("COMPLETED", "Завершена"),
-        ("CANCELED", "Отменена")
+        ("COMPLETED", "Завершен"),
+        ("CANCELED", "Отменен")
     )
 
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="customer_projects", verbose_name="Заказчик")
@@ -69,14 +81,6 @@ class Project(models.Model):
     class Meta:
         verbose_name = "Проект"
         verbose_name_plural = "Проекты"
-        ordering = (
-            Case(
-                *[When(project_status=j, then=i) for i, j in enumerate(STATUS_ORDER)],
-                default=len(STATUS_ORDER),
-                output_field=IntegerField()
-            ),
-            "-created_at"
-        )
 
 
 class ChatManager(models.Manager):
@@ -129,7 +133,7 @@ class MessageFiles(models.Model):
         
 class Response(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name="Проект")
-    executor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name="Исполнитель")
+    executor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="executor_responses", verbose_name="Исполнитель")
     comment = models.TextField(null=True, blank=True, verbose_name="Комментарий")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата и время отклика")
 

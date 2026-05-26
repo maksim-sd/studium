@@ -2,26 +2,28 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 
+from unfold.admin import ModelAdmin
+
 from user.models import CustomUser
 from .models import CategoryProduct, Product, Cart, CartProduct, Order, OrderProduct
 
 
 @admin.register(CategoryProduct)
-class CategoryProductAdmin(admin.ModelAdmin):
+class CategoryProductAdmin(ModelAdmin):
     list_display = ("id", "name")
     list_display_links = ("name",)
     search_fields = ("name",)
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ModelAdmin):
     list_display = ("id", "name", "category_product", "stock", "price", "product_status")
     list_display_links = ("name",)
     search_fields = ("name",)
     list_filter = ("category_product", "product_status")
  
 @admin.register(Cart)
-class CartAdmin(admin.ModelAdmin):
+class CartAdmin(ModelAdmin):
     list_display = ("id", "executor")
     list_display_links = ("executor",)
     search_fields = ("executor",)
@@ -38,14 +40,14 @@ class CartAdmin(admin.ModelAdmin):
     
 
 @admin.register(CartProduct)
-class CartProductsAdmin(admin.ModelAdmin):
+class CartProductsAdmin(ModelAdmin):
     list_display = ("id", "cart", "product", "quantity")
     list_display_links = ("cart",)
     search_fields = ("cart", "product")   
  
     
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(ModelAdmin):
     list_display = ("id", "executor", "created_at", "total_amount", "order_status")
     list_display_links = ("executor",)
     search_fields = ("executor",)
@@ -63,7 +65,7 @@ class OrderAdmin(admin.ModelAdmin):
     
 
 @admin.register(OrderProduct)
-class OrderProductsAdmin(admin.ModelAdmin):
+class OrderProductsAdmin(ModelAdmin):
     list_display = ("id", "order", "product", "quantity", "price")
     list_display_links = ("order",)
     search_fields = ("order", "product")

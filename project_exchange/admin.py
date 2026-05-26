@@ -1,31 +1,53 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Case, IntegerField, When
+
+from unfold.admin import ModelAdmin
+
 from .models import CategoryProject, Technology, Project, Chat, ChatMessages, MessageFiles, Feedback, Response, ProjectFiles, ChatUsers
 from user.models import CustomUser
 
 
 @admin.register(CategoryProject)
-class CategoryProjectAdmin(admin.ModelAdmin):
+class CategoryProjectAdmin(ModelAdmin):
     list_display = ("id", "name")
     list_display_links = ("name",)
     search_fields = ("name",)
 
 
 @admin.register(Technology)
-class TechnologyAdmin(admin.ModelAdmin):
+class TechnologyAdmin(ModelAdmin):
     list_display = ("id", "name")
     list_display_links = ("name",)
     search_fields = ("name",)
 
 
 @admin.register(Project)
-class ProjectAdmin(admin.ModelAdmin):
+class ProjectAdmin(ModelAdmin):
     list_display = ("id", "name", "project_status", "category_project", "cash_reward", "created_at")
     list_display_links = ("name",)
     filter_horizontal = ("moderators", "executors", "technologies")
     search_fields = ("name",)
-    list_filter = ("category_project", "project_status") 
+    list_filter = ("category_project", "project_status")
+
+    STATUS_ORDER = (
+        "IN_PROGRESS",
+        "LOOKING_FOR_EXECUTOR",
+        "UNDER_INSPECTION",
+        "COMPLETED",
+        "CANCELED",
+    )    
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(
+            status_order=Case(
+                *[When(project_status=j, then=i) for i, j in enumerate(self.STATUS_ORDER)],
+                default=len(self.STATUS_ORDER),
+                output_field=IntegerField()
+            )
+        ).order_by("status_order", "-created_at") 
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "customer":
@@ -60,28 +82,28 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 @admin.register(Chat)
-class ChatAdmin(admin.ModelAdmin):
+class ChatAdmin(ModelAdmin):
     list_display = ("id", "project")
     list_display_links = ("project",)
     search_fields = ("project",)
     
 
 @admin.register(ChatMessages)
-class ChatMessagesAdmin(admin.ModelAdmin):
+class ChatMessagesAdmin(ModelAdmin):
     list_display = ("id", "chat", "user", "message", "created_at")
     list_display_links = ("chat",)
     search_fields = ("user", "message",)
     
     
 @admin.register(MessageFiles)
-class MessageFilesAdmin(admin.ModelAdmin):
+class MessageFilesAdmin(ModelAdmin):
     list_display = ("id", "chat_message", "file")
     list_display_links = ("chat_message",)
     search_fields = ("chat_message",)
     
    
 @admin.register(Response)
-class ResponseAdmin(admin.ModelAdmin):
+class ResponseAdmin(ModelAdmin):
     list_display = ("id", "project", "executor", "comment", "created_at")
     list_display_links = ("project",)
 
@@ -103,7 +125,7 @@ class ResponseAdmin(admin.ModelAdmin):
     
      
 @admin.register(Feedback)
-class FeedbackAdmin(admin.ModelAdmin):
+class FeedbackAdmin(ModelAdmin):
     list_display = ("id", "project", "number_stars", "comment", "created_at")
     list_display_links = ("project",)
     search_fields = ("project", "comment")
@@ -120,14 +142,14 @@ class FeedbackAdmin(admin.ModelAdmin):
 
 
 @admin.register(ProjectFiles)
-class ProjectFilesAdmin(admin.ModelAdmin):
+class ProjectFilesAdmin(ModelAdmin):
     list_display = ("id", "project", "file")
     list_display_links = ("project",)
     search_fields = ("project",)
 
 
 @admin.register(ChatUsers)
-class ChatUsersAdmin(admin.ModelAdmin):
+class ChatUsersAdmin(ModelAdmin):
     list_display = ("id", "chat", "user", "last_read_message_id")
     list_display_links = ("chat",)
     search_fields = ("user",)
