@@ -50,7 +50,6 @@ function TaskModal ({ onClose, type }) {
                     </div>
                 </div>
             </div>
-            
         </div>
     )   
 }
@@ -75,31 +74,9 @@ function CreateNewTask ({ type }) {
     const [dueDate, setDueDate] = useState('')
     const [selectedFiles, setSelectedFiles] = useState([])
 
-    // const categories = [
-    //     'Автоматизированное рабочее место', 
-    //     'Мобильное приложение',
-    //     'Проектирование базы данных',
-    //     '1С Конфигурация',
-    //     'Десктопное приложение',
-    //     'Модуль 1С',
-    //     'Web-приложение',
-    //     'Чат-бот'
-    // ]
+    const [currentTech, setCurrrentTech] = useState([])
 
-    // const technologies = [
-    //     'Node.js',
-    //     'Django',
-    //     'Python',
-    //     'REST API',
-    //     'Android',
-    //     'HTML5',
-    //     '1C',
-    //     'C#',
-    //     'IOS',
-    //     'CSS',
-    //     'React',
-    //     'Java'
-    // ]
+    const [url, setUrl] = useState('')
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -133,6 +110,7 @@ function CreateNewTask ({ type }) {
                 setCashReward(data.cash_reward)
                 setPointsNumber(data.number_of_points)
                 setDueDate(data.due_date)
+                setCurrrentTech(data.technologies_id)
 
             }
         }
@@ -188,34 +166,72 @@ function CreateNewTask ({ type }) {
         }
     }
 
-    const handleChanges = async (e) => {
-        if (e) {
-            e.preventDefault()
+    const handleCreate = async (e) => {
+        const data = {
+            "category_project_id": category,
+            "technologies_id": technology,
+            "name": name,
+            "description": description,
+            "cash_reward": cashReward,
+            "number_of_points": pointsNumber,
+            "due_date": dueDate
         }
+
+        const formData = new FormData()
+        formData.append('payload', JSON.stringify(data))
+
+        if (selectedFiles && selectedFiles.length > 0) {
+            for (let i = 0; i < selectedFiles.length; i++) {
+                console.log(selectedFiles[i])
+                formData.append('files', selectedFiles[i])
+            }
+        }
+
+        const response = await fetch(`/api/project_exchange/`, {
+			method: 'POST',
+			headers: {
+				'Authorization': `Basic ${user}`,
+			},
+            body: formData
+		})
+
+        if (response.ok) {
+            setIsModalOpen(true)
+        }
+    }
+
+    const handleChanges = async (e) => {
         const data = {
             "new_category_project_id": category,
             "new_name": name,
             "new_technologies_id": technology,
             "new_number_of_points": pointsNumber,
-            "delete_files_id": [
-                0
-            ],
+            "delete_files_id": [],
             "new_due_date": dueDate,
-            "delete_technologies_id": [
-                0
-            ],
+            "delete_technologies_id": currentTech.filter(item => !technology.includes(item)),
             "new_cash_reward": cashReward,
             "new_description": description
         }
 
-        const response = await fetch(`/api/project_exchange/${taskId}/`, {
+        const formData = new FormData()
+        formData.append('payload', JSON.stringify(data))
+
+        if (type === 'moderate') {
+            setUrl(`/api/project_exchange/${taskId}/publish/`)
+        } else {
+            setUrl(`/api/project_exchange/${taskId}/`)
+        }
+
+        const response = await fetch(url, {
 			method: 'PUT',
 			headers: {
 				'Authorization': `Basic ${user}`,
-                'Content-Type': 'application/json',
 			},
-            payload: JSON.stringify(data)
+            body: formData
 		})
+
+        console.log(data) 
+
         if (response.ok) {
             setIsModalOpen(true)
         }
@@ -240,6 +256,9 @@ function CreateNewTask ({ type }) {
                                 onChange={(e) => setName(e.target.value)}
                                 required 
                             />
+                            <div className="text-sm text-gray-500 mt-2.5">
+                                В названии постарайтесь указать основную суть проекта. Например, "Веб-приложение для ветеринарной клиники"
+                            </div>
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
@@ -256,6 +275,9 @@ function CreateNewTask ({ type }) {
                                 onChange={(e) => setDescription(e.target.value)}
                                 required 
                             />
+                            <div className="text-sm text-gray-500 mt-2.5">
+                                Расскажите, какой продукт Вы хотите получить? Какими функциями он должен обладать?
+                            </div>
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
@@ -427,7 +449,7 @@ function CreateNewTask ({ type }) {
                 <div className="mb-5 text-base md:text-lg self-center">
                     <button 
                         className="text-white rounded-md bg-green-700 hover:bg-green-800 active:bg-green-900 cursor-pointer self-center px-8.75 py-3.75 font-bold" 
-                        onClick={handleChanges}
+                        onClick={type === 'create' ? handleCreate : handleChanges}
                     >
                         { text }
                     </button>

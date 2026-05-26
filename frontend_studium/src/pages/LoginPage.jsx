@@ -12,7 +12,7 @@ function LoginPage () {
     const fetchUser = useUserStore((state) => state.fetchUser)
 
     const fetchTechnologies = useTechnologiesStore((state) => state.fetchTechnologies)
-    const fetchCategories = useProjectCategoryStore((state) => state.fetchCategories)
+    const fetchProjectCategories = useProjectCategoryStore((state) => state.fetchCategories)
     const fetchOrganizations = useOrganizationStore((state) => state.fetchOrganizations)
 
     const [email, setEmail] = useState('')
@@ -27,7 +27,7 @@ function LoginPage () {
         if (response) {
             await Promise.all([
                 fetchTechnologies(credentials),
-                fetchCategories(credentials),
+                fetchProjectCategories(credentials),
                 fetchOrganizations(credentials),
             ])
             navigate('/profile')

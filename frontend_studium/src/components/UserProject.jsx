@@ -2,9 +2,6 @@ import { useNavigate } from 'react-router-dom'
 import { useUserStore } from '../store/UserStore'
 import { useTechnologiesStore } from '../store/TechnologiesStore'
 import { useProjectCategoryStore } from '../store/ProjectCategoryStore'
-// import mobile from '../assets/mobile.png'
-// import web from '../assets/web.png'
-// import database from '../assets/database.png'
 import points from '../assets/points-reward.png'
 import money from '../assets/money-reward.png'
 
@@ -12,26 +9,22 @@ function UserProjectCategory ({ category }) {
     const categories = useProjectCategoryStore((state) => state.categories)
     const projectCategory = categories.find(item => item.id === category)
 
+    console.log(projectCategory.icon)
+
     return (
-        <div className="flex justify-baseline text-sm gap-2">
-            <img className='size-8 md:size-10' src={`${projectCategory?.icon}`} alt='' />
+        <div className="flex items-center text-sm gap-2">
+            <img className='size-8 md:size-10 shrink-0' src={projectCategory?.icon} alt='' />
             {projectCategory?.name}
         </div>
     )
-
-    // switch (category) {
-    //     case 'Веб-программирование':
-    //         return <img className='size-8 md:size-10' src={web} alt="" />;
-    //     case 'Мобильная разработка':
-    //         return <img className='size-8 md:size-10' src={mobile} alt="" />;
-    //     case 'Создание и администрирование БД':
-    //         return <img className='size-8 md:size-10' src={database} alt="" />;
-    // }
 }
 
 function UserProjectButton ({ activeTab, project }) {
     const navigate = useNavigate()
     const user = useUserStore((state) => state.currentUserData)
+    const userGroup = useUserStore((state) => state.groups)
+
+    console.log(project)
 
     switch(activeTab) {
         case 'current-projects':
@@ -40,7 +33,7 @@ function UserProjectButton ({ activeTab, project }) {
                     <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-nowrap rounded-md" onClick={() => navigate(`/chats`)}>
                         Перейти к чату
                     </div>
-                    <div className="underline px-3.5 py-1.25 hover:font-medium cursor-pointer hidden md:block" onClick={() => navigate(`/tasks/${project}`)}>
+                    <div className="underline px-3.5 py-1.25 hover:font-medium cursor-pointer hidden md:block" onClick={() => navigate(`/tasks/${project.id}`)}>
                         Посмотреть подробности задачи
                     </div>
                 </div>
@@ -48,8 +41,8 @@ function UserProjectButton ({ activeTab, project }) {
 
         case 'my-responses':
             return (
-                <div className="flex gap-3.75">
-                    <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/tasks/${project}`)}>
+                <div className="flex mt-auto gap-3.75">
+                    <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/tasks/${project.id}`)}>
                         Посмотреть подробности задачи
                     </div>
                 </div>
@@ -58,12 +51,12 @@ function UserProjectButton ({ activeTab, project }) {
         case 'looking-for-executor':
             return (
                 <div className="flex gap-3.75 text-sm">
-                    {user.role !== 'customer' &&
-                        <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/tasks/1/responses`)}>
+                    {userGroup === 'Модератор' &&
+                        <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/tasks/${project.id}/responses`)}>
                             Посмотреть откликнувшихся
                         </div>
                     }
-                    <div className={`${user.role !== 'customer' ? 'underline px-3.5 py-1.25 hover:font-medium cursor-pointer' : 'px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md'}`} onClick={() => navigate(`/tasks/${project}`)}>
+                    <div className={`${userGroup === 'Модератор' ? 'underline px-3.5 py-1.25 hover:font-medium cursor-pointer' : 'px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md'}`} onClick={() => navigate(`/tasks/${project}`)}>
                         Посмотреть подробности задачи
                     </div>
                 </div>
@@ -72,7 +65,7 @@ function UserProjectButton ({ activeTab, project }) {
         case 'under-inspection':
             return (
                 <div className="flex gap-3.75">
-                    <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/tasks/${project}`)}>
+                    <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/tasks/${project.id}`)}>
                         Посмотреть подробности задачи
                     </div>
                 </div>
@@ -81,7 +74,7 @@ function UserProjectButton ({ activeTab, project }) {
         case 'wait-for-inspection':
             return (
                 <div className="flex gap-3.75">
-                    <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/moderate-task/${project}`)}>
+                    <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/moderate-task/${project.id}`)}>
                         Перейти к задаче
                     </div>
                 </div>
@@ -99,18 +92,19 @@ function UserProjectButton ({ activeTab, project }) {
         case 'archived-projects':
             return (
                 <div className="flex gap-3.75 text-sm">
-                    <div className="">
+                    <div className="w-full">
                         <div className="flex justify-between pb-2.5">
                             <div className="font-bold">
-                                Комментарий от заказчика
+                                {userGroup === "Заказчик" ? "Ваш комментарий" : "Комментарий от заказчика"}
                             </div>
                             <div className="">
-                                ⭐⭐⭐⭐⭐
+                                {Array.from({ length: project.number_stars }).map((_, index) => (
+                                    <span>⭐</span>
+                                ))}
                             </div>
                         </div>
-                            
                         <div className="pl-2.5">
-                            Исполнитель выполнил задачу оперативно. Работать с ним было приятно: исполнитель предлагал варианты решения, вносил правки. Реализованный проект находится в эксплуатации.
+                            {project.comment}
                         </div>
                     </div>
                 </div>
@@ -141,10 +135,7 @@ function UserProject ({ project, activeTab }) {
                 {project.author}
             </div> */}
             <div className="flex items-center gap-15 md:gap-10 pb-3 md:pb-6">
-                    {/* <div className="flex justify-baseline text-sm gap-2"> */}
                 <UserProjectCategory category={project.category_project_id} />
-                    {/* {project.category_project_id}
-                </div> */}
                 <div className="flex gap-2">
                     <img className='size-8 md:size-10' src={points} alt="" />
                     <div className="text-sm">
@@ -174,7 +165,7 @@ function UserProject ({ project, activeTab }) {
                 ))}
             </div>
 
-            <UserProjectButton activeTab={activeTab} project={project.id}/>
+            <UserProjectButton activeTab={activeTab} project={project}/>
 
         </div>
     )

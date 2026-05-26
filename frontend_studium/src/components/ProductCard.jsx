@@ -1,22 +1,22 @@
-function ProductCard () {
+function ProductCard ({ item }) {
     return (
-        <div className="flex flex-col gap-2.5 outline outline-gray-200 rounded-md p-5">
-            <div className="flex flex-col gap-2.5 pb-20">
-                <div className="font-bold text-lg">
-                    Наименование товара
+        <div className="flex flex-col outline outline-gray-200 rounded-md p-5">
+            <div className={`w-fit px-3 py-1.25 rounded-md ml-auto ${item.product_status === "В наличии" ? "text-green-700 border-2 border-green-700" : "text-amber-600 border-2 border-amber-600"}`}>
+                {item.product_status}
+            </div>
+            <div className="w-full size-40 items-center text-center">
+                {item.photo ? <img src="" alt="" /> : <div className="text-4xl pt-10">🖼️</div>}
+            </div>
+            <div className="flex flex-col gap-2.5 mt-auto">
+                <div className="font-bold text-base">
+                    {item.name}
                 </div>
-                <div className="">
-                    Короткое, но содержательное описание товара в несколько строк
+                <div className="text-sm">
+                    {item.description}
                 </div>
-            </div>
-            <div className="w-fit px-3 py-1.25 rounded-md text-green-700 border-2 border-green-700">
-                Товар в наличии
-            </div>
-            <div className="font-bold py-2.5 text-lg">
-                $ 20
-            </div>
-            <div className="cursor-pointer w-full py-2.5 rounded-md text-center text-white bg-green-700 hover:bg-green-800 active:bg-green-900">
-                Обменять
+                <div className={`${item.product_status === "В наличии" ? "cursor-pointer text-white bg-green-700 hover:bg-green-800 active:bg-green-900" : "bg-gray-300 "}w-full py-2.5 rounded-md text-center`}>
+                    {item.product_status === "В наличии" ? `Обменять за ${item.price}🪙` : `${item.product_status}`}
+                </div>
             </div>
         </div>
     )

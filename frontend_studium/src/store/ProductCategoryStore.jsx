@@ -1,22 +1,24 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-export const useProjectCategoryStore = create()(persist((set) => ({
+export const useProductCategoryStore = create()(persist((set) => ({
     categories: [],
 
     fetchCategories: async (currentUser) => {
         try {
-            const response = await fetch (`/api/project_exchange/categories/`, {
+            const response = await fetch (`/api/shop/categories/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Basic ${currentUser}`
                 }
             })
             if (!response.ok) {
-                throw new Error('Failed to fetch tags!')
+                throw new Error('Failed to fetch product categories!')
             }
 
             const data = await response.json()
+
+            console.log(data)
 
             set({
                 categories: data,
@@ -30,7 +32,7 @@ export const useProjectCategoryStore = create()(persist((set) => ({
     }
 }),
     {
-        name: 'project-categories-storage',
+        name: 'product-categories-storage',
         getStorage: () => localStorage,
     }
 ))

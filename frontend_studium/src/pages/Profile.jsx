@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { FormatDate } from '../shared/FormatDate'
 import { useUserStore } from '../store/UserStore'
+import { useProductCategoryStore } from '../store/ProductCategoryStore'
 import UserProject from '../components/UserProject'
 
 function Profile () {
@@ -8,40 +10,32 @@ function Profile () {
 
     const user = useUserStore((state) => state.currentUser)
     const userData = useUserStore((state) => state.currentUserData)
+    const userGroup = useUserStore((state) => state.groups)
+    const fetchCategories = useProductCategoryStore((state) => state.fetchCategories)
 
     const [currentProjects, setCurrentProjects] = useState([])
+    const [responsedProjects, setResponsedProjects] = useState([])
     const [futureProjects, setFutureProjects] = useState([])
     const [moderateProjects, setModerateProjects] = useState([])
+    const [underInspectionProjects, setUnderInspectionProjects] = useState([])
     const [archivedProjects, setArchivedProjects] = useState([])
-
-    const project1 = {
-      id: 1,
-      title: "Разработка дашборда аналитики продаж",
-      description: "Разработать адаптивный веб-интерфейс для отображения ключевых метрик (KPI) отдела продаж. Необходимо реализовать динамические графики на основе библиотеки Chart.js, получающие данные через REST API. Бэкенд должен предоставлять эндпоинты для фильтрации данных по дате (сегодня, неделя, месяц) и категориям товаров. Обязательно наличие авторизации через JWT-токены и ролевой модели (администратор видит всё, менеджер — только свой отдел).",
-      author: "Алексей Иванов",
-      technologies: ["React", "Chart.js", "Node.js", "PostgreSQL", "JWT"],
-      category: "Веб-программирование",
-      date_of_publication: "2024-03-15",
-      points_reward: 500,
-      money_reward: 0
-    }
 
     const [activeTab, setActiveTab] = useState('current-projects')
 
     const getTabs = (group) => {
         const tabsMap = {
-            3: [
+            "Исполнитель": [
                 {id: 'current-projects', label: 'Текущие проекты'},
                 {id: 'my-responses', label: 'Мои отклики'},
                 {id: 'archived-projects', label: 'Завершенные проекты'},
             ],
-            2: [
+            "Заказчик": [
                 {id: 'current-projects', label: 'Текущие проекты'},
                 {id: 'looking-for-executor', label: 'Поиск исполнителя'},
                 {id: 'under-inspection', label: 'На модерации'},
                 {id: 'archived-projects', label: 'Завершенные проекты'},
             ],
-            1: [
+            "Модератор": [
                 {id: 'current-projects', label: 'Текущие проекты'},
                 {id: 'looking-for-executor', label: 'Поиск исполнителя'},
                 {id: 'wait-for-inspection', label: 'Проекты для модерации'},
@@ -51,7 +45,7 @@ function Profile () {
         return tabsMap[group]
     }
 
-    const tabs = getTabs(userData.groups_id[0])
+    const tabs = getTabs(userGroup)
 
     const tabContent = {
         'current-projects': (
@@ -62,7 +56,22 @@ function Profile () {
                     </div>
                 ) : (
                     <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
-                        {moderateProjects.map((project) => (
+                        {currentProjects.map((project) => (
+                            <UserProject project={project} activeTab={activeTab} />
+                        ))}
+                    </div>
+                )}
+            </div>
+        ),
+        'my-responses': (
+            <div className="">
+                {responsedProjects.length === 0 ? (
+                    <div className="">
+                        Нет текущих проектов на данный момент
+                    </div>
+                ) : (
+                    <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
+                        {responsedProjects.map((project) => (
                             <UserProject project={project} activeTab={activeTab} />
                         ))}
                     </div>
@@ -73,11 +82,11 @@ function Profile () {
             <div className="">
                 {futureProjects.length === 0 ? (
                     <div className="">
-                        ((()))
+                        На данный момент нет проектов, для которых идет процесс поиска исполнителя
                     </div>
                 ) : (
                     <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
-                        {moderateProjects.map((project) => (
+                        {futureProjects.map((project) => (
                             <UserProject project={project} activeTab={activeTab} />
                         ))}
                     </div>
@@ -99,9 +108,34 @@ function Profile () {
                 )}
             </div>
         ),
+        'under-inspection': (
+            <div className="">
+                {underInspectionProjects.length === 0 ? (
+                    <div className="">
+                        На данный момент нет проектов, нуждающихся в модерации
+                    </div>
+                ) : (
+                    <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
+                        {underInspectionProjects.map((project) => (
+                            <UserProject project={project} activeTab={activeTab} />
+                        ))}
+                    </div>
+                )}
+            </div>
+        ),
         'archived-projects': (
             <div className="">
-
+                {archivedProjects.length === 0 ? (
+                    <div className="">
+                        Нет завершенных проектов на данный момент
+                    </div>
+                ) : (
+                    <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
+                        {archivedProjects.map((project) => (
+                            <UserProject project={project} activeTab={activeTab} />
+                        ))}
+                    </div>
+                )}
             </div>
         )
     }
@@ -112,29 +146,75 @@ function Profile () {
         setActiveTab('current-projects')
 
         async function fetchProjects() {
+            if (!user) return
+
+            if (userGroup === "Модератор") {
+                const responseModeration = await fetch(`/api/project_exchange/moderation/`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Basic ${user}`
+                    }
+                })
+                if (responseModeration.ok) {
+                    const data = await responseModeration.json()
+
+                    setModerateProjects(data.filter((project) => project.project_status === 'На проверке'))
+                    setFutureProjects(data.filter((project) => project.project_status === 'Поиск исполнителя'))
+                }
+            }
+
+            if (userGroup === "Исполнитель") {
+                const responseResponses = await fetch('/api/project_exchange/responses/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Basic ${user}`
+                    }
+                })
+                if (responseResponses.ok) {
+                    const data = await responseResponses.json()
+                    setResponsedProjects(data)
+                }
+            }
+
             const responseActive = await fetch(`/api/project_exchange/active/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Basic ${user}`
+                }
+            })
+            if (responseActive.ok) {
+                const data = await responseActive.json()
+
+                setCurrentProjects(data.filter((project) => project.project_status === 'В работе'))
+                setUnderInspectionProjects(data.filter((project) => project.project_status === 'На проверке'))
+                if (userGroup === "Заказчик") {
+                    setFutureProjects(data.filter((project) => project.project_status === "Поиск исполнителя"))
+                }
+            }
+
+            const responseArchived = await fetch('/api/project_exchange/history/', {
                 method: 'GET',
 				headers: {
 					'Authorization': `Basic ${user}`
 				}
-            })
-            if (responseActive.ok) {
-                const data = await responseActive.json()
-                setCurrentProjects(data)
-            }
-			const responseModeration = await fetch(`/api/project_exchange/moderation/`, {
-				method: 'GET',
-				headers: {
-					'Authorization': `Basic ${user}`
-				}
 			})
-			if (responseModeration.ok) {
-				const data = await responseModeration.json()
-				setModerateProjects(data)
-			}
+            if (responseArchived.ok) {
+                const data = await responseArchived.json()
+                setArchivedProjects(data)
+            }
 		}
+
         fetchProjects()
-    }, [])
+
+        const intervalId = setInterval(() => {
+            if (user) {
+                fetchProjects()
+            }
+        }, 5000)
+
+        return () => clearInterval(intervalId)
+
+    }, [user, userGroup])
 
     return (
         <div className="mx-5 sm:mx-15 lg:mx-62.5">
@@ -147,17 +227,17 @@ function Profile () {
                         <div className="font-bold text-xl md:text-2xl mb-2.5 md:mb-3">
                             {userData.last_name} {userData.first_name} {userData.patronymic}
                         </div>
-                        {userData.groups_id[0] === 3 &&
+                        {userGroup === 'Исполнитель' &&
                             <div className="flex flex-col gap-5">
                                 <div className="text-base text-gray-600">
-                                    Факультет, специальность, группа
+                                    {userData.faculty}, {userData.specialty}, {userData.study_group}
                                 </div>
                                 <div className="text-sm md:text-lg">
-                                    Рейтинг пользователя ⭐
+                                    Рейтинг пользователя: {userData.average_rating}⭐
                                 </div>
                             </div>
                         }
-                        {userData.groups_id[0] === 2 &&
+                        {userGroup === 'Заказчик' &&
                             <div className="px-4 py-2 rounded-md cursor-pointer text-sm md:text-lg bg-green-700 hover:bg-green-800 active:bg-green-900 text-center text-white mt-5"
                                 onClick={() => navigate('/create-new-task')}>
                                 Создать новую задачу
@@ -165,7 +245,7 @@ function Profile () {
                         }
                     </div>
                     <div className="text-gray-400">
-                        Последний логин: dd.mm.YYYY
+                        Последний логин: {FormatDate(userData.last_login)}
                     </div>
                 </div>
             </div>
@@ -188,12 +268,6 @@ function Profile () {
                 </div>
                 <div className="p-4">
                     {tabContent[activeTab]}
-                    <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
-                        
-                        {/* <UserProject project={project} activeTab={activeTab} />
-                        <UserProject project={project} activeTab={activeTab} />
-                        <UserProject project={project} activeTab={activeTab} /> */}
-                    </div>
                 </div>
             </div>
         </div>

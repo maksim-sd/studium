@@ -1,5 +1,6 @@
-import { useState } from "react"
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from "react"
+import { useNavigate, useParams } from 'react-router-dom'
+import { useUserStore } from "../store/UserStore"
 import ResponseCard from "../components/ResponseCard"
 
 function ConfirmationModal ({onClose}) {
@@ -35,33 +36,118 @@ function ConfirmationModal ({onClose}) {
 }
 
 function Responses () {
+    const user = useUserStore((state) => state.currentUser)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const navigate = useNavigate()
-    // const closeModal = () => setIsModalOpen(false)
+    const { taskId } = useParams()
+
+    const [projectName, setProjectName] = useState('')
+    const [responses, setRepsonses] = useState([])
 
     const closeModal = () => {
         setIsModalOpen(false)
         navigate('/profile')
     }
 
+    const [selectedResponses, setSelectedResponses] = useState([])
+
+    const handleSelect = (responseId, isSelected) => {
+        if (isSelected) {
+            setSelectedResponses([...selectedResponses, responseId])
+        } else {
+            setSelectedResponses(selectedResponses.filter(id => id !== responseId))
+        }
+    }
+
+    const handleConfirm = async (e) => {
+        if (e) {
+            e.preventDefault()
+        }
+
+        const payload = {
+            responses_id: selectedResponses,
+        }
+
+        if (selectedResponses) {
+            try {
+                const response = await fetch(`/api/project_exchange/${taskId}/responses/appoint/`, {
+                    method: "POST",
+                    headers: {
+                        'Authorization': `Basic ${user}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                })
+                if (response.ok) {
+                    setIsModalOpen(true)
+                } else {
+                    throw new Error(response.statusText)
+                }
+            } catch (error) {
+                if (error.message === 'Bad Request') {
+                    alert('Недопустимое количество исполнителей')
+                }
+            }
+        }
+    }
+
+    useEffect(() => {
+        async function fetchProject() {
+            const response = await fetch(`/api/project_exchange/${taskId}/`, {
+              method: 'GET',
+              headers: {
+                'Authorization': `Basic ${user}`
+              }
+            })
+            if (response.ok) {
+              const data = await response.json()
+              setProjectName(data.name)
+            }
+        }
+        if (taskId) {
+            fetchProject()
+        }
+    }, [taskId])
+
+    useEffect(() => {
+        async function fetchResponses() {
+            const response = await fetch(`/api/project_exchange/${taskId}/responses/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Basic ${user}`
+                }
+            })
+            if (response.ok) {
+                const data = await response.json()
+                setRepsonses(data)
+            }
+        }
+        fetchResponses()
+    }, [])
+
     return (
         <>
         <div className="mx-5 md:mx-62.5">
             <div className="text-2xl md:text-3xl font-bold">
-                Отклики к задаче Разработка программного приложения
+                Отклики к задаче {projectName}
                 <div className="font-normal text-lg md:text-xl pt-3.75 mb-10 text-black">
                     Выберите студентов, которых готовы назначить исполнителями 
                 </div>
             </div>
             <div className="grid 2xl:grid-cols-2 gap-5 md:gap-7.5 xl:grid-cols-1 pb-7">
-                <ResponseCard />
-                <ResponseCard />
-                <ResponseCard />
+                {responses.map((response) => (
+                    <ResponseCard 
+                        key={response.id}
+                        data={response} 
+                        isSelected={selectedResponses.includes(response.id)}
+                        onSelect={handleSelect}
+                    />
+                ))}
             </div>
             <div className="mx-auto w-max pb-5">
                 <div 
                     className="px-9 py-3 cursor-pointer rounded-md bg-green-700 hover:bg-green-800 active:bg-green-900 text-white text-base md:text-lg font-bold"
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={handleConfirm}
                 >
                     Утвердить исполнителей
                 </div>

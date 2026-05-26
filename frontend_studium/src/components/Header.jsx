@@ -1,20 +1,52 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUserStore } from '../store/UserStore'
 
-function NavigationPanel ({ userRole }) {
+function NavigationPanel () {
     const navigate = useNavigate()
     const logoutUser = useUserStore((state) => state.logoutUser)
+    const user = useUserStore((state) => state.currentUserData)
+    const userData = useUserStore((state) => state.currentUser)
+    const userGroup = useUserStore((state) => state.groups)
 
     const [isOpen, setIsOpen] = useState(false)
 
+    const [balance, setBalance] = useState(0)
+
     const handleLogout = (event) => {
         event.preventDefault()
-
         logoutUser()
-
         navigate('/login')
     }
+
+    useEffect(() => {
+        async function fetchBalance() {
+            if (!userData) return
+
+            const response = await fetch('/api/user/balance/', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Basic ${userData}`,
+                }
+            })
+            if (response.ok) {
+                const data = await response.json()
+                setBalance(data.number_of_points)
+            }
+        }
+
+        if (userGroup === "Исполнитель") {
+            fetchBalance()
+        }
+
+        const intervalId = setInterval(() => {
+            if (userGroup === "Исполнитель") {
+                fetchBalance()
+            }
+        }, 300000)
+
+        return () => clearInterval(intervalId)
+    }, [userGroup, userData])
 
     return (
         <nav className="flex w-full justify-between items-center">
@@ -27,13 +59,15 @@ function NavigationPanel ({ userRole }) {
                     <a href="/profile" className="hover:text-green-700">Профиль</a>
                     <a href="/tasks" className="hover:text-green-700">Проекты</a>
                     <a href="/chats" className='hover:text-green-700'>Чаты</a>
-                    {userRole === '3' &&
+                    {userGroup === 'Исполнитель' &&
                         <a href="/studium-store" className='hover:text-green-700'>Магазин</a>
                     }
                 </div>
 
                 <div className="flex gap-7">
-                    $ 0
+                    <div title='Баланс пользователя во внутренней валюте' className={`${userGroup === "Исполнитель" ? '' : 'hidden'}`}>
+                        {balance}🪙
+                    </div>
                     <div onClick={handleLogout} className="text-red-600 font-bold cursor-pointer">
                         ➜]
                     </div>
@@ -62,7 +96,6 @@ function NavigationPanel ({ userRole }) {
 function Header () {
     const isAuth = useUserStore((state) => state.isAuth)
     const user = useUserStore((state) => state.currentUserData)
-    
 
     return (
         <header className="h-12.5 md:px-26 px-5 flex mb-12.5 sticky top-0 z-1000 bg-white outline outline-gray-300">
@@ -73,7 +106,7 @@ function Header () {
             }
 
             {isAuth && 
-                <NavigationPanel userRole={user.groups_id[0]} />
+                <NavigationPanel />
             }
         </header>
     )

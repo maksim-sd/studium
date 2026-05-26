@@ -23,6 +23,7 @@ import { UserProvider } from './userContext.jsx'
 function ProtectedRoute ({ allowedRoles }) {
   const isAuth = useUserStore((state) => state.isAuth)
   const user =  useUserStore((state) => state.currentUserData)
+  const userGroup = useUserStore((state) => state.groups)
 
   if (!isAuth) {
     return (
@@ -30,9 +31,7 @@ function ProtectedRoute ({ allowedRoles }) {
     )
   } 
   
-  if (!allowedRoles.includes(user?.groups_id[0])) {
-    console.log(user?.groups_id[0])
-    console.log(allowedRoles)
+  if (!allowedRoles.includes(userGroup)) {
     return (
       <Navigate to='/page-not-found' replace />
     )
@@ -49,26 +48,26 @@ function App() {
       <Routes>
         <Route path='/login' element={ <LoginPage /> }/>
         <Route path='/page-not-found' element={ <PageNotFound /> }/>
-        <Route element={<ProtectedRoute allowedRoles={[3, 2, 1]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["Модератор", "Заказчик", "Исполнитель"]} />}>
           <Route path='/profile' element={ <Profile /> }/>
           <Route path='/tasks' element={ <Tasks /> }/>
           <Route path='/tasks/:taskId' element={ <Task /> }/>
           <Route path='/chats' element={ <Chats /> }/>
-          <Route path='/chats/:chatId'/>
+          <Route path='/chats/:chatId' element={ <Chats /> }/>
           <Route path='/help-us-become-better' element={ <HelpUsBecomBetter /> }/>
           <Route path='*' element={ <PageNotFound /> }/>
         </Route>
-        <Route element={<ProtectedRoute allowedRoles={[3]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["Исполнитель"]} />}>
           <Route path='/studium-store' element={ <Shop /> }/>
           <Route path='/order-story' element={ <OrdersPage /> }/>
         </Route>
-        <Route element={<ProtectedRoute allowedRoles={[1, 2]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["Модератор", "Заказчик"]} />}>
           <Route path='/tasks/:taskId/edit' element={ <CreateNewTask type='edit' /> }/>
         </Route>
-        <Route element={<ProtectedRoute allowedRoles={[2]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["Заказчик"]} />}>
           <Route path='/create-new-task' element={ <CreateNewTask type='create' /> }/>
         </Route>
-        <Route element={<ProtectedRoute allowedRoles={[1]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["Модератор"]} />}>
           <Route path='/tasks/:taskId/responses' element={ <Responses /> }/>
           <Route path='/moderate-task/:taskId' element={ <CreateNewTask type='moderate' /> }/>
           <Route path='/tasks/:taskId/edit-users' element={ <EditUsers /> }/>

@@ -1,5 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from 'react-router-dom'
+import { useUserStore } from "../store/UserStore"
+import { useProductCategoryStore } from "../store/ProductCategoryStore"
 import ProductCard from '../components/ProductCard'
 
 function ConfirmationModal ({onClose}) {
@@ -104,6 +106,11 @@ function ConfirmationModal ({onClose}) {
 
 function Shop() {
     const navigate = useNavigate()
+    const user = useUserStore((state) => state.currentUser)
+
+    const [categories, setCategories] = useState([])
+    const [products, setProducts] = useState([])
+    const [balance, setBalance] = useState(0)
 
     const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -111,13 +118,49 @@ function Shop() {
         setIsModalOpen(false)
     }
 
-    const technologies = [
-        'Одежда',
-        'Канцелярия',
-        'Учебная литература',
-        'Электроника',
-        'Кружки',
-    ]
+    useEffect(() => {
+        async function fetchBalance() {
+            const response = await fetch('/api/user/balance/', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Basic ${user}`,
+                }
+            })
+            if (response.ok) {
+                const data = await response.json()
+                setBalance(data.number_of_points)
+            }
+        }
+
+        async function fetchUsers() {
+            try {
+                const [responseCategories, responseProducts] = await Promise.all([
+                    fetch(`/api/shop/categories/`, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Basic ${user}` }
+                    }),
+                    fetch(`/api/shop/products/`, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Basic ${user}` }
+                    })
+                ])
+                if (responseCategories.ok && responseProducts.ok) {
+                    const dataCategories = await responseCategories.json()
+                    const dataProducts = await responseProducts.json()
+                        
+                    setCategories(dataCategories)
+                    setProducts(dataProducts)
+                } else {
+                    console.error('Ошибка при получении данных')
+                }
+            } catch (error) {
+                console.error('Ошибка при получении данных')
+            }
+        }
+
+        fetchBalance()
+        fetchUsers()
+    }, [])
 
     return (
         <>
@@ -128,7 +171,7 @@ function Shop() {
                             Обмен внутренней валюты
                         </div>
                         <div className="text-2xl text-nowrap">
-                            $ 0
+                            🪙{balance}
                         </div>
                     </div>
                     <div className="flex flex-row-reverse self-start md:flex-row md:items-center gap-10">
@@ -148,22 +191,19 @@ function Shop() {
                     
                 </div>
                 <div className="pb-5 w-full flex gap-2.5 flex-wrap">
-                    {technologies.map((technology, index) => (
+                    {categories.map((category) => (
                         <div className="relative block">
-                            <input type="checkbox" name="technology" id={`technology${index}`} className="peer absolute left-0 -z-1 opacity-0 checked:bg-gray-600" />
-                            <label htmlFor={`technology${index}`} className="cursor-pointer px-3 md:px-3.5 py-1.5 rounded-[50px] font-normal inline-block relative mb-0 bg-gray-200 hover:bg-gray-300 peer-checked:bg-white peer-checked:outline-2 peer-checked:outline-green-600">
-                                {technology}
+                            <input type="checkbox" name="category" id={`category${category.id}`} className="peer absolute left-0 -z-1 opacity-0 checked:bg-gray-600" />
+                            <label htmlFor={`category${category.id}`} className="cursor-pointer px-3 md:px-3.5 py-1.5 rounded-[50px] font-normal inline-block relative mb-0 bg-gray-200 hover:bg-gray-300 peer-checked:bg-white peer-checked:outline-2 peer-checked:outline-green-600">
+                                {category.name}
                             </label>
                         </div>
                     ))}
                 </div>
                 <div className="grid md:grid-cols-4 gap-5">
-                    <ProductCard />
-                    <ProductCard />
-                    <ProductCard />
-                    <ProductCard />
-                    <ProductCard />
-                    <ProductCard />
+                    {products.map((item) => (
+                        <ProductCard item={item} />
+                    ))}
                 </div>
             </div>
 

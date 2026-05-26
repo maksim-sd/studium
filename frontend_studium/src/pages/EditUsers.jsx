@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useUserStore } from '../store/UserStore'
 
 function AskModal ({ onClose }) {
     return (
@@ -34,26 +35,10 @@ function AskModal ({ onClose }) {
     )   
 }
 
-function PaginatedTable ({ type }) {  
+function PaginatedTable ({ type, data, onAddUser, participants }) {  
     const [selectedUsers, setSelectedUsers] = useState(new Set())
 
-    const [testData, setTestData] = useState([
-        { id: 1, name: 'Someone A', faculty: 'ЭФ', speciality: 'Software Developer', group: 'ПИ-22' },
-        { id: 2, name: 'Someone B', faculty: 'ФФКиС', speciality: 'Product Manager', group: 'ПИ-23' },
-        { id: 3, name: 'Someone C', faculty: 'ЭФ', speciality: 'UI/UX Designer', group: 'ПИ-24' },
-        { id: 4, name: 'Someone D', faculty: 'ГФ', speciality: 'Project Manager', group: 'ПИ-25' },
-        { id: 5, name: 'Someone E', faculty: 'ГФ', speciality: 'Engineer', group: 'ПИ-22' },
-        { id: 6, name: 'Someone F', faculty: 'ИФФ', speciality: 'Data Scientist', group: 'ПИ-27' },
-        { id: 7, name: 'Someone G', faculty: 'МФПиБ', speciality: 'Scientist', group: 'ПИ-16' },
-        { id: 8, name: 'Someone H', faculty: 'МФПиБ', speciality: 'Architect', group: 'ПИ-45' },
-        { id: 9, name: 'Someone I', faculty: 'ИФФ', speciality: 'Manager', group: 'ПИ-34' },
-        { id: 10, name: 'Someone J', faculty: 'ГФ', speciality: 'HR Specialist', group: 'ПИ-34' },
-        { id: 11, name: 'Someone K', faculty: 'МФПиБ', speciality: 'Data Scientist', group: 'ПИ-78' },
-        { id: 12, name: 'Someone L', faculty: 'ГФ', speciality: 'Scientist', group: 'ПИ-22' },
-        { id: 13, name: 'Someone M', faculty: 'ИФФ', speciality: 'Architect', group: 'ПИ-33' },
-        { id: 14, name: 'Someone N', faculty: 'МФПиБ', speciality: 'Manager', group: 'ПИ-55' },
-        { id: 15, name: 'Someone O', faculty: 'ИФФ', speciality: 'HR Specialist', group: 'ПИ-77' },
-    ])
+    const { taskId } = useParams()
 
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +48,7 @@ function PaginatedTable ({ type }) {
 
     const [sortConfig, setSortConfig] = useState({ key: 'id', direction: 'ascending' });
 
-    const sortedData = [...testData].sort((a, b) => {
+    const sortedData = [...data].sort((a, b) => {
         if (sortConfig !== null) {
             const { key, direction } = sortConfig;
             if (a[key] < b[key]) {
@@ -126,13 +111,13 @@ function PaginatedTable ({ type }) {
                             const isChecked = selectedUsers.has(person.id)
                             return (
                                 <tr key={person.id} className="hover:bg-gray-100 text-sm">
-                                    <td className="border border-gray-300 px-6 py-3">{person.name}</td>
+                                    <td className="border border-gray-300 px-6 py-3">{person.last_name} {person.first_name} {person.patronymic}</td>
                                     {/* <td className="border border-gray-300 px-6 py-3">{person.faculty}</td>
                                     <td className="border border-gray-300 px-6 py-3">{person.speciality}</td> */}
-                                    <td className="border border-gray-300 px-6 py-3">{person.group}</td>
+                                    <td className="border border-gray-300 px-6 py-3">{person.study_group}</td>
                                     <td className="border border-gray-300 px-6 py-3 text-center">
                                         <button key={person.id} 
-                                            onClick={() => toggleUser(person.id)} 
+                                            onClick={() => onAddUser(person.id, "executor")} 
                                             className={`w-23.5 h-7 flex justify-center items-center cursor-pointer px-3 py-1.5 rounded-md ${
                                                 isChecked ? "box-border border-2 border-red-600 hover:border-red-700" : 'text-white bg-green-700 hover:bg-green-800'}`}
                                         >
@@ -150,10 +135,10 @@ function PaginatedTable ({ type }) {
                             const isChecked = selectedUsers.has(person.id)
                             return (
                                 <tr key={person.id} className="hover:bg-gray-50 text-sm">
-                                    <td className="border border-gray-300 px-6 py-3">{person.name}</td>
+                                    <td className="border border-gray-300 px-6 py-3">{person.last_name} {person.first_name} {person.patronymic}</td>
                                     <td className="border border-gray-300 px-6 py-3">
                                         <button key={person.id} 
-                                            onClick={() => toggleUser(person.id)} 
+                                            onClick={() => onAddUser(person.id, "moderator")} 
                                             className={`w-23.5 h-7 flex justify-center items-center cursor-pointer px-3 py-1.5 rounded-md ${
                                                 isChecked ? "box-border border-2 border-red-600 hover:border-red-700" : 'text-white bg-green-700 hover:bg-green-800'}`}
                                         >
@@ -167,7 +152,6 @@ function PaginatedTable ({ type }) {
                 }    
             </table>
 
-            {/* Pagination Controls */}
             <div className="flex justify-between items-center mt-auto">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
@@ -177,11 +161,11 @@ function PaginatedTable ({ type }) {
                     Назад
                 </button>
                 <div className="text-gray-700">
-                    Страница {currentPage} из {Math.ceil(testData.length / itemsPerPage)}
+                    Страница {currentPage} из {Math.ceil(data.length / itemsPerPage)}
                 </div>
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === Math.ceil(testData.length / itemsPerPage)}
+                    disabled={currentPage === Math.ceil(data.length / itemsPerPage)}
                     className="px-4 py-2 bg-green-700 text-white rounded-lg shadow hover:bg-green-800 disabled:opacity-50 cursor-pointer"
                 >
                     Далее
@@ -193,11 +177,60 @@ function PaginatedTable ({ type }) {
 
 function EditUsers () {
     const navigate = useNavigate()
+    const user = useUserStore((state) => state.currentUser)
+
+    const [participants, setParticipants] = useState([])
+
+    const [moderators, setModerators] = useState([])
+    const [executors, setExecutors] = useState([])
+
+    const { taskId } = useParams()
 
     const [isModalOpen, setIsModalOpen] = useState(false)
 
     const closeModal = () => {
         setIsModalOpen(false)
+    }
+
+    const handleAddUser = async (userId, group) => {
+        try {
+            const response = await fetch(`/api/project_exchange/${taskId}/${group}/${userId}/`, {
+                method: 'POST', 
+                headers: {
+                    'Authorization': `Basic ${user}`
+                }
+            })
+            if (!response.ok) {
+                console.error('Ошибка при добавлении')
+            }
+        } catch (error) {
+            console.error('Ошибка при обращении к серверу')
+        }
+    }
+
+    const handleDeleteUser = async (userId) => {
+        if (!window.confirm("Вы уверены, что хотите удалить этого пользователя?")) return
+
+        try {
+            const response = await fetch(`/api/project_exchange/${taskId}/user/${userId}/`, {
+                method: 'DELETE', 
+                headers: {
+                    'Authorization': `Basic ${user}`
+                }
+            })
+            if (response.ok) {
+                setParticipants(prevParticipants => ({
+                    ...prevParticipants, 
+                    moderators: prevParticipants.moderators.filter(person => person.id !== userId),
+                    executors: prevParticipants.executors.filter(person => person.id !== userId),
+                }))
+                // notification?
+            } else {
+                alert('Не удалось удалить пользователя')
+            }
+        } catch (error) {
+            console.error(error.message)
+        }
     }
 
     const [activeTab, setActiveTab] = useState('tab1')
@@ -209,18 +242,75 @@ function EditUsers () {
 
     const tabContent = {
         tab1: (
-            <PaginatedTable type={'exec'} />
+            <PaginatedTable type={'exec'} data={executors} onAddUser={handleAddUser} participants={participants} />
         ),
         tab2: (
-            <PaginatedTable type={'moder'} />
+            <PaginatedTable type={'moder'} data={moderators} onAddUser={handleAddUser} participants={participants} />
         )
     }
+
+    useEffect(() => {
+        async function fetchParticipants() {
+            const response = await fetch(`/api/project_exchange/${taskId}/participants/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Basic ${user}`
+                }
+            })
+            if (response.ok) {
+                const data = await response.json()
+                setParticipants(data)
+            }
+        }
+
+        async function fetchUsers() {
+            try {
+                const [responseExec, responseModers] = await Promise.all([
+                    fetch(`/api/project_exchange/${taskId}/executors/`, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Basic ${user}` }
+                    }),
+                    fetch(`/api/project_exchange/${taskId}/moderators/`, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Basic ${user}` }
+                    })
+                ])
+                if (responseExec.ok && responseModers.ok) {
+                    const dataExec = await responseExec.json()
+                    const dataModer = await responseModers.json()
+                        
+                    setExecutors(dataExec)
+                    setModerators(dataModer)
+                } else {
+                    console.error('Ошибка при получении данных')
+                }
+            } catch (error) {
+                console.error('Ошибка при получении данных')
+            }
+        }
+
+        if (taskId && user) {
+            fetchParticipants()
+            fetchUsers()
+        }
+
+        const intervalId = setInterval(() => {
+            if (taskId && user) {
+                fetchParticipants()
+                fetchUsers()
+            }
+        }, 5000)
+
+        return () => clearInterval(intervalId)
+        
+    }, [user, taskId])
 
     return (
         <>
             <div className="mx-62.5 min-h-[85vh]">
                 <div className="text-3xl font-semibold pb-10">
-                    Изменить состав участников проекта Разработка программного приложения
+                    Изменить состав участников проекта
+                    {/* Изменить состав участников проекта Разработка программного приложения */}
                 </div>
                 <div className="flex gap-10">
                     <div className="basis-3/4">
@@ -246,7 +336,7 @@ function EditUsers () {
                                 
                             </div>
                         </div>
-                        <div class="overflow-x-auto">
+                        <div className="overflow-x-auto">
                             {tabContent[activeTab]}
                         </div>
                     </div>
@@ -259,57 +349,37 @@ function EditUsers () {
                                 <div className="border-b border-gray-400 pb-2.5">
                                     Заказчик:
                                     <div className="pl-2.5 py-4 text-sm">
-                                        [Фамилия Имя заказчика]
+                                        {participants.customer?.last_name} {participants.customer?.first_name}
                                     </div>
                                 </div>
                                 <div className="border-b border-gray-400 pt-5 pb-2.5">
                                     Модераторы:
                                     <ul className='pl-2.5 text-sm'>
-                                        <li className='flex justify-between py-4'>
-                                            <div className="">
-                                                Модератор Модераторов
-                                            </div>
-                                            <div onClick={() => setIsModalOpen(true)} className="cursor-pointer">
-                                                ❌
-                                            </div>
-                                        </li>
-                                        <li className='flex justify-between py-4'>
-                                            <div className="">
-                                                Модератор Модераторов
-                                            </div>
-                                            <div onClick={() => setIsModalOpen(true)} className="cursor-pointer">
-                                                ❌
-                                            </div>
-                                        </li>
+                                        {participants.moderators?.map((person) => (
+                                            <li key={person.id} className='flex justify-between py-4'>
+                                                <div className="">
+                                                    {person.last_name} {person.first_name}
+                                                </div>
+                                                <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer`}>
+                                                    ❌
+                                                </div>
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
                                 <div className="pt-5 pb-2.5">
                                     Исполнители:
                                     <ul className='pl-2.5 text-sm'>
-                                        <li className='flex justify-between py-4'>
-                                            <div className="">
-                                                Исполнитель Исполнителов
-                                            </div>
-                                            <div onClick={() => setIsModalOpen(true)} className="cursor-pointer">
-                                                ❌
-                                            </div>
-                                        </li>
-                                        <li className='flex justify-between py-4'>
-                                            <div className="">
-                                                Исполнитель Исполнителов
-                                            </div>
-                                            <div onClick={() => setIsModalOpen(true)} className="cursor-pointer">
-                                                ❌
-                                            </div>
-                                        </li>
-                                        <li className='flex justify-between py-4'>
-                                            <div className="">
-                                                Исполнитель Исполнителов
-                                            </div>
-                                            <div onClick={() => setIsModalOpen(true)} className="cursor-pointer">
-                                                ❌
-                                            </div>
-                                        </li>
+                                        {participants.executors?.map((person) => (
+                                            <li className='flex justify-between py-4'>
+                                                <div className="">
+                                                    {person.last_name} {person.first_name}
+                                                </div>
+                                                <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer`}>
+                                                    ❌
+                                                </div>
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
                             </div>

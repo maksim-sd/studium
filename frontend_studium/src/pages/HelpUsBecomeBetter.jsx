@@ -1,7 +1,34 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import OfferCard from "../components/OfferCard"
+import { useUserStore } from "../store/UserStore"
 
-function OfferModal ({ onClose }) {
+function OfferModal ({ user, onClose }) {
+    const [offerText, setOfferText] = useState('')
+
+    const handleOfferSend = async () => {
+        const data = {
+            'message': offerText,
+        }
+
+        try {
+            const response = await fetch(`/api/user/request/`, {
+                method: 'POST', 
+                headers: {
+                    'Authorization': `Basic ${user}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data) 
+            })
+            if (response.ok) {
+                onClose()
+            } else {
+                alert('Не удалось отправить предложение')
+            }
+        } catch (error) {
+            console.error(error.message)
+        }
+    }
+
     return (
         <div className="fixed top-0 left-0 w-full h-full z-9999 bg-black/50">
             <div className="w-[90%] md:w-[35%] absolute top-[50%] left-[50%] translate-[-50%]">
@@ -18,9 +45,9 @@ function OfferModal ({ onClose }) {
                         Оставьте обращение к администраторам с предложениями по улучшению платформы и ее функций!
                     </div>
                     <div className="text-sm">
-                        <textarea placeholder='Ваше обращение...' className='p-1.25 w-full h-37.5 rounded-md outline outline-gray-200 focus:outline-green-700' name="" id=""></textarea>
+                        <textarea value={offerText} onChange={(e) => setOfferText(e.target.value)} placeholder='Ваше обращение...' className='p-1.25 w-full h-37.5 rounded-md outline outline-gray-200 focus:outline-green-700' name="" id=""></textarea>
                     </div>
-                    <div className="text-base md:text-lg cursor-pointer rounded-md self-center text-white bg-green-700 hover:bg-green-800 active:bg-green-900 px-6 py-1.5" onClick={onClose}>
+                    <div className="text-base md:text-lg cursor-pointer rounded-md self-center text-white bg-green-700 hover:bg-green-800 active:bg-green-900 px-6 py-1.5" onClick={() => handleOfferSend()}>
                         Отправить
                     </div>
                 </div>
@@ -31,11 +58,33 @@ function OfferModal ({ onClose }) {
 }
 
 function HelpUsBecomBetter () {
+    const user = useUserStore((state) => state.currentUser)
     const [isModalOpen, setIsModalOpen] = useState(false)
+
+    const [requests, setRequests] = useState([])
 
     const closeModal = () => {
         setIsModalOpen(false)
     }
+
+    useEffect(() => {
+        async function fetchRequests() {
+            const response = await fetch('/api/user/requests/', {
+                method: 'GET', 
+                headers: {
+                    'Authorization': `Basic ${user}`,
+                    'Content-Type': 'application/json'
+                },
+            })
+            if (response.ok) {
+                const data = await response.json()
+                setRequests(data)
+            } else (
+                console.error("Ошибка получения обращений")
+            )
+        }
+        fetchRequests()
+    }, [])
 
     return (
         <>
@@ -58,14 +107,14 @@ function HelpUsBecomBetter () {
                         История обращений
                     </div>
                     <div className="flex flex-col gap-5">
-                        <OfferCard />
-                        <OfferCard />
-                        <OfferCard />
+                        {requests.map((request) => (
+                            <OfferCard request={request} />
+                        ))}
                     </div>
                 </div>
             </div>
 
-            {isModalOpen && <OfferModal onClose={closeModal} />}
+            {isModalOpen && <OfferModal user={user} onClose={closeModal} />}
 
         </>
     )

@@ -1,10 +1,11 @@
 import { useState } from "react"
+import { FormatDate } from "../shared/FormatDate"
 
-function ResponseCard () {
+function ResponseCard ({ data, isSelected, onSelect }) {
     const [buttonState, setButtonState] = useState(false)
 
     const toggle = () => {
-        setButtonState(!buttonState)
+        onSelect(data.id, !isSelected)
     }
 
     return (
@@ -29,7 +30,7 @@ function ResponseCard () {
                     Текст отклика:
                 </div>
                 <div className="basis-3/4 min-h-17.75">
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes mus...
+                    {data?.comment}
                 </div>
             </div>
             <div className="flex gap-2.5 text-sm mt-2.5">
@@ -37,7 +38,7 @@ function ResponseCard () {
                     Откликнулся:
                 </div>
                 <div className="basis-3/4">
-                    01.01.2001 в 00:00
+                    {FormatDate(data?.created_at)}
                 </div>
             </div>
             <div className="mt-6.25 flex gap-7.5 justify-end items-center">
@@ -47,8 +48,8 @@ function ResponseCard () {
                 {/* <div className="bg-gray-500 px-5 py-3.75 hover:bg-gray-600 cursor-pointer" onClick={toggle}>
                         Назначить исполнителем
                 </div> */}
-                <div className={`px-5 py-3 rounded-md cursor-pointer border-3 ${buttonState ? 'bg-white border-green-700' : 'bg-green-700 hover:bg-green-800 text-white border-transparent'}`} onClick={toggle}>
-                    {buttonState ? 'Выбран исполнителем' : 'Выбрать исполнителем'}
+                <div className={`px-5 py-3 rounded-md cursor-pointer border-3 ${isSelected ? 'bg-white border-green-700' : 'bg-green-700 hover:bg-green-800 text-white border-transparent'}`} onClick={toggle}>
+                    {isSelected ? 'Выбран исполнителем' : 'Выбрать исполнителем'}
                 </div>
             </div>
         </div>
