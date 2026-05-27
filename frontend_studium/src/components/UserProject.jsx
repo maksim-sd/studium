@@ -24,8 +24,6 @@ function UserProjectButton ({ activeTab, project }) {
     const user = useUserStore((state) => state.currentUserData)
     const userGroup = useUserStore((state) => state.groups)
 
-    console.log(project)
-
     switch(activeTab) {
         case 'current-projects':
             return (

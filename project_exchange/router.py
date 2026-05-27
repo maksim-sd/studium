@@ -907,7 +907,8 @@ def get_chat_messages(request, id_chat:int = Path(..., description="ID чата"
         raise HttpError(403, "Недостаточно прав")
     chat_messages = ChatMessages.objects.filter(chat=chat).prefetch_related("files")
     chat_user, _ = ChatUsers.objects.get_or_create(chat=chat, user=user)
-    chat_user.last_read_message_id = chat_messages.last().id
+    if chat_messages.last():
+        chat_user.last_read_message_id = chat_messages.last().id
     chat_user.save()
     messages = [
         ChatMessageOut(

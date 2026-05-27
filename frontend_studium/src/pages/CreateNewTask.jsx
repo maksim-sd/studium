@@ -182,7 +182,6 @@ function CreateNewTask ({ type }) {
 
         if (selectedFiles && selectedFiles.length > 0) {
             for (let i = 0; i < selectedFiles.length; i++) {
-                console.log(selectedFiles[i])
                 formData.append('files', selectedFiles[i])
             }
         }
@@ -230,7 +229,6 @@ function CreateNewTask ({ type }) {
             body: formData
 		})
 
-        console.log(data) 
 
         if (response.ok) {
             setIsModalOpen(true)

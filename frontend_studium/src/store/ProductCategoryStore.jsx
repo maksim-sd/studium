@@ -18,8 +18,6 @@ export const useProductCategoryStore = create()(persist((set) => ({
 
             const data = await response.json()
 
-            console.log(data)
-
             set({
                 categories: data,
             })

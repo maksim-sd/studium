@@ -230,8 +230,6 @@ function ProjectManagementPanel ({ project }) {
         navigate('/tasks')
     }
 
-    console.log(project)
-
     const handleCanceling = async () => {
         if (!window.confirm("Вы уверены, что хотите отменить данный проект? Отменить действие будет невозможно")) return
 
