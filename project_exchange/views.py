@@ -96,7 +96,11 @@ def dashboard_callback(request, context):
             )
             .order_by("-total_projects", "last_name", "first_name")
         )
-        organization_data.append({"organization": organization, "users": users})
+        if organization.total_projects > 0:
+            organization_data.append({
+            "organization": organization,
+            "users": users,
+        })
 
     executor_group = get_object_or_404(Group, name=EXECUTOR)
 

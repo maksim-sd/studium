@@ -25,6 +25,7 @@ from .models import (
 )
 from .schemas import (
     ClassifierOut, 
+    TypeProject,
     CategoryProjectOut,
     StatusesOut, 
     ProjectOut,
@@ -79,6 +80,14 @@ def get_statuses(request):
     return [{"id": id, "name": name} for id, name in Project.STATUS_CHOICES]
 
 
+@router.get("/types/", auth=BasicAuth(), response=List[TypeProject], summary="Типы проекта")
+def get_types(request):
+    return [
+        {"type_project": type_project, "number_of_points": number_of_points[1]} 
+        for type_project, number_of_points in zip(Project.PROJECT_TYPE, Project.NUMBER_OF_POINTS_CHOICES)
+    ]
+
+
 @router.get("/", auth=BasicAuth(), response=List[ProjectOut], summary="Список доступных проектов")
 def get_projects(
     request, 
@@ -100,7 +109,9 @@ def get_projects(
             id=project.id,
             project_status=project.get_project_status_display,
             category_project_id=project.category_project_id,
+            custom_category_project=project.custom_category_project,
             technologies_id=[tech.id for tech in project.technologies.all()],
+            custom_technologies=project.custom_technologies,
             name=project.name,
             description=project.description,
             cash_reward=project.cash_reward,
@@ -140,15 +151,15 @@ def get_responses_user(
         project = response.project
         project_response_out = ProjectResponseOut(
             id=project.id,
-            project_status=project.get_project_status_display(),
+            project_status=project.get_project_status_display,
             category_project_id=project.category_project_id,
+            custom_category_project=project.custom_category_project,
             technologies_id=[tech.id for tech in project.technologies.all()],
+            custom_technologies=project.custom_technologies,
             name=project.name,
             description=project.description,
             cash_reward=project.cash_reward,
-            number_of_points=project.number_of_points,
-            response_comment=response.comment,
-            response_create_at=response.created_at
+            number_of_points=project.number_of_points
         )
         projects_response_out.append(project_response_out)
     return projects_response_out
@@ -178,7 +189,9 @@ def get_projects_moderation(
             id=project.id,
             project_status=project.get_project_status_display,
             category_project_id=project.category_project_id,
+            custom_category_project=project.custom_category_project,
             technologies_id=[tech.id for tech in project.technologies.all()],
+            custom_technologies=project.custom_technologies,
             name=project.name,
             description=project.description,
             cash_reward=project.cash_reward,
@@ -210,7 +223,9 @@ def get_projects_active(request):
             id=project.id,
             project_status=project.get_project_status_display,
             category_project_id=project.category_project_id,
+            custom_category_project=project.custom_category_project,
             technologies_id=[tech.id for tech in project.technologies.all()],
+            custom_technologies=project.custom_technologies,
             name=project.name,
             description=project.description,
             cash_reward=project.cash_reward,
@@ -242,7 +257,9 @@ def get_projects_user_active(request, id_user:int = Path(..., description="ID п
             id=project.id,
             project_status=project.get_project_status_display,
             category_project_id=project.category_project_id,
+            custom_category_project=project.custom_category_project,
             technologies_id=[tech.id for tech in project.technologies.all()],
+            custom_technologies=project.custom_technologies,
             name=project.name,
             description=project.description,
             cash_reward=project.cash_reward,
@@ -263,14 +280,16 @@ def get_projects_history(request):
     projects = Project.objects.ordered_by_status().filter(
         Q(customer=user) | Q(moderators=user) | Q(executors=user),
         project_status="COMPLETED"
-    )
+    ).distinct()
     projects_out = []
     for project in projects:
         project_out=ProjectCompletedOut(
             id=project.id,
             project_status=project.get_project_status_display,
             category_project_id=project.category_project_id,
+            custom_category_project=project.custom_category_project,
             technologies_id=[tech.id for tech in project.technologies.all()],
+            custom_technologies=project.custom_technologies,
             name=project.name,
             description=project.description,
             cash_reward=project.cash_reward,
@@ -302,7 +321,9 @@ def get_projects_user_history(request, id_user:int = Path(..., description="ID �
             id=project.id,
             project_status=project.get_project_status_display,
             category_project_id=project.category_project_id,
+            custom_category_project=project.custom_category_project,
             technologies_id=[tech.id for tech in project.technologies.all()],
+            custom_technologies=project.custom_technologies,
             name=project.name,
             description=project.description,
             cash_reward=project.cash_reward,
@@ -407,7 +428,9 @@ def get_project(request, id_project:int = Path(..., description="ID проект
         customer=project.customer,
         project_status=project.get_project_status_display(),
         category_project_id=project.category_project_id,
-        technologies_id=[i.id for i in project.technologies.all()],
+        custom_category_project=project.custom_category_project,
+        technologies_id=[tech.id for tech in project.technologies.all()],
+        custom_technologies=project.custom_technologies,
         name=project.name,
         description=project.description,
         cash_reward=project.cash_reward,
@@ -484,6 +507,10 @@ def put_project(
         data = payload.dict()
         if data["new_category_project_id"]:
             project.category_project_id = data["new_category_project_id"]
+        if data["new_custom_category_project"]:
+            project.new_custom_category_project = data["new_custom_category_project"]
+        if data["new_custom_technologies"]:
+            project.new_custom_technologies = data["new_custom_technologies"]
         if data["new_name"]:
             project.name = data["new_name"]
         if data["new_description"]:
@@ -533,6 +560,10 @@ def put_project_publish(
         data = payload.dict()
         if data["new_category_project_id"]:
             project.category_project_id = data["new_category_project_id"]
+        if data["new_custom_category_project"]:
+            project.new_custom_category_project = data["new_custom_category_project"]
+        if data["new_custom_technologies"]:
+            project.new_custom_technologies = data["new_custom_technologies"]
         if data["new_name"]:
             project.name = data["new_name"]
         if data["new_description"]:
@@ -596,7 +627,14 @@ def post_project_feedback(request, payload:FeedbackIn, id_project:int = Path(...
     project = get_object_or_404(Project, id=id_project)
     if not permission_leave_feedback_project(user, project):
         raise HttpError(400, "Недоступно")
-    Feedback.objects.create(project=project, **payload.dict())
+    data = payload.dict()
+    with transaction.atomic():
+        number_of_points = Project.NUMBER_OF_POINTS_FEEDBACK[data["number_stars"]]
+        for executor in project.executors.all():
+            balance, _ = Balance.objects.get_or_create(executor=executor)
+            balance.number_of_points += number_of_points
+            balance.save()
+    Feedback.objects.create(project=project, **data)
     return {"detail": "Отзыв оставлен"}
 
 

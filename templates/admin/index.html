@@ -8,11 +8,11 @@
 .section-title { font-size:1.15rem; font-weight:600; color:#111827; }
 .dark .section-title { color:#f3f4f6; }
 .section-desc  { font-size:0.9rem; font-weight:500; color:#6b7280; margin-top:0.2rem; }
-.dark .section-desc { color:hsl(218, 11%, 65%); }
-.label-text    { font-size:0.9rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; }
+.dark .section-desc { color:hsl(218,11%,65%); }
+.label-text    { font-size:0.9rem; font-weight:600; }
 .body-text     { font-size:0.9rem; font-weight:500; color:#374151; }
 .dark .body-text { color:#d1d5db; }
-.small-text    { font-size:0.8rem; font-weight:500; color:#6b7280; }
+.small-text    { font-size:0.9rem; font-weight:500; color:#6b7280; }
 .dark .small-text { color:#9ca3af; }
 
 .stat-card { border-radius:0.75rem; padding:1rem; display:flex; flex-direction:column; gap:0.6rem; border:1px solid; }
@@ -24,28 +24,24 @@
 .sc-violet .stat-lbl { color:#7c3aed; } .dark .sc-violet .stat-lbl { color:#a78bfa; }
 .sc-green  .stat-lbl { color:#16a34a; } .dark .sc-green  .stat-lbl { color:#4ade80; }
 .sc-red    .stat-lbl { color:#dc2626; } .dark .sc-red    .stat-lbl { color:#f87171; }
-
 .sc-gray   { background:#f9fafb; border-color:#e5e7eb; }
 .sc-yellow { background:#fefce8; border-color:#fde68a; }
 .sc-blue   { background:#eff6ff; border-color:#bfdbfe; }
 .sc-violet { background:#f5f3ff; border-color:#ddd6fe; }
 .sc-green  { background:#f0fdf4; border-color:#bbf7d0; }
 .sc-red    { background:#fff1f2; border-color:#fecdd3; }
-
 .sc-gray   .stat-num { color:#111827; } .sc-gray   .si { color:#9ca3af; }
 .sc-yellow .stat-num { color:#d97706; } .sc-yellow .si { color:#d97706; }
 .sc-blue   .stat-num { color:#3b82f6; } .sc-blue   .si { color:#3b82f6; }
 .sc-violet .stat-num { color:#7c3aed; } .sc-violet .si { color:#7c3aed; }
 .sc-green  .stat-num { color:#16a34a; } .sc-green  .si { color:#16a34a; }
 .sc-red    .stat-num { color:#dc2626; } .sc-red    .si { color:#dc2626; }
-
 .dark .sc-gray   { background:#1f2937; border-color:#374151; }
 .dark .sc-yellow { background:rgba(120,80,0,.18);  border-color:rgba(251,191,36,.3); }
 .dark .sc-blue   { background:rgba(30,64,175,.18); border-color:rgba(96,165,250,.3); }
 .dark .sc-violet { background:rgba(76,29,149,.18); border-color:rgba(167,139,250,.3); }
 .dark .sc-green  { background:rgba(6,78,59,.18);   border-color:rgba(74,222,128,.3); }
 .dark .sc-red    { background:rgba(127,29,29,.18); border-color:rgba(252,165,165,.3); }
-
 .dark .sc-gray   .stat-num { color:#f3f4f6; } .dark .sc-gray   .si { color:#6b7280; }
 .dark .sc-yellow .stat-num { color:#fbbf24; } .dark .sc-yellow .si { color:#fbbf24; }
 .dark .sc-blue   .stat-num { color:#60a5fa; } .dark .sc-blue   .si { color:#60a5fa; }
@@ -58,11 +54,11 @@
   background:#f9fafb; border:1px solid #e5e7eb; border-radius:0.75rem; padding:0.55rem 0.875rem;
 }
 .dark .period-wrap { background:#1f2937; border-color:#374151; }
-.period-sep { width:1px; height:1.2rem; background:#e5e7eb; flex-shrink:0; }
+.period-sep { width:2px; height:1.2rem; background:#e5e7eb; flex-shrink:0; margin:0 0.45rem; }
 .dark .period-sep { background:#374151; }
 .date-input {
   border:1px solid #d1d5db; border-radius:0.5rem; padding:0.3rem 0.55rem;
-  font-size:0.9rem; font-weight:500; color:#111827; background:#fff; outline:none;
+  font-size:0.9rem; font-weight:500; background:#fff; outline:none;
   transition:border-color .15s; min-width:8.5rem;
 }
 .dark .date-input { background:#1f2937; border-color:#4b5563; color:#e5e7eb; color-scheme:dark; }
@@ -83,6 +79,19 @@
   padding:0.2rem 0.55rem; font-size:0.9rem; font-weight:600;
 }
 .dark .period-badge { background:rgba(109,40,217,.2); color:#a78bfa; }
+
+.search-wrap { position:relative; margin-bottom:0.75rem; }
+.search-icon { position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); color:#9ca3af; pointer-events:none; width:0.95rem; height:0.95rem; }
+.search-input {
+  width:100%; border:1px solid #e5e7eb; border-radius:0.6rem;
+  padding:0.45rem 0.75rem 0.45rem 2.25rem;
+  font-size:0.9rem; font-weight:500; color:#111827; background:#fff;
+  outline:none; transition:border-color .15s, box-shadow .15s; box-sizing:border-box;
+}
+.search-input::placeholder { color:#9ca3af; }
+.search-input:focus { border-color:#6366f1; box-shadow:0 0 0 2px rgba(99,102,241,.12); }
+.dark .search-input { background:#1f2937; border-color:#4b5563; color:#e5e7eb; }
+.dark .search-input:focus { border-color:#818cf8; }
 
 .dt { border-radius:0.75rem; overflow:hidden; border:1px solid #e5e7eb; background:#fff; }
 .dark .dt { border-color:#4b5563; background:#111827; }
@@ -114,18 +123,18 @@ details[open] .arr { transform:rotate(90deg); }
 .dark .nd { color:#4b5563; }
 .sub-wrap { border-top:1px solid #e5e7eb; background:#f9fafb; }
 .dark .sub-wrap { border-color:#374151; background:rgba(31,41,55,.5); }
-.sub-hd { display:grid; border-bottom:1px solid #e5e7eb; padding:0.45rem 1rem; }
+.sub-hd { display:grid; border-bottom:1px solid #e5e7eb; text-transform:uppercase; }
 .dark .sub-hd { border-color:#374151; }
-.sub-hc { font-size:0.9rem; font-weight:600; color:#9ca3af; }
+.sub-hc { font-size:0.75rem; font-weight:600; color:#9ca3af; padding:0.6rem 1rem; }
 .sub-hc.ctr { text-align:center; }
-.sub-row { display:grid; padding:0.6rem 1rem; border-bottom:1px solid #f3f4f6; transition:background .1s; }
+.sub-row { display:grid; border-bottom:1px solid #f3f4f6; transition:background .1s; }
 .sub-row:last-child { border-bottom:none; }
 .dark .sub-row { border-color:rgba(55,65,81,.4); }
 .sub-row:hover { background:rgba(255,255,255,.7); }
 .dark .sub-row:hover { background:rgba(55,65,81,.25); }
 
-.b    { display:inline-flex; align-items:center; justify-content:center; min-width:1.9rem; height:1.6rem; padding:0 0.55rem; border-radius:0.375rem; font-size:0.9rem; font-weight:700; }
-.bs   { display:inline-flex; align-items:center; justify-content:center; min-width:1.5rem; height:1.35rem; padding:0 0.4rem; border-radius:0.25rem; font-size:0.9rem; font-weight:700; }
+.b  { display:inline-flex; align-items:center; justify-content:center; min-width:1.9rem; height:1.6rem; padding:0 0.55rem; border-radius:0.375rem; font-size:0.9rem; font-weight:700; }
+.bs { display:inline-flex; align-items:center; justify-content:center; min-width:1.5rem; height:1.35rem; padding:0 0.4rem; border-radius:0.25rem; font-size:0.9rem; font-weight:700; }
 .b-y,.bs.b-y { background:rgba(217,119,6,.12);  color:#b45309; }
 .b-b,.bs.b-b { background:rgba(59,130,246,.12); color:#2563eb; }
 .b-v,.bs.b-v { background:rgba(124,58,237,.12); color:#7c3aed; }
@@ -151,7 +160,7 @@ details[open] .arr { transform:rotate(90deg); }
 .dark .chart-label { color:#d1d5db; }
 .chart-count { font-size:0.9rem; font-weight:700; color:#111827; }
 .dark .chart-count { color:#f3f4f6; }
-.chart-pct { font-size:0.9rem; font-weight:500; color:#9ca3af; min-width:2.5rem; text-align:right; }
+.chart-pct { font-size:0.82rem; font-weight:500; color:#9ca3af; min-width:2.5rem; text-align:right; }
 </style>
 
 <div class="flex flex-col gap-8 mb-8">
@@ -163,16 +172,15 @@ details[open] .arr { transform:rotate(90deg); }
 
   <form method="get" action="" id="period-form">
     <div class="period-wrap">
-      <span class="label-text c-def">Период</span>
-      <div class="period-sep"></div>
+      <span class="label-text c-def" style="margin-right:0.45rem">Выберите период:</span>
       <a href="?all_time=1" id="btn-all" class="period-btn {% if all_time == '1' %}is-active{% endif %}">За всё время</a>
       <div class="period-sep"></div>
       <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
         <input type="date" name="date_from" id="date_from" class="date-input" value="{{ date_from }}">
-        <span class="small-text">—</span>
+        <span class="small-text">-</span>
         <input type="date" name="date_to" id="date_to" class="date-input" value="{{ date_to }}">
         <input type="hidden" name="all_time" value="0">
-        <button type="submit" id="btn-apply" class="period-btn {% if all_time != '1' %}is-active{% endif %}">Применить</button>
+        <button type="submit" id="btn-apply" class="period-btn {% if all_time != '1' %}is-active{% endif %}">За указанный период</button>
       </div>
       {% if all_time != "1" and date_from and date_to %}
       <span class="period-badge">
@@ -182,15 +190,24 @@ details[open] .arr { transform:rotate(90deg); }
       {% endif %}
     </div>
   </form>
+
   <script>
   (function(){
-    var from=document.getElementById('date_from'),to=document.getElementById('date_to'),
-        apply=document.getElementById('btn-apply'),all=document.getElementById('btn-all');
-    if(!from)return;
-    [from,to].forEach(function(el){
-      el.addEventListener('input',function(){
-        apply.classList.add('is-active'); all.classList.remove('is-active');
-      });
+    var from=document.getElementById('date_from'),
+        to=document.getElementById('date_to'),
+        apply=document.getElementById('btn-apply'),
+        all=document.getElementById('btn-all');
+
+    if(!apply || !all) return;
+
+    apply.addEventListener('click', function() {
+      apply.classList.add('is-active');
+      all.classList.remove('is-active');
+    });
+
+    all.addEventListener('click', function() {
+      all.classList.add('is-active');
+      apply.classList.remove('is-active');
     });
   })();
   </script>
@@ -233,6 +250,10 @@ details[open] .arr { transform:rotate(90deg); }
       <p class="section-title">По организациям</p>
       <p class="section-desc">Статистика проектов в разрезе организаций-заказчиков за выбранный период. Нажмите на строку, чтобы раскрыть список заказчиков</p>
     </div>
+    <div class="search-wrap">
+      <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+      <input type="text" id="org-search" class="search-input" placeholder="Поиск по организации...">
+    </div>
     <div class="dt">
       <div class="dt-head" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
         <div class="dt-hc c-def">Организация</div>
@@ -243,7 +264,7 @@ details[open] .arr { transform:rotate(90deg); }
         <div class="dt-hc c-grn ctr">Завершено</div>
       </div>
       {% for item in organization_data %}
-      <div class="t-row">
+      <div class="t-row org-row" data-name="{{ item.organization.full_name|lower }}">
         <details>
           <summary class="org-sum" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
             <div class="t-cell" style="display:flex;align-items:center;gap:0.45rem;">
@@ -267,18 +288,21 @@ details[open] .arr { transform:rotate(90deg); }
             </div>
             {% for user in item.users %}
             <div class="sub-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
-              <div style="display:flex;align-items:center;"><span class="body-text">{{ user.last_name }} {{ user.first_name }}</span></div>
-              <div style="display:flex;align-items:center;justify-content:center;"><span class="nv" style="font-size:0.875rem;">{{ user.total_projects }}</span></div>
-              <div style="display:flex;align-items:center;justify-content:center;">{% if user.under_inspection > 0 %}<span class="bs b-y">{{ user.under_inspection }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
-              <div style="display:flex;align-items:center;justify-content:center;">{% if user.looking_for_executor > 0 %}<span class="bs b-b">{{ user.looking_for_executor }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
-              <div style="display:flex;align-items:center;justify-content:center;">{% if user.in_progress > 0 %}<span class="bs b-v">{{ user.in_progress }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
-              <div style="display:flex;align-items:center;justify-content:center;">{% if user.completed > 0 %}<span class="bs b-g">{{ user.completed }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+              <div style="padding:0.6rem 1rem;display:flex;align-items:center;"><span class="body-text">{{ user.last_name }} {{ user.first_name }}</span></div>
+              <div style="padding:0.6rem 1rem;display:flex;align-items:center;justify-content:center;"><span class="nv" style="font-size:0.875rem;">{{ user.total_projects }}</span></div>
+              <div style="padding:0.6rem 1rem;display:flex;align-items:center;justify-content:center;">{% if user.under_inspection > 0 %}<span class="bs b-y">{{ user.under_inspection }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+              <div style="padding:0.6rem 1rem;display:flex;align-items:center;justify-content:center;">{% if user.looking_for_executor > 0 %}<span class="bs b-b">{{ user.looking_for_executor }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+              <div style="padding:0.6rem 1rem;display:flex;align-items:center;justify-content:center;">{% if user.in_progress > 0 %}<span class="bs b-v">{{ user.in_progress }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
+              <div style="padding:0.6rem 1rem;display:flex;align-items:center;justify-content:center;">{% if user.completed > 0 %}<span class="bs b-g">{{ user.completed }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
             </div>
             {% endfor %}
           </div>
         </details>
       </div>
+      {% empty %}
+      <div style="padding:1.5rem 1rem;text-align:center;"><span class="small-text">Нет данных за выбранный период</span></div>
       {% endfor %}
+      <div id="org-empty" style="display:none;padding:1.5rem 1rem;text-align:center;"><span class="small-text">Организации не найдены</span></div>
     </div>
   </div>
 
@@ -286,6 +310,10 @@ details[open] .arr { transform:rotate(90deg); }
     <div class="mb-3">
       <p class="section-title">По исполнителям</p>
       <p class="section-desc">Активность исполнителей: количество откликов, текущих и завершённых проектов</p>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+      <input type="text" id="exec-search" class="search-input" placeholder="Поиск по исполнителю...">
     </div>
     <div class="dt">
       <div class="dt-head" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;">
@@ -295,7 +323,7 @@ details[open] .arr { transform:rotate(90deg); }
         <div class="dt-hc c-grn ctr">Завершено</div>
       </div>
       {% for executor in executors %}
-      <div class="t-row" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;align-items:center;">
+      <div class="t-row exec-row" data-name="{{ executor.last_name|lower }} {{ executor.first_name|lower }}" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;align-items:center;">
         <div class="t-cell"><span class="nm">{{ executor.last_name }} {{ executor.first_name }}</span></div>
         <div class="t-cell ctr">{% if executor.total_responses > 0 %}<span class="b b-t">{{ executor.total_responses }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
         <div class="t-cell ctr">{% if executor.in_progress > 0 %}<span class="b b-v">{{ executor.in_progress }}</span>{% else %}<span class="nd">—</span>{% endif %}</div>
@@ -304,8 +332,10 @@ details[open] .arr { transform:rotate(90deg); }
       {% empty %}
       <div style="padding:1.5rem 1rem;text-align:center;"><span class="small-text">Нет данных за выбранный период</span></div>
       {% endfor %}
+      <div id="exec-empty" style="display:none;padding:1.5rem 1rem;text-align:center;"><span class="small-text">Исполнители не найдены</span></div>
     </div>
-  </div> 
+  </div>
+
   <div>
     <div class="mb-3">
       <p class="section-title">По категориям</p>
@@ -325,7 +355,7 @@ details[open] .arr { transform:rotate(90deg); }
             <span class="chart-pct">{{ cat.pct }}%</span>
           </div>
           {% empty %}
-          <p class="small-text">Нет данных</p>
+          <p class="small-text">Нет данных за выбранный период</p>
           {% endfor %}
         </div>
       </div>
@@ -348,7 +378,7 @@ details[open] .arr { transform:rotate(90deg); }
             <span class="chart-pct">{{ tech.pct }}%</span>
           </div>
           {% empty %}
-          <p class="small-text">Нет данных</p>
+          <p class="small-text">Нет данных за выбранный период</p>
           {% endfor %}
         </div>
         <div class="chart-canvas-wrap">
@@ -357,8 +387,6 @@ details[open] .arr { transform:rotate(90deg); }
       </div>
     </div>
   </div>
-
-
 
 </div>
 
@@ -371,59 +399,125 @@ details[open] .arr { transform:rotate(90deg); }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
+(function() {
+  var CAT_DATA  = JSON.parse(document.getElementById('cat-data').textContent);
+  var TECH_DATA = JSON.parse(document.getElementById('tech-data').textContent);
 
-var CAT_DATA  = JSON.parse(document.getElementById('cat-data').textContent);
-var TECH_DATA = JSON.parse(document.getElementById('tech-data').textContent);
+  var CAT_PALETTE  = ["#3b0764","#6b21a8","#7c3aed","#a855f7","#c084fc","#d8b4fe"];
+  var TECH_PALETTE = ["#3b0764","#6b21a8","#7c3aed","#a855f7","#c084fc","#d8b4fe"];
 
-var CAT_PALETTE  = ["#3b0764","#6b21a8","#7c3aed","#a855f7","#c084fc","#d8b4fe"];
-var TECH_PALETTE = ["#3b0764","#6b21a8","#7c3aed","#a855f7","#c084fc","#d8b4fe"];
+  function colorDots(prefix, palette) {
+    palette.forEach(function(color, i) {
+      document.querySelectorAll('.' + prefix + '-dot-' + i).forEach(function(el) {
+        el.style.background = color;
+      });
+    });
+  }
 
-function colorDots(prefix, palette) {
-  palette.forEach(function(color, i) {
-    var dots = document.querySelectorAll('.' + prefix + '-dot-' + i);
-    dots.forEach(function(el){ el.style.background = color; });
-  });
-}
+  function makePctPlugin(palette) {
+    return {
+      id: 'pctLabels',
+      afterDatasetDraw: function(chart) {
+        var ctx  = chart.ctx;
+        var meta = chart.getDatasetMeta(0);
+        var sum  = chart.data.datasets[0].data.reduce(function(a, b) { return a + b; }, 0);
+        meta.data.forEach(function(arc, i) {
+          var val = chart.data.datasets[0].data[i];
+          var pct = sum > 0 ? Math.round(val / sum * 100) : 0;
+          if (pct < 5) return;
+          var mid = arc.startAngle + (arc.endAngle - arc.startAngle) / 2;
+          var rv  = (arc.outerRadius - arc.innerRadius) * 0.5 + arc.innerRadius;
+          var x   = arc.x + rv * Math.cos(mid);
+          var y   = arc.y + rv * Math.sin(mid);
+          ctx.save();
+          var hex = palette[i % palette.length];
+          var r = parseInt(hex.slice(1, 3), 16);
+          var g = parseInt(hex.slice(3, 5), 16);
+          var b = parseInt(hex.slice(5, 7), 16);
+          var lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          ctx.font = 'bold 13px system-ui,sans-serif';
+          ctx.fillStyle = lum > 0.55 ? '#4c1d95' : '#fff';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = lum > 0.55 ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.35)';
+          ctx.shadowBlur = 3;
+          ctx.fillText(pct + '%', x, y);
+          ctx.restore();
+        });
+      }
+    };
+  }
 
-function buildChart(canvasId, data, palette) {
-  var el = document.getElementById(canvasId);
-  if (!el || !data.length) return;
-  var isDark = document.documentElement.classList.contains('dark');
-  new Chart(el, {
-    type: 'pie',
-    data: {
-      labels: data.map(function(d){ return d.name; }),
-      datasets: [{
-        data:            data.map(function(d){ return d.total; }),
-        backgroundColor: data.map(function(_, i){ return palette[i % palette.length]; }),
-        borderColor:     isDark ? '#111827' : '#fff',
-        borderWidth: 3,
-        hoverOffset: 10
-      }]
-    },
-    options: {
-      responsive: false,
-      animation: { duration: 500 },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function(ctx) {
-              var sum = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
-              var pct = sum > 0 ? Math.round(ctx.parsed / sum * 100) : 0;
-              return ' ' + ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+  function buildChart(canvasId, data, palette) {
+    var el = document.getElementById(canvasId);
+    if (!el || !data.length) return;
+    var isDark = document.documentElement.classList.contains('dark');
+    new Chart(el, {
+      type: 'pie',
+      data: {
+        labels: data.map(function(d) { return d.name; }),
+        datasets: [{
+          data:            data.map(function(d) { return d.total; }),
+          backgroundColor: data.map(function(_, i) { return palette[i % palette.length]; }),
+          borderColor:     isDark ? '#111827' : '#fff',
+          borderWidth: 3,
+          hoverOffset: 10
+        }]
+      },
+      options: {
+        responsive: false,
+        animation: { duration: 500 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                var sum = ctx.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                var pct = sum > 0 ? Math.round(ctx.parsed / sum * 100) : 0;
+                return ' ' + ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+              }
             }
           }
         }
+      },
+      plugins: [makePctPlugin(palette)]
+    });
+  }
+
+function makeSearch(inputId, rowSelector, emptyId) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+
+  input.addEventListener('input', function() {
+    var q = this.value.trim().toLowerCase();
+    var rows = document.querySelectorAll(rowSelector);
+    var found = false;
+
+    rows.forEach(function(row) {
+      var match = !q || (row.getAttribute('data-name') || '').includes(q);
+
+      if (match) {
+        row.style.display = rowSelector === '.exec-row' ? 'grid' : '';
+        found = true;
+      } else {
+        row.style.display = 'none';
       }
-    },
+    });
+
+    var empty = document.getElementById(emptyId);
+    if (empty) {
+      empty.style.display = found ? 'none' : 'block';
+    }
   });
 }
 
-colorDots('cat',  CAT_PALETTE);
-colorDots('tech', TECH_PALETTE);
-buildChart('cat-chart',  CAT_DATA,  CAT_PALETTE);
-buildChart('tech-chart', TECH_DATA, TECH_PALETTE);
+  colorDots('cat',  CAT_PALETTE);
+  colorDots('tech', TECH_PALETTE);
+  buildChart('cat-chart',  CAT_DATA,  CAT_PALETTE);
+  buildChart('tech-chart', TECH_DATA, TECH_PALETTE);
+  makeSearch('org-search',  '.org-row',  'org-empty');
+  makeSearch('exec-search', '.exec-row', 'exec-empty');
+})();
 </script>
 
 {% endblock %}

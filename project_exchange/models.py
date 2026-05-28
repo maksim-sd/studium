@@ -52,6 +52,11 @@ class ProjectManager(models.Manager):
 
 class Project(models.Model):
     objects = ProjectManager()
+
+    NUMBER_OF_POINTS_FEEDBACK = {
+        4: 15,
+        5: 30
+    }
     
     STATUS_CHOICES = (
         ("UNDER_INSPECTION", "На проверке"),
@@ -61,16 +66,30 @@ class Project(models.Model):
         ("CANCELED", "Отменен")
     )
 
+    NUMBER_OF_POINTS_CHOICES = (
+        (50 , 50),
+        (125, 125),
+        (200, 200)
+    )
+
+    PROJECT_TYPE = (
+        "Маленький", 
+        "Средний", 
+        "Большой"
+    )
+
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="customer_projects", verbose_name="Заказчик")
     moderators = models.ManyToManyField(CustomUser, blank=True, related_name="moderator_projects", verbose_name="Модераторы")
     executors = models.ManyToManyField(CustomUser, blank=True, related_name="executor_projects", verbose_name="Исполнители")
     project_status = models.CharField(max_length=30, default="UNDER_INSPECTION", choices=STATUS_CHOICES, verbose_name="Статус проекта")
     category_project = models.ForeignKey(CategoryProject, null=True, blank=True, on_delete=models.SET_NULL, verbose_name="Категория проекта")
+    custom_category_project = models.CharField(max_length=60, null=True, blank=True, verbose_name="Другая категория проекта")
     technologies = models.ManyToManyField(Technology, blank=True, related_name="technology_projects", verbose_name="Технологии")
+    custom_technologies = models.TextField(null=True, blank=True, verbose_name="Другие технологии")
     name = models.CharField(max_length=120, verbose_name="Наименование")
     description = models.TextField(verbose_name="Описание")
     cash_reward = models.BooleanField(default=False, verbose_name="Денежное вознаграждение")
-    number_of_points = models.IntegerField(default=0, verbose_name="Количество баллов")
+    number_of_points = models.IntegerField(default=50, choices=NUMBER_OF_POINTS_CHOICES, verbose_name="Количество баллов")
     due_date = models.DateField(verbose_name="Дата сдачи")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата и время создания")
     completed_at = models.DateTimeField(null=True, blank=True, verbose_name="Дата и время завершения")

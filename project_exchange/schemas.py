@@ -9,6 +9,11 @@ class ClassifierOut(Schema):
     name: str
 
 
+class TypeProject(Schema):
+    type_project: str
+    number_of_points: int
+
+
 class CategoryProjectOut(Schema):
     id: int
     name: str
@@ -52,7 +57,9 @@ class ProjectOut(Schema):
     id: int
     project_status: str 
     category_project_id: int | None = None
+    custom_category_project: str | None = None
     technologies_id: List[int] = []
+    custom_technologies: str | None = None
     name: str
     description: str
     cash_reward: bool
@@ -63,7 +70,9 @@ class ProjectCompletedOut(Schema):
     id: int
     project_status: str 
     category_project_id: int | None = None
+    custom_category_project: str | None = None
     technologies_id: List[int] = []
+    custom_technologies: str | None = None
     name: str
     description: str
     cash_reward: bool
@@ -76,7 +85,9 @@ class ProjectResponseOut(Schema):
     id: int
     project_status: str 
     category_project_id: int | None = None
+    custom_category_project: str | None = None
     technologies_id: List[int] = []
+    custom_technologies: str | None = None
     name: str
     description: str
     cash_reward: bool
@@ -105,8 +116,10 @@ class ProjectDetailsOut(Schema):
     id: int
     customer: CustomerUserOut
     project_status: str
-    category_project_id: int | None
-    technologies_id: List[int] = [] 
+    category_project_id: int | None = None
+    custom_category_project: str | None = None
+    technologies_id: List[int] = []
+    custom_technologies: str | None = None
     name: str
     description: str
     cash_reward: bool
@@ -120,7 +133,9 @@ class ProjectDetailsOut(Schema):
 
 class ProjectIn(Schema):
     category_project_id: int | None = None
+    custom_category_project: str | None = None
     technologies_id: List[int] = []
+    custom_technologies: str | None = None
     name: str
     description: str
     cash_reward: bool
@@ -145,6 +160,8 @@ class ResponsesListIdIn(Schema):
 
 class ProjectChangeIn(Schema):
     new_category_project_id: int | None = None
+    new_custom_category_project: str | None = None
+    new_custom_technologies: str | None = None
     new_technologies_id: List[int] | None = None
     delete_technologies_id: List[int] | None = None
     delete_files_id: List[int] | None = None
