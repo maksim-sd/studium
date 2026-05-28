@@ -28,7 +28,6 @@ class UserOut(Schema):
     specialty: str | None = None
     study_group: str | None = None
     average_rating: float | None = None
-    last_login: datetime | None = None
 
     
 class BalanceOut(Schema):

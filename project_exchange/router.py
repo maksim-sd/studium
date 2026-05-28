@@ -367,6 +367,8 @@ def permission_view_responses_project(user:CustomUser, project:Project):
 
 
 def permission_view_participants_project(user:CustomUser, project:Project):
+    if project.project_status not in ("IN_PROGRESS", "COMPLETED"):
+        return False
     if user != project.customer and user not in project.moderators.all() and user not in project.executors.all():
         return False
     return True

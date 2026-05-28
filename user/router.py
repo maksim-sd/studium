@@ -27,11 +27,7 @@ router = Router(tags=["Профиль"])
 
 class BasicAuth(HttpBasicAuth):
     def authenticate(self, request, email, password):
-        user = authenticate(email=email, password=password)
-        if user:
-            user.last_login = timezone.now()
-            user.save(update_fields=['last_login'])
-        return user
+        return authenticate(email=email, password=password)
     
 
 def create_user_out(user:CustomUser):
@@ -41,7 +37,6 @@ def create_user_out(user:CustomUser):
         first_name=user.first_name,
         photo=user.photo,
         groups_id=[i.id for i in user.groups.all()],
-        last_login=user.last_login
     )
     return user_out
 
