@@ -257,64 +257,64 @@ def get_order_statuses(request):
     return [{"id": id, "name": name} for id, name in Order.STATUS_CHOICES]
 
 
-@router.patch(
-    "order/{int:id_order}/status/{str:id_status}/",
-    auth=BasicAuth(), 
-    summary="Изменить статус выбранного заказа исполнителя",
-    tags=["Заказ"]
-)
-def patch_order_status(
-    request, 
-    id_order:int = Path(..., description="ID заказа"), 
-    id_status:str = Path(..., description="ID статуса")
-):
-    user = request.auth
-    if not user.groups.filter(name="Модератор").exists():
-        raise HttpError(403, "Недостаточно прав")
-    order = get_object_or_404(Order, id=id_order)
-    if order.order_status == "CANCELED":
-        raise HttpError(400, "Заказ отменен")
-    elif not id_status in [i[0] for i in Order.STATUS_CHOICES]:
-        raise HttpError(404, "Указанный статус заказа не существует")
-    order.order_status = id_status
-    order.save()
-    if id_status == "CANCELED":
-        with transaction.atomic():
-            order_products = OrderProduct.objects.filter(order=order)
-            total_amount = sum(i.price * i.quantity for i in order_products)
-            balance = get_object_or_404(Balance, executor=order.executor)
-            balance.number_of_points += total_amount
-            balance.save()
-            for order_product in order_products:
-                order_product.product.stock += order_product.quantity
-                order_product.product.save()
-    return {"detail": "Статус заказа изменен"}
+# @router.patch(
+#     "order/{int:id_order}/status/{str:id_status}/",
+#     auth=BasicAuth(), 
+#     summary="Изменить статус выбранного заказа исполнителя",
+#     tags=["Заказ"]
+# )
+# def patch_order_status(
+#     request, 
+#     id_order:int = Path(..., description="ID заказа"), 
+#     id_status:str = Path(..., description="ID статуса")
+# ):
+#     user = request.auth
+#     if not user.groups.filter(name="Модератор").exists():
+#         raise HttpError(403, "Недостаточно прав")
+#     order = get_object_or_404(Order, id=id_order)
+#     if order.order_status == "CANCELED":
+#         raise HttpError(400, "Заказ отменен")
+#     elif not id_status in [i[0] for i in Order.STATUS_CHOICES]:
+#         raise HttpError(404, "Указанный статус заказа не существует")
+#     order.order_status = id_status
+#     order.save()
+#     if id_status == "CANCELED":
+#         with transaction.atomic():
+#             order_products = OrderProduct.objects.filter(order=order)
+#             total_amount = sum(i.price * i.quantity for i in order_products)
+#             balance = get_object_or_404(Balance, executor=order.executor)
+#             balance.number_of_points += total_amount
+#             balance.save()
+#             for order_product in order_products:
+#                 order_product.product.stock += order_product.quantity
+#                 order_product.product.save()
+#     return {"detail": "Статус заказа изменен"}
 
 
-@router.get(
-    "/executors/orders/", 
-    auth=BasicAuth(), 
-    response=List[OrderOut], 
-    summary="Заказы всех исполнителей",
-    tags=["Заказ"]
-)
-def get_executors_orders(request):
-    user = request.auth
-    if not user.groups.filter(name="Модератор").exists():
-        raise HttpError(403, "Недостаточно прав")
-    return Order.objects.all()
+# @router.get(
+#     "/executors/orders/", 
+#     auth=BasicAuth(), 
+#     response=List[OrderOut], 
+#     summary="Заказы всех исполнителей",
+#     tags=["Заказ"]
+# )
+# def get_executors_orders(request):
+#     user = request.auth
+#     if not user.groups.filter(name="Модератор").exists():
+#         raise HttpError(403, "Недостаточно прав")
+#     return Order.objects.all()
 
 
-@router.get(
-    "/executor/order/{int:id_order}/",
-    auth=BasicAuth(), 
-    response=List[OrderProductOut], 
-    summary="Выбранный заказ исполнителя", 
-    tags=["Заказ"]
-)
-def get_executor_order(request, id_order:int = Path(..., description="ID заказа")):
-    user = request.auth
-    if not user.groups.filter(name="Модератор").exists():
-        raise HttpError(403, "Недостаточно прав")
-    order = get_object_or_404(Order, id=id_order)
+# @router.get(
+#     "/executor/order/{int:id_order}/",
+#     auth=BasicAuth(), 
+#     response=List[OrderProductOut], 
+#     summary="Выбранный заказ исполнителя", 
+#     tags=["Заказ"]
+# )
+# def get_executor_order(request, id_order:int = Path(..., description="ID заказа")):
+#     user = request.auth
+#     if not user.groups.filter(name="Модератор").exists():
+#         raise HttpError(403, "Недостаточно прав")
+#     order = get_object_or_404(Order, id=id_order)
     return OrderProduct.objects.filter(order=order)
