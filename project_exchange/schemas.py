@@ -149,7 +149,7 @@ class ResponseIn(Schema):
 
 class ResponseOut(Schema):
     id: int
-    executor_id: int
+    executor: CustomUserOut   
     comment: str | None = None
     created_at: datetime
 

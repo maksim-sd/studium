@@ -159,7 +159,9 @@ def get_responses_user(
             name=project.name,
             description=project.description,
             cash_reward=project.cash_reward,
-            number_of_points=project.number_of_points
+            number_of_points=project.number_of_points,
+            response_comment=response.comment,
+            response_create_at=response.created_at
         )
         projects_response_out.append(project_response_out)
     return projects_response_out
