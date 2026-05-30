@@ -1,10 +1,12 @@
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { createJSONStorage, persist } from "zustand/middleware"
 
-export const useProductCategoryStore = create()(persist((set) => ({
+export const useProductCategoryStore = create()(persist((set, get) => ({
     categories: [],
 
     fetchCategories: async (currentUser) => {
+        if (get().categories.length > 0) return
+
         try {
             const response = await fetch (`/api/shop/categories/`, {
                 method: 'GET',
@@ -31,6 +33,6 @@ export const useProductCategoryStore = create()(persist((set) => ({
 }),
     {
         name: 'product-categories-storage',
-        getStorage: () => localStorage,
+        storage: createJSONStorage(() => localStorage),
     }
 ))

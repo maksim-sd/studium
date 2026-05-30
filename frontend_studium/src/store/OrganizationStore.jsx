@@ -1,22 +1,15 @@
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { createJSONStorage, persist } from "zustand/middleware"
+import { userApi } from "../api/user"
 
-export const useOrganizationStore = create()(persist((set) => ({
+export const useOrganizationStore = create()(persist((set, get) => ({
     organizations: [],
 
     fetchOrganizations: async (currentUser) => {
-        try {
-            const response = await fetch (`/api/user/organizations/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Basic ${currentUser}`
-                }
-            })
-            if (!response.ok) {
-                throw new Error('Failed to fetch organizations!')
-            }
+        if (get().organizations.length > 0) return
 
-            const data = await response.json()
+        try {
+            const data = await userApi.fetchOrganizations()
 
             set({
                 organizations: data,
@@ -31,6 +24,6 @@ export const useOrganizationStore = create()(persist((set) => ({
 }),
     {
         name: 'project-organizations-storage',
-        getStorage: () => localStorage,
+        storage: createJSONStorage(() => localStorage),
     }
 ))

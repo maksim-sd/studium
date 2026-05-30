@@ -1,22 +1,15 @@
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { createJSONStorage, persist } from "zustand/middleware"
+import { projectApi } from "../api/project"
 
-export const useTechnologiesStore = create()(persist((set) => ({
+export const useTechnologiesStore = create()(persist((set, get) => ({
     technologies: [],
 
     fetchTechnologies: async (currentUser) => {
+        if(get().technologies.length > 0) return
+        
         try {
-            const response = await fetch (`/api/project_exchange/technologies/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Basic ${currentUser}`
-                }
-            })
-            if (!response.ok) {
-                throw new Error('Failed to fetch tags!')
-            }
-
-            const data = await response.json()
+            const data = await projectApi.fetchTechnologies()
 
             set({
                 technologies: data,
@@ -31,6 +24,6 @@ export const useTechnologiesStore = create()(persist((set) => ({
 }),
     {
         name: 'technologies-storage',
-        getStorage: () => localStorage,
+        storage: createJSONStorage(() => localStorage),
     }
 ))

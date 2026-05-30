@@ -4,12 +4,11 @@ import { useTechnologiesStore } from '../store/TechnologiesStore'
 import { useProjectCategoryStore } from '../store/ProjectCategoryStore'
 import points from '../assets/points-reward.png'
 import money from '../assets/money-reward.png'
+import custom_category from '../assets/custom_category.png'
 
 function UserProjectCategory ({ category }) {
     const categories = useProjectCategoryStore((state) => state.categories)
     const projectCategory = categories.find(item => item.id === category)
-
-    console.log(projectCategory.icon)
 
     return (
         <div className="flex items-center text-sm gap-2">
@@ -89,11 +88,11 @@ function UserProjectButton ({ activeTab, project }) {
             
         case 'archived-projects':
             return (
-                <div className="flex gap-3.75 text-sm">
+                <div className={`${(project.comment && project.number_stars > 0) ? 'flex gap-3.75 text-sm' : 'hidden'}`}>
                     <div className="w-full">
                         <div className="flex justify-between pb-2.5">
                             <div className="font-bold">
-                                {userGroup === "Заказчик" ? "Ваш комментарий" : "Комментарий от заказчика"}
+                                {userGroup === "Заказчик" ? "Ваш отзыв" : "Отзыв от заказчика"}
                             </div>
                             <div className="">
                                 {Array.from({ length: project.number_stars }).map((_, index) => (
@@ -101,7 +100,7 @@ function UserProjectButton ({ activeTab, project }) {
                                 ))}
                             </div>
                         </div>
-                        <div className="pl-2.5">
+                        <div className={`${project.comment ? 'pl-2.5' : 'hidden'}`}>
                             {project.comment}
                         </div>
                     </div>
@@ -129,11 +128,16 @@ function UserProject ({ project, activeTab }) {
             <div className="font-semibold text-base md:text-lg pb-6 cursor-pointer" onClick={() => navigate(`/tasks/${project.id}`)}> 
                 {project.name}
             </div>
-            {/* <div className="text-xs md:text-sm pb-4 md:pb-6">
-                {project.author}
-            </div> */}
             <div className="flex items-center gap-15 md:gap-10 pb-3 md:pb-6">
-                <UserProjectCategory category={project.category_project_id} />
+                {project.category_project_id !== null && 
+                    <UserProjectCategory category={project.category_project_id} />
+                }
+                {project.category_project_id === null && 
+                    <div className="flex items-center text-sm gap-2">
+                        <img className='size-8 md:size-10 shrink-0' src={custom_category} alt='' />
+                        {project.custom_category_project}
+                    </div>
+                }
                 <div className="flex gap-2">
                     <img className='size-8 md:size-10' src={points} alt="" />
                     <div className="text-sm">
@@ -161,6 +165,11 @@ function UserProject ({ project, activeTab }) {
                         {item.technologyName}
                     </div>
                 ))}
+                {(project.custom_technologies !== null && project.custom_technologies !== '') &&
+                    <div className="bg-gray-200 px-2.5 py-1.5 rounded-[50px] text-xs">
+                        {project.custom_technologies}
+                    </div>
+                }
             </div>
 
             <UserProjectButton activeTab={activeTab} project={project}/>

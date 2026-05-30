@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from 'react-router-dom'
+import { projectApi } from "../api/project"
 import { FormatDate } from "../shared/FormatDate"
 import { useUserStore } from "../store/UserStore"
 import { useTechnologiesStore } from "../store/TechnologiesStore"
 import { useProjectCategoryStore } from "../store/ProjectCategoryStore"
 import { useOrganizationStore } from "../store/OrganizationStore"
 import ProjectManagementPanel from "../components/ProjectManagementPanel"
-
-import mobile from '../assets/mobile.png'
-import web from '../assets/web.png'
-import database from '../assets/database.png'
+import Skeleton from "react-loading-skeleton"
+import 'react-loading-skeleton/dist/skeleton.css';
+import custom_category from '../assets/custom_category.png'
 import points from '../assets/points-reward.png'
 import money from '../assets/money-reward.png'
 
@@ -21,6 +21,21 @@ function UserProjectCategory ({ category }) {
         <div className="flex justify-baseline text-sm gap-2">
             <img className='size-8 md:size-10' src={`${projectCategory?.icon}`} alt='' />
             {projectCategory?.name}
+        </div>
+    )
+}
+
+function ProjectStatus ({ status }) {
+    const statusColors = {
+        "На проверке": "outline-gray-500 text-500",
+        "Поиск исполнителя": "outline-amber-600 text-amber-600",
+        "В работе": "outline-green-700 text-green-700",
+        "Завершен": "outline-blue-500 text-blue-500",
+    }
+
+    return (
+        <div className={`outline rounded-md px-2 py-0.5 ${statusColors[status]}`}>
+            {status}
         </div>
     )
 }
@@ -60,6 +75,8 @@ function Task() {
     const [projectData, setProjectData] = useState([])
     const [techList, setTechList] = useState([])
 
+    const [isLoading, setIsLoading] = useState(false)
+
     // const currentTask = tasks.find(task => task.id === Number(taskId))
 
     // const [isModalOpen, setIsModalOpen] = useState(false)
@@ -73,29 +90,26 @@ function Task() {
     const technologies = useTechnologiesStore((state) => state.technologies)
 
     useEffect(() => {
-      async function fetchProject() {
-        const response = await fetch(`/api/project_exchange/${taskId}/`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Basic ${user}`
-          }
-        })
-        if (response.ok) {
-          const data = await response.json()
-          setProjectData(data)
-                  
-                  setCurrentOrganization(organizations.find(item => item.id === data.customer.organization_id))
-        
-                  const techList = data.technologies_id.map(technology_id => {
-                      const technology = technologies.find(item => item.id === technology_id)
-                      return {
-                          ...technology_id,
-                          technologyName: technology ? technology.name : '',
-                      }
-                  })
+        async function fetchProject() {
+            setIsLoading(true)
 
-                  setTechList(techList)
-              }
+            const data = await projectApi.fetchChosenProject(taskId)
+            
+            setProjectData(data)
+                    
+            setCurrentOrganization(organizations.find(item => item.id === data.customer.organization_id))
+            
+            const techList = data.technologies_id.map(technology_id => {
+                const technology = technologies.find(item => item.id === technology_id)
+                    return {
+                        ...technology_id,
+                        technologyName: technology ? technology.name : '',
+                    }
+                })
+
+                setTechList(techList)
+
+                setIsLoading(false)
             }
         if (taskId) {
             fetchProject()
@@ -121,9 +135,13 @@ function Task() {
                     <div className="flex basis-264.5 flex-col gap-10">
                         <div className="">
                             <div className="flex justify-between">
-                                <div className="text-xl md:text-2xl font-semibold">
-                                    {projectData.name}
+                                <div className="flex items-center gap-10">
+                                    <div className="text-xl md:text-2xl font-semibold">
+                                        {isLoading ? <Skeleton height={24} width={400}/> : projectData.name }
+                                    </div>
+                                    {isLoading ? <Skeleton height={22} width={200}/> : <ProjectStatus status={projectData.project_status} />}
                                 </div>
+                                
                                 {projectData.permission?.change &&
                                     <div className="flex flex-nowrap mt-1.25">
                                         <div className="self-center pr-1.25">
@@ -137,29 +155,37 @@ function Task() {
                             </div>
                             <div className="flex gap-3.75 md:gap-7.5 text-sm md:text-sm pt-1.25 md:pt-2.5 font-normal">
                                 <p>
-                                    Автор: { currentOrganization?.full_name }
+                                    Автор: {isLoading ? <Skeleton height={14} width={200}/> : currentOrganization?.full_name }
                                 </p>
                                 <p>
-                                    Опубликовано: { FormatDate(projectData.created_at) }
+                                    Опубликовано: {isLoading ? <Skeleton height={14} width={120}/> : FormatDate(projectData.created_at) }
                                 </p>
                             </div>
                         </div>
                         <div className="text-lg md:text-xl font-semibold">
-                            Описание задачи
+                            Описание проекта
                             <div className="text-base pt-1.25 md:pt-2.5 pb-10 font-normal">
-                                {projectData.description}
+                                {isLoading ? <Skeleton height={16} width={878} count={5}/> : projectData.description }
                             </div>
                             <div className="font-normal text-base">
                                 <div className="flex items-center gap-15 md:gap-20">
                                     <div className="flex justify-baseline gap-2">
-                                        <UserProjectCategory category={projectData.category_project_id} />
+                                        {projectData.category_project_id !== null &&
+                                            <UserProjectCategory category={projectData.category_project_id} />
+                                        }
+                                        {projectData.category_project_id === null &&
+                                            <div className="flex justify-baseline text-sm gap-2">
+                                                <img className='size-8 md:size-10' src={custom_category} alt='' />
+                                                {projectData.custom_category_project}
+                                            </div>
+                                        }
                                     </div>
                                     <div title="Сумма баллов, которые получит исполнитель в случае успешного выполнения задачи" className="flex gap-2">
                                         <img className='size-8 md:size-10' src={points} alt="" />
                                         <div className="">
                                             Вознаграждение
                                             <div className="">
-                                                {projectData.number_of_points} баллов
+                                                {isLoading ? <Skeleton height={24} width={40}/> : `${projectData.number_of_points} баллов`} 
                                             </div>
                                         </div>
                                     </div>
@@ -185,16 +211,21 @@ function Task() {
                                         {item.technologyName}
                                     </div>
                                 ))}
+                                {(projectData.custom_technologies !== '' && projectData.custom_technologies !== null) &&
+                                    <div className="bg-gray-200 px-3 py-1.5 rounded-[50px] text-sm font-normal">
+                                        {projectData.custom_technologies}
+                                    </div>
+                                }
                             </div>
                         </div>
                         <div className="text-lg md:text-xl font-semibold">
                             Срок выполнения
                             <div className="text-sm pt-1.25 md:pt-2.5 font-normal">
-                                Проект необходимо выполнить до <span className='font-bold'>{ projectData.due_date }</span>
+                                Проект необходимо выполнить до <span className='font-bold'>{isLoading ? <Skeleton height={14} width={80}/> : new Date(projectData.due_date).toLocaleDateString('ru-RU') }</span>
                             </div>
                         </div>
 
-                        {projectData.files?.length !== 0 &&
+                        {(!isLoading && projectData.files?.length !== 0) &&
                             <div className="text-lg md:text-xl font-semibold">
                                 Дополнительные материалы
                                 <div className="text-sm pt-1.25 md:pt-2.5 font-normal">

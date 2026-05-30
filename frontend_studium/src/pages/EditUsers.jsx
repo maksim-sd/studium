@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { responseApi } from '../api/response'
+import { projectApi } from '../api/project'
+import { toast } from 'react-toastify'
 import { useUserStore } from '../store/UserStore'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css' 
 
 function AskModal ({ onClose }) {
     return (
@@ -40,7 +45,7 @@ function PaginatedTable ({ type, data, onAddUser, participants }) {
 
     const { taskId } = useParams()
 
-    const itemsPerPage = 10;
+    const itemsPerPage = 8;
     const [currentPage, setCurrentPage] = useState(1);
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -152,7 +157,7 @@ function PaginatedTable ({ type, data, onAddUser, participants }) {
                 }    
             </table>
 
-            <div className="flex justify-between items-center mt-auto">
+            <div className="flex justify-between items-center mt-auto mb-13">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
@@ -184,6 +189,8 @@ function EditUsers () {
     const [moderators, setModerators] = useState([])
     const [executors, setExecutors] = useState([])
 
+    const [isLoading, setIsLoading] = useState(false)
+
     const { taskId } = useParams()
 
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -192,17 +199,15 @@ function EditUsers () {
         setIsModalOpen(false)
     }
 
+    const location = useLocation()
+
     const handleAddUser = async (userId, group) => {
         try {
-            const response = await fetch(`/api/project_exchange/${taskId}/${group}/${userId}/`, {
-                method: 'POST', 
-                headers: {
-                    'Authorization': `Basic ${user}`
-                }
-            })
-            if (!response.ok) {
+            const response = await responseApi.fetchAddParticipant(taskId, group, userId)
+            if (!response) {
                 console.error('Ошибка при добавлении')
             }
+            toast.success("Пользователь был добавлен")
         } catch (error) {
             console.error('Ошибка при обращении к серверу')
         }
@@ -212,19 +217,14 @@ function EditUsers () {
         if (!window.confirm("Вы уверены, что хотите удалить этого пользователя?")) return
 
         try {
-            const response = await fetch(`/api/project_exchange/${taskId}/user/${userId}/`, {
-                method: 'DELETE', 
-                headers: {
-                    'Authorization': `Basic ${user}`
-                }
-            })
-            if (response.ok) {
+            const response = await responseApi.fetchDeleteParticipant(taskId, userId)
+            if (response) {
                 setParticipants(prevParticipants => ({
                     ...prevParticipants, 
                     moderators: prevParticipants.moderators.filter(person => person.id !== userId),
                     executors: prevParticipants.executors.filter(person => person.id !== userId),
                 }))
-                // notification?
+                toast.success("Пользователь был удален")
             } else {
                 alert('Не удалось удалить пользователя')
             }
@@ -250,54 +250,49 @@ function EditUsers () {
     }
 
     useEffect(() => {
-        async function fetchParticipants() {
-            const response = await fetch(`/api/project_exchange/${taskId}/participants/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Basic ${user}`
-                }
-            })
-            if (response.ok) {
-                const data = await response.json()
-                setParticipants(data)
+        async function fetchParticipants(isInitial = false) {
+            if (isInitial) {
+                setIsLoading(true)
+            }
+            const response = await projectApi.fetchProjectParticipants(taskId)
+            setParticipants(response)
+            if (isInitial) {
+                setIsLoading(false)
             }
         }
 
-        async function fetchUsers() {
+        async function fetchUsers(isInitial = false) {
+            if (isInitial) {
+                setIsLoading(true)
+            }
             try {
                 const [responseExec, responseModers] = await Promise.all([
-                    fetch(`/api/project_exchange/${taskId}/executors/`, {
-                        method: 'GET',
-                        headers: { 'Authorization': `Basic ${user}` }
-                    }),
-                    fetch(`/api/project_exchange/${taskId}/moderators/`, {
-                        method: 'GET',
-                        headers: { 'Authorization': `Basic ${user}` }
-                    })
+                    responseApi.fetchExecutors(taskId),
+                    responseApi.fetchModerators(taskId)
                 ])
-                if (responseExec.ok && responseModers.ok) {
-                    const dataExec = await responseExec.json()
-                    const dataModer = await responseModers.json()
-                        
-                    setExecutors(dataExec)
-                    setModerators(dataModer)
+                if (responseExec && responseModers) {             
+                    setExecutors(responseExec)
+                    setModerators(responseModers)
                 } else {
                     console.error('Ошибка при получении данных')
                 }
             } catch (error) {
                 console.error('Ошибка при получении данных')
             }
+            if (isInitial) {
+                setIsLoading(false)
+            }
         }
 
         if (taskId && user) {
-            fetchParticipants()
-            fetchUsers()
+            fetchParticipants(true)
+            fetchUsers(true)
         }
 
         const intervalId = setInterval(() => {
             if (taskId && user) {
-                fetchParticipants()
-                fetchUsers()
+                fetchParticipants(false)
+                fetchUsers(false)
             }
         }, 5000)
 
@@ -337,7 +332,15 @@ function EditUsers () {
                             </div>
                         </div>
                         <div className="overflow-x-auto">
-                            {tabContent[activeTab]}
+                            {isLoading ? (
+                                <div className="py-4">
+                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => (
+                                        <Skeleton key={i} height={50} width="100%" className="rounded-md" />
+                                    ))}
+                                </div>
+                            ): (
+                                tabContent[activeTab]
+                            )}
                         </div>
                     </div>
                     <div className="basis-1/4">
@@ -348,45 +351,75 @@ function EditUsers () {
                             <div className="flex flex-col">
                                 <div className="border-b border-gray-400 pb-2.5">
                                     Заказчик:
-                                    <div className="pl-2.5 py-4 text-sm">
-                                        {participants.customer?.last_name} {participants.customer?.first_name}
+                                    <div className="">
+                                        {isLoading ? (
+                                            <Skeleton height={46} width="100%" className="rounded-md" />
+                                        ) : (
+                                            <div className="pl-2.5 py-4 text-sm">
+                                                {participants.customer?.last_name} {participants.customer?.first_name}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="border-b border-gray-400 pt-5 pb-2.5">
                                     Модераторы:
-                                    <ul className='pl-2.5 text-sm'>
-                                        {participants.moderators?.map((person) => (
-                                            <li key={person.id} className='flex justify-between py-4'>
-                                                <div className="">
-                                                    {person.last_name} {person.first_name}
-                                                </div>
-                                                <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer`}>
-                                                    ❌
-                                                </div>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                    {isLoading ? (
+                                        <div className="">
+                                            {[1, 2, 3 ].map(i => (
+                                                <Skeleton key={i} height={40} width="100%" className="rounded-md mb-1.5" />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <ul className='pl-2.5 text-sm'>
+                                            {participants.moderators?.map((person) => (
+                                                <li key={person.id} className='flex justify-between py-4'>
+                                                    <div className="">
+                                                        {person.last_name} {person.first_name}
+                                                    </div>
+                                                    <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer`}>
+                                                        ❌
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
                                 </div>
                                 <div className="pt-5 pb-2.5">
                                     Исполнители:
-                                    <ul className='pl-2.5 text-sm'>
-                                        {participants.executors?.map((person) => (
-                                            <li className='flex justify-between py-4'>
-                                                <div className="">
-                                                    {person.last_name} {person.first_name}
-                                                </div>
-                                                <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer`}>
-                                                    ❌
-                                                </div>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                    {isLoading ? (
+                                        <div className="">
+                                            {[1, 2, 3 ].map(i => (
+                                                <Skeleton key={i} height={40} width="100%" className="rounded-md mb-1.5" />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <ul className='pl-2.5 text-sm'>
+                                            {participants.executors?.map((person) => (
+                                                <li className='flex justify-between py-4'>
+                                                    <div className="">
+                                                        {person.last_name} {person.first_name}
+                                                    </div>
+                                                    <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer`}>
+                                                        ❌
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                    
                                 </div>
                             </div>
-                            <div className="self-center mt-auto mb-7.5">
-                                <div onClick={() => navigate('/chats')} className="px-9 py-3 cursor-pointer rounded-md text-white text-lg font-bold bg-green-700 hover:bg-green-800 active:bg-green-900">
-                                    Вернуться к чату
-                                </div>
+                            <div className="self-center mt-auto">
+                                {location.state?.from === `/tasks/${taskId}` ? (
+                                    <div onClick={() => navigate(`/tasks/${taskId}`)} className="px-9 py-3 cursor-pointer rounded-md text-white text-lg font-bold bg-green-700 hover:bg-green-800 active:bg-green-900">
+                                        Вернуться к проекту
+                                    </div>
+                                ) : (
+                                    <div onClick={() => navigate('/chats')} className="px-9 py-3 cursor-pointer rounded-md text-white text-lg font-bold bg-green-700 hover:bg-green-800 active:bg-green-900">
+                                        Вернуться к чату
+                                    </div>
+                                )}
+                                
                             </div>
                         </div>
                     </div>

@@ -1,32 +1,21 @@
-import { useState, useEffect } from "react"
-import OfferCard from "../components/OfferCard"
+import { useState, useEffect, useRef } from "react"
+import { requestApi } from "../api/request"
 import { useUserStore } from "../store/UserStore"
+import OfferCard from "../components/OfferCard"
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css' 
 
 function OfferModal ({ user, onClose }) {
     const [offerText, setOfferText] = useState('')
+    const mountedRef = useRef(true)
 
     const handleOfferSend = async () => {
-        const data = {
-            'message': offerText,
-        }
-
         try {
-            const response = await fetch(`/api/user/request/`, {
-                method: 'POST', 
-                headers: {
-                    'Authorization': `Basic ${user}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data) 
-            })
-            if (response.ok) {
-                onClose()
-            } else {
-                alert('Не удалось отправить предложение')
-            }
+            const response = await requestApi.fetchPostRequest(offerText)
         } catch (error) {
             console.error(error.message)
         }
+        onClose()
     }
 
     return (
@@ -67,23 +56,29 @@ function HelpUsBecomBetter () {
         setIsModalOpen(false)
     }
 
+    const [isLoading, setIsLoading] = useState(false)
+
     useEffect(() => {
-        async function fetchRequests() {
-            const response = await fetch('/api/user/requests/', {
-                method: 'GET', 
-                headers: {
-                    'Authorization': `Basic ${user}`,
-                    'Content-Type': 'application/json'
-                },
-            })
-            if (response.ok) {
-                const data = await response.json()
-                setRequests(data)
-            } else (
-                console.error("Ошибка получения обращений")
-            )
+        async function fetchRequests(isInitial = false) {
+            if (isInitial) {
+                setIsLoading(true)
+            }
+
+            const data = await requestApi.fetchRequests()
+            setRequests(data)
+
+            if (isInitial) {
+                setIsLoading(false)
+            }
         }
-        fetchRequests()
+
+        fetchRequests(true)
+
+        const intervalId = setInterval(() => {
+            fetchRequests(false)
+        }, 5000)
+        
+        return () => clearInterval(intervalId)
     }, [])
 
     return (
@@ -107,9 +102,20 @@ function HelpUsBecomBetter () {
                         История обращений
                     </div>
                     <div className="flex flex-col gap-5">
-                        {requests.map((request) => (
-                            <OfferCard request={request} />
-                        ))}
+                        {isLoading ? (
+                            <div className="flex flex-col gap-5">
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="border border-gray-200 rounded-md p-6.25">
+                                        <Skeleton height={24} width="40%" className="mb-6" />
+                                        <Skeleton height={16} width="80%" />
+                                    </div>
+                                ))}
+                            </div>
+                        ): (
+                            requests.map((request) => (
+                                <OfferCard request={request} />
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

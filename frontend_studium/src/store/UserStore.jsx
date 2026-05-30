@@ -1,38 +1,31 @@
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { createJSONStorage, persist } from "zustand/middleware"
 
 export const createUserGroupSlice = (set, get) => ({
     groups: [],
+    isLoading: false,
 
     fetchGroups: async () => {
         try {
-        const currentUser = get().currentUser
-
-        if (!currentUser) throw new Error('No user authenticated');
-
-            const response = await fetch(`/api/user/groups/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Basic ${currentUser}`
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to fetch users groups!');
-            }
-
-            const data = await response.json()
+            set({ isLoading: true })
+            const { userApi } = await import('../api/user')
+            const data = await userApi.fetchGroups()
 
             const userGroupId = get().currentUserData?.groups_id
 
-            const userGroup = data.filter(group => userGroupId[0] === group.id)
-
-            set({ groups: userGroup[0].name })
-
-            return true;
+            if (userGroupId && userGroupId.length > 0) {
+                const userGroup = data.filter(group => userGroupId[0] === group.id)
+                if (userGroup.length > 0) {
+                    set({ groups: userGroup[0].name, isLoading: false })
+                }
+            } else {
+                set({ isLoading: false })
+            }
+            return true
         } catch (error) {
-            console.log(error);
-            return false;
+            console.log(error)
+            set({ groups: userGroup[0].name, isLoading: false })
+            return false
         }
     }
 })
@@ -41,44 +34,79 @@ export const createUserSlice = (set, get) => ({
     isAuth: false,
     currentUser: null,
     currentUserData: [],
+    isLoading: true,
 
-    logoutUser: () => set({
-        isAuth: false,
-        currentUser: null,
-        currentUserData: [],
-        groups: [], 
-    }),
+    checkAuth: async () => {
+        const storedData = localStorage.getItem('user-storage')
+        
+        if (!storedData) {
+            set({ isLoading: false, isAuth: false })
+            return false
+        }
+
+        try {
+            const parsedData = JSON.parse(storedData)
+            const { currentUser, currentUserData } = parsedData.state
+            
+            if (currentUser && currentUserData?.id) {
+                const { userApi } = await import('../api/user')
+                const isValid = await userApi.fetchUser(currentUser)
+                
+                if (isValid) {
+                    set({ 
+                        isAuth: true, 
+                        currentUser, 
+                        currentUserData,
+                        isLoading: false 
+                    })
+                    if (!get().groups?.length) {
+                        await get().fetchGroups()
+                    }
+                    return true
+                }
+            }
+            
+            set({ isLoading: false, isAuth: false })
+            return false
+        } catch (error) {
+            console.log('Auth check failed:', error)
+            set({ isLoading: false, isAuth: false })
+            return false
+        }
+    },
+
+    logoutUser: () => {
+        set({
+            isAuth: false,
+            currentUser: null,
+            currentUserData: [],
+            isLoading: false,
+        })
+        set({ groups: [] })
+        localStorage.removeItem('user-storage')
+    },
 
     fetchUser: async (credentials) => {
+        set({ isLoading: true })
         try {
-            const response = await fetch(`/api/user/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Basic ${credentials}`
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to fetch user!');
-            }
-
-            const data = await response.json();
+            const { userApi } = await import('../api/user')
+            const data = await userApi.fetchUser(credentials)
 
             set({
                 isAuth: true,
                 currentUser: credentials,
                 currentUserData: data,
-            });
-
-            await get().fetchGroups();
-
-            return true;
+                isLoading: false,
+            })
+            await get().fetchGroups()
+            return true
         } catch (error) {
-            console.log(error);
-            return false;
+            console.log(error)
+            set({ isLoading: false })
+            return false
         }
     }
-});
+})
 
 export const useUserStore = create()(persist((set, get, store) => ({
     ...createUserSlice(set, get, store),
@@ -86,6 +114,12 @@ export const useUserStore = create()(persist((set, get, store) => ({
 }),
     {
         name: 'user-storage',
-        getStorage: () => localStorage,
+        storage: createJSONStorage(() => localStorage),
+        partialize: (state) => ({
+            isAuth: state.isAuth,
+            currentUser: state.currentUser,
+            currentUserData: state.currentUserData,
+            groups: state.groups
+        })
     }
 ))

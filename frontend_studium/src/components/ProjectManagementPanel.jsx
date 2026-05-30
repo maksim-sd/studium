@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
+import { projectApi } from "../api/project"
+import { responseApi } from "../api/response"
 import { useUserStore } from "../store/UserStore"
+import { toast } from "react-toastify"
 
 function ConfirmationModal ({task, onClose}) {
     return (
@@ -78,19 +81,13 @@ function FeedbackModal ({ projectId, onClose }) {
         }
 
         try {
-            const response = await fetch(`/api/project_exchange/${projectId}/feedback/`, {
-                method: 'POST', 
-                headers: {
-                    'Authorization': `Basic ${user}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data) 
-            })
-            if (response.ok) {
+            const response = await projectApi.fetchFeedback(projectId, JSON.stringify(data))
+
+            if (response.detail === 'Отзыв оставлен') {
+                toast.success("Отзыв сохранен!")
                 onClose()
-                // notification?
             } else {
-                alert('Не удалось оставить отзыв')
+                toast.error("Не удалось оставить отзыв")
             }
         } catch (error) {
             console.error(error.message)
@@ -155,18 +152,8 @@ function ExecutorResponsePanel ({ project }) {
             "comment": textResponse,
         }
 
-        const response = await fetch(`/api/project_exchange/${project.id}/response/`, {
-			method: 'POST',
-			headers: {
-				'Authorization': `Basic ${user}`,
-                'Content-Type': 'application/json'
-			},
-            body: JSON.stringify(data)
-		})
-
-        if (response.ok) {
-            setIsModalOpen(true)
-        }
+        const response = await responseApi.fetchResponse(project.id, JSON.stringify(data))
+        setIsModalOpen(true)
     }
 
     if (project.project_status === 'Поиск исполнителя') {
@@ -230,21 +217,19 @@ function ProjectManagementPanel ({ project }) {
         navigate('/tasks')
     }
 
+    const location = useLocation()
+
     const handleCanceling = async () => {
         if (!window.confirm("Вы уверены, что хотите отменить данный проект? Отменить действие будет невозможно")) return
 
         try {
-            const response = await fetch(`/api/project_exchange/${project.id}/cancel/`, {
-                method: 'POST', 
-                headers: {
-                    'Authorization': `Basic ${user}`
-                }
-            })
-            if (response.ok) {
+            const data = await projectApi.fetchCancelProject(project.id)
+            
+            if (data.detail === "Задача отменена") {
                 navigate('/profile')
-                // notification?
+                toast.success(`Проект "${project.name}" был отменен`)
             } else {
-                alert('Не удалось отменить проект')
+                toast.error(`Не удалось отменить проект "${project.name}`)
             }
         } catch (error) {
             console.error(error.message)
@@ -255,17 +240,13 @@ function ProjectManagementPanel ({ project }) {
         if (!window.confirm("Вы уверены, что хотите завершить работу над данным проектом?")) return
 
         try {
-            const response = await fetch(`/api/project_exchange/${project.id}/complete/`, {
-                method: 'POST', 
-                headers: {
-                    'Authorization': `Basic ${user}`
-                }
-            })
-            if (response.ok) {
+            const data = await projectApi.fetchCompleteProject(project.id)
+            
+            if (data.detail === "Задача завершена") {
                 setIsFeedbackModalOpen(true)
-                // notification?
+                toast.success(data.detail)
             } else {
-                alert('Не удалось удалить пользователя')
+                toast.error(data.detail)
             }
         } catch (error) {
             console.error(error.message)
@@ -299,29 +280,13 @@ function ProjectManagementPanel ({ project }) {
 
     useEffect(() => {
         async function fetchResponses() {
-            const response = await fetch(`/api/project_exchange/${project.id}/response/quantity/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Basic ${user}`
-                }
-            })
-            if (response.ok) {
-                const data = await response.json()
-                setResponses(data)
-            }
+            const data = await responseApi.fetchResponseQuantity(project.id)
+            setResponses(data)
         }
 
         async function fetchParticipants() {
-            const response = await fetch(`/api/project_exchange/${project.id}/participants/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Basic ${user}`
-                }
-            })
-            if (response.ok) {
-                const data = await response.json()
-                setParticipants(data)
-            }
+            const data = await projectApi.fetchProjectParticipants(project.id)
+            setParticipants(data)
         }
 
         if (userGroup === "Модератор" && project.permission?.view_responses) {
@@ -386,7 +351,7 @@ function ProjectManagementPanel ({ project }) {
                     </div>
                     {(userGroup === "Модератор" && project.permission?.view_participants) &&
                         <div className="self-center mt-auto mb-7.5">
-                            <div onClick={() => navigate(`/tasks/${project.id}/edit-users`)} className="px-9 py-3 cursor-pointer rounded-md text-white text-lg font-bold bg-green-700 hover:bg-green-800 active:bg-green-900">
+                            <div onClick={() => navigate(`/tasks/${project.id}/edit-users`, { state : { from : location.pathname }})} className="px-9 py-3 cursor-pointer rounded-md text-white text-lg font-bold bg-green-700 hover:bg-green-800 active:bg-green-900">
                                 Добавить участников
                             </div>
                         </div>
@@ -397,10 +362,10 @@ function ProjectManagementPanel ({ project }) {
                 <div className="bg-gray-100 rounded-md flex flex-col p-5 items-center text-center gap-3.75 self-start">
                     <div className="flex flex-col gap-5">
                         <div className="text-xl font-bold">
-                            Проект находится на проверке
+                            {project.project_status === "На проверке" ? "Проект находится на проверке" : "Ищем исполнителей для проекта"}
                         </div>
                         <div className="text-sm">
-                            После проверки модератором проект будет опубликован
+                            {project.project_status === "На проверке" ? "После проверки модератором проект будет опубликован" : "Вскоре сможем приступить к работе над Вашим проектом!"}
                         </div>
                     </div>
                     <div className="text-sm pt-10 underline cursor-pointer" onClick={() => handleCanceling()}>

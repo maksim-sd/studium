@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { projectApi } from '../api/project'
 import { FormatDate } from '../shared/FormatDate'
 import { useUserStore } from '../store/UserStore'
 import { useProductCategoryStore } from '../store/ProductCategoryStore'
 import UserProject from '../components/UserProject'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 function Profile () {
     const navigate = useNavigate()
@@ -19,6 +22,8 @@ function Profile () {
     const [moderateProjects, setModerateProjects] = useState([])
     const [underInspectionProjects, setUnderInspectionProjects] = useState([])
     const [archivedProjects, setArchivedProjects] = useState([])
+
+    const [isLoading, setIsLoading] = useState(false)
 
     const [activeTab, setActiveTab] = useState('current-projects')
 
@@ -37,7 +42,7 @@ function Profile () {
             ],
             "Модератор": [
                 {id: 'current-projects', label: 'Текущие проекты'},
-                {id: 'looking-for-executor', label: 'Поиск исполнителя'},
+                {id: 'looking-for-executor', label: 'Отклики на задачи'},
                 {id: 'wait-for-inspection', label: 'Проекты для модерации'},
                 {id: 'archived-projects', label: 'Завершенные проекты'},
             ],
@@ -145,70 +150,47 @@ function Profile () {
 
         setActiveTab('current-projects')
 
-        async function fetchProjects() {
+        async function fetchProjects(isInitial = false) {
             if (!user) return
 
-            if (userGroup === "Модератор") {
-                const responseModeration = await fetch(`/api/project_exchange/moderation/`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Basic ${user}`
-                    }
-                })
-                if (responseModeration.ok) {
-                    const data = await responseModeration.json()
+            if (isInitial) {
+                setIsLoading(true)
+            }
 
-                    setModerateProjects(data.filter((project) => project.project_status === 'На проверке'))
-                    setFutureProjects(data.filter((project) => project.project_status === 'Поиск исполнителя'))
-                }
+            if (userGroup === "Модератор") {
+                const data = await projectApi.fetchModerateProjects()
+
+                setModerateProjects(data.filter((project) => project.project_status === 'На проверке'))
+                setFutureProjects(data.filter((project) => project.project_status === 'Поиск исполнителя'))
             }
 
             if (userGroup === "Исполнитель") {
-                const responseResponses = await fetch('/api/project_exchange/responses/', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Basic ${user}`
-                    }
-                })
-                if (responseResponses.ok) {
-                    const data = await responseResponses.json()
-                    setResponsedProjects(data)
-                }
+                const data = await projectApi.fetchResponsedProjects()
+                setResponsedProjects(data)
             }
 
-            const responseActive = await fetch(`/api/project_exchange/active/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Basic ${user}`
-                }
-            })
-            if (responseActive.ok) {
-                const data = await responseActive.json()
+            const active = await projectApi.fetchActiveProjects()
 
-                setCurrentProjects(data.filter((project) => project.project_status === 'В работе'))
-                setUnderInspectionProjects(data.filter((project) => project.project_status === 'На проверке'))
-                if (userGroup === "Заказчик") {
-                    setFutureProjects(data.filter((project) => project.project_status === "Поиск исполнителя"))
-                }
+            setCurrentProjects(active.filter((project) => project.project_status === 'В работе'))
+            setUnderInspectionProjects(active.filter((project) => project.project_status === 'На проверке'))
+
+            if (userGroup === "Заказчик") {
+                setFutureProjects(active.filter((project) => project.project_status === "Поиск исполнителя"))
             }
 
-            const responseArchived = await fetch('/api/project_exchange/history/', {
-                method: 'GET',
-				headers: {
-					'Authorization': `Basic ${user}`
-				}
-			})
-            if (responseArchived.ok) {
-                const data = await responseArchived.json()
-                setArchivedProjects(data)
+            const archived = await projectApi.fetchArchivedProjects()
+            setArchivedProjects(archived)
+
+            if (isInitial) {
+                setIsLoading(false)
             }
 		}
 
-        fetchProjects()
+        fetchProjects(true)
 
         const intervalId = setInterval(() => {
             if (user) {
-                fetchProjects()
+                fetchProjects(false)
             }
         }, 5000)
 
@@ -227,26 +209,26 @@ function Profile () {
                         <div className="font-bold text-xl md:text-2xl mb-2.5 md:mb-3">
                             {userData.last_name} {userData.first_name} {userData.patronymic}
                         </div>
+                        <div className="h-fit rounded-md mb-2.5 md:mb-3 font-semibold">
+                            {userGroup}
+                        </div>
                         {userGroup === 'Исполнитель' &&
-                            <div className="flex flex-col gap-5">
-                                <div className="text-base text-gray-600">
-                                    {userData.faculty}, {userData.specialty}, {userData.study_group}
-                                </div>
-                                <div className="text-sm md:text-lg">
-                                    Рейтинг пользователя: {userData.average_rating}⭐
-                                </div>
+                            <div className="text-base text-gray-600 mt-3">
+                                Факультет {userData.faculty}, {userData.specialty}, {userData.study_group}
                             </div>
                         }
                         {userGroup === 'Заказчик' &&
                             <div className="px-4 py-2 rounded-md cursor-pointer text-sm md:text-lg bg-green-700 hover:bg-green-800 active:bg-green-900 text-center text-white mt-5"
                                 onClick={() => navigate('/create-new-task')}>
-                                Создать новую задачу
+                                Создать новый проект
                             </div>
                         }
                     </div>
-                    <div className="text-gray-400">
-                        Последний логин: {FormatDate(userData.last_login)}
-                    </div>
+                    {userGroup === 'Исполнитель' && 
+                        <div className={`text-sm md:text-lg mt-2.5 md:mt-5 outline-2 outline-amber-400 px-2 py-0.5 rounded-md h-fit ${userData.average_rating > 4 ? "outline-green-700" : "outline-amber-400"}`}>
+                            Рейтинг пользователя: {userData.average_rating}⭐
+                        </div>
+                    }
                 </div>
             </div>
             <div className="">
@@ -267,7 +249,30 @@ function Profile () {
                     </div>
                 </div>
                 <div className="p-4">
-                    {tabContent[activeTab]}
+                    {isLoading ? (
+                        <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
+                            {[1, 2, 3, 4].map(i => (
+                                <div key={i} className="border border-gray-200 rounded-md p-5">
+                                    <Skeleton height={18} width="60%" className="mb-6" />
+                                    <div className="flex gap-5 mb-6">
+                                        <Skeleton height={40} width={150} />
+                                        <Skeleton height={40} width={150} />
+                                    </div>
+                                    <Skeleton height={16} count={3} className="mb-6" />
+                                    <div className="flex gap-1.25 mb-6">
+                                        <Skeleton width={60} height={28} />
+                                        <Skeleton width={60} height={28} />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Skeleton width={80} height={30} />
+                                        <Skeleton width={80} height={30} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ): (
+                        tabContent[activeTab]
+                    )}
                 </div>
             </div>
         </div>

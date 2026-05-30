@@ -1,16 +1,16 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Navigate } from "react-router-dom"
+import { toast } from "react-toastify"
 import { useUserStore } from "../store/UserStore"
 import { useTechnologiesStore } from "../store/TechnologiesStore"
 import { useProjectCategoryStore } from "../store/ProjectCategoryStore"
 import { useOrganizationStore } from "../store/OrganizationStore"
 
 function LoginPage () {
+    const isAuth = useUserStore((state) => state.isAuth)
     const navigate = useNavigate()
 
-    const currentUser = useUserStore((state) => state.currentUser)
     const fetchUser = useUserStore((state) => state.fetchUser)
-
     const fetchTechnologies = useTechnologiesStore((state) => state.fetchTechnologies)
     const fetchProjectCategories = useProjectCategoryStore((state) => state.fetchCategories)
     const fetchOrganizations = useOrganizationStore((state) => state.fetchOrganizations)
@@ -31,9 +31,14 @@ function LoginPage () {
                 fetchOrganizations(credentials),
             ])
             navigate('/profile')
+            toast.success("Вы успешно вошли в свою учетную запись!")
         } else {
-            alert('Пользователь не найден')
+            toast.error('Неправильный логин или пароль!')
         }
+    }
+
+    if (isAuth) {
+        return <Navigate to='/profile' replace />
     }
 
     return (

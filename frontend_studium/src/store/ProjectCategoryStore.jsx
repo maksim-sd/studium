@@ -1,22 +1,15 @@
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { createJSONStorage, persist } from "zustand/middleware"
+import { projectApi } from "../api/project"
 
-export const useProjectCategoryStore = create()(persist((set) => ({
+export const useProjectCategoryStore = create()(persist((set, get) => ({
     categories: [],
 
     fetchCategories: async (currentUser) => {
-        try {
-            const response = await fetch (`/api/project_exchange/categories/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Basic ${currentUser}`
-                }
-            })
-            if (!response.ok) {
-                throw new Error('Failed to fetch tags!')
-            }
+        if (get().categories.length > 0) return
 
-            const data = await response.json()
+        try {
+            const data = await projectApi.fetchCategories()
 
             set({
                 categories: data,
@@ -31,6 +24,6 @@ export const useProjectCategoryStore = create()(persist((set) => ({
 }),
     {
         name: 'project-categories-storage',
-        getStorage: () => localStorage,
+        storage: createJSONStorage(() => localStorage),
     }
 ))

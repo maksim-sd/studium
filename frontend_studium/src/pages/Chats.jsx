@@ -2,6 +2,8 @@ import { useRef, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { FormatDate } from '../shared/FormatDate'
 import { useUserStore } from '../store/UserStore'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css' 
 
 function ChatPanel ({ chatInfo }) {
     const navigate = useNavigate()
@@ -135,6 +137,8 @@ function Chats() {
     const userGroup = useUserStore((state) => state.groups)
     const navigate = useNavigate()
 
+    const [isLoading, setIsLoading] = useState(false)
+
     const { chatId } = useParams()
 
     const [userChats, setUserChats] = useState([])
@@ -194,6 +198,7 @@ function Chats() {
 
     useEffect(() => {
         async function fetchUserChats () {
+            setIsLoading(true)
             const response = await fetch('/api/project_exchange/user/chats/', {
                 method: 'GET',
                 headers: {
@@ -204,6 +209,7 @@ function Chats() {
                 const data = await response.json()
                 setUserChats(data)
                 setCurrentChat(data.find((chat) => parseInt(chat.id, 10) === parseInt(chatId, 10)))
+                setIsLoading(false)
             }
         } 
         fetchUserChats()
@@ -212,25 +218,34 @@ function Chats() {
     return (
         <div className="mx-5 md:mx-62.5 flex gap-7.5 pb-10">
             <div className="basis-1/4 flex flex-col gap-3 p-2.5 h-[80vh] outline outline-gray-300 rounded-md">
-                {/* <div className="">
-                    <input type="text" className="bg-white outline outline-gray-400 focus:outline-green-600 rounded-md w-full p-1.25" placeholder="Поиск среди чатов..." />
-                </div> */}
                 <div className="text-lg text-center border-b border-b-gray-300 pb-2">
                     Список чатов
                 </div>
-                {userChats.length > 0 ? (
+                {isLoading ? (
                     <div className="flex flex-col gap-2.5">
-                        {userChats.map((chat) => (
-                            <ChatPanel chatInfo={chat} />
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="border border-gray-200 rounded-md p-2.5">
+                                <Skeleton height={36} width="60%" className="mb-6" />
+                                <Skeleton height={12} count={2} width="80%" className="mb-3" />
+                            </div>
                         ))}
                     </div>
-                ) : (
-                    <div className="flex items-center justify-center mt-5">
-                        <div className="">
-                            У Вас пока нет активных чатов
+                ): (
+                    userChats.length > 0 ? (
+                        <div className="flex flex-col gap-2.5">
+                            {userChats.map((chat) => (
+                                <ChatPanel chatInfo={chat} />
+                            ))}
                         </div>
-                    </div>
+                    ) : (
+                        <div className="flex items-center justify-center mt-5">
+                            <div className="">
+                                У Вас пока нет активных чатов
+                            </div>
+                        </div>
+                    )
                 )}
+                
             </div>
             {chatId === undefined ? (
                 <div className="basis-3/4 bg-gray-200 flex flex-col outline outline-gray-300 rounded-md">
@@ -244,10 +259,10 @@ function Chats() {
                         <div className="flex items-center pl-5">
                             <div className="flex flex-col gap-1.5">
                                 <div title='Перейти к деталям проекта' className="text-[18px] cursor-pointer" onClick={() => navigate(`/tasks/${currentChat.project?.id}`)} >
-                                    {currentChat ? currentChat.project.name : '...'}
+                                    {(!isLoading && currentChat) ? currentChat.project.name : <Skeleton width={260} height={24} />}
                                 </div>
                                 <div className="text-sm cursor-pointer" onClick={() => navigate(`/tasks/${currentChat.project?.id}/edit-users`)} >
-                                    Участники чата
+                                    {isLoading ? <Skeleton width={130} height={12} /> : "Участники чата"}
                                 </div>
                             </div>
                         </div>
@@ -259,40 +274,31 @@ function Chats() {
                                     <div className="py-1 hover:font-semibold">
                                         <a
                                             key={1}
-                                            href="/tasks/1"
+                                            href={`/tasks/${currentChat.project.id}`}
                                             className="text-gray-700 block px-4 py-2 text-sm"
                                             onClick={() => setIsOpen(false)}
                                         >
                                             Перейти к задаче
                                         </a>
                                     </div>
-                                    <div className="py-1 hover:font-semibold">
-                                        <a
-                                            key={2}
-                                            href="/tasks/1/edit-users"
-                                            className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100"
-                                            onClick={() => setIsOpen(false)}
-                                        >
-                                            Изменить участников
-                                        </a>
-                                    </div>
+                                    {userGroup === "Модератор" &&
+                                        <div className="py-1 hover:font-semibold">
+                                            <a
+                                                key={2}
+                                                href={`/tasks/${currentChat.project.id}/edit-users`}
+                                                className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100"
+                                                onClick={() => setIsOpen(false)}
+                                            >
+                                                Изменить участников
+                                            </a>
+                                        </div>
+                                    }
                                 </div>
                             )}
                         </div>
                     }
                     </div>
                     <Messenger chatId={chatId} user={user} userId={userData.id} />
-                    {/* <div className="p-2.5 flex flex-col gap-2">
-                        <div className="self-end bg-green-700 text-white px-3 py-1.5 rounded-l-full rounded-t-full">
-                            Привет!
-                        </div>
-                        <div className="self-end bg-green-700 text-white px-3 py-1.5 rounded-l-full rounded-t-full">
-                            Я здесь только для того, чтобы показать визуал
-                        </div>
-                        <div className="self-start bg-white px-3 py-1.5 rounded-r-full rounded-t-full">
-                            Привет! Хорошо
-                        </div>
-                    </div> */}
                     <div className="flex items-center gap-2.5 rounded-2xl bg-white mt-auto p-2.5 border-10 border-gray-200">
                         <div className="self-end mb-2.5 cursor-pointer">
                             🧷

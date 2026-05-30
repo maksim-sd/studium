@@ -1,8 +1,11 @@
 import { useEffect, useState, useCallback, useMemos } from 'react';
 import { useUserStore } from '../store/UserStore.jsx';
+import { projectApi } from '../api/project.jsx';
 import { useTechnologiesStore } from '../store/TechnologiesStore.jsx'
-import { useProjectCategoryStore } from '../store/ProjectCategoryStore.jsx';
-import TaskCard from '../components/TaskCard.jsx'          
+import { useProjectCategoryStore } from '../store/ProjectCategoryStore.jsx'
+import TaskCard from '../components/TaskCard.jsx'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'   
 
 function ProjectsContent ({ projects }) {
 	if (projects.length === 0) {
@@ -38,40 +41,51 @@ function Tasks () {
 	const [selectedCategories, setSelectedCategories] = useState([])
 	const [selectedTechnologies, setSelectedTechnologies] = useState([])
 
-	const fetchProjects = async () => {
+	const [isLoading, setIsLoading] = useState(false)
+
+	const fetchProjects = async (overrideParams = null) => {
+		setIsLoading(true)
 		try {
 			const params = new URLSearchParams()
 
-			if (searchTerm) {
-				params.append('search', searchTerm)
+			const search = overrideParams ? overrideParams.search : searchTerm
+			const categories = overrideParams ? overrideParams.categories : selectedCategories
+			const technologies = overrideParams ? overrideParams.technologies : selectedTechnologies
+
+			if (search) {
+				params.append('search', search)
 			}
 
-			if (selectedCategories.length > 0) {
-				selectedCategories.forEach(category => {
+			if (categories.length > 0) {
+				categories.forEach(category => {
 					params.append('category_id', category)
 				})
 			}
 
-			if (selectedTechnologies.length > 0) {
-				selectedTechnologies.forEach(technology => {
+			if (technologies.length > 0) {
+				technologies.forEach(technology => {
 					params.append('technologies_id', technology)
 				})
 			}
 
-		const response = await fetch (`/api/project_exchange/?${params.toString()}`, {
-			method: 'GET',
-			headers: {
-				'accept': 'application/json',
-				'Authorization': `Basic ${user}`
-				}
-			})
-			if (response.ok) {
-				const data = await response.json()
-				setProjects(data)
-			}
+			const data = await projectApi.fetchProjects(params.toString())
+			setProjects(data)
+
+		// const response = await fetch (`/api/project_exchange/?${params.toString()}`, {
+		// 	method: 'GET',
+		// 	headers: {
+		// 		'accept': 'application/json',
+		// 		'Authorization': `Basic ${user}`
+		// 		}
+		// 	})
+		// 	if (response.ok) {
+		// 		const data = await response.json()
+		// 		setProjects(data)
+		// 	}
 		} catch (error) {
 			console.log(error)
 		}
+		setIsLoading(false)
 	}
 
 	const handleSearchChange = (e) => {
@@ -103,7 +117,7 @@ function Tasks () {
 		setSelectedCategories([])
 		setSelectedTechnologies([])
 
-		fetchProjects()
+		fetchProjects({ search: '', categories: [], technologies: [] })
 	}
 
 	const applyFilters = () => {
@@ -195,9 +209,28 @@ function Tasks () {
 						</div>
 					</div>
 				</div>
-				<div className="">
-					<ProjectsContent projects={projects} />
-				</div>
+				{isLoading ? (
+					<div className="flex flex-col gap-5">
+						{[1, 2, 3].map(i => (
+							<div key={i} className="border border-gray-200 rounded-md p-7.5">
+								<Skeleton height={24} width="60%" className="mb-6" />
+								<div className="flex gap-5 mb-6">
+									<Skeleton height={40} width={150} />
+									<Skeleton height={40} width={150} />
+								</div>
+								<Skeleton height={16} count={1} className="mb-6" />
+								<div className="flex gap-1.25 mb-6">
+									<Skeleton width={120} height={32} />
+									<Skeleton width={120} height={32} />
+								</div>
+							</div>
+						))}
+					</div>
+				): (
+					<div className="">
+						<ProjectsContent projects={projects} />
+					</div>
+				)}
 			</div>           
         </div>
     )

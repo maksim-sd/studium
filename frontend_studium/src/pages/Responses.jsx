@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from 'react-router-dom'
+import { projectApi } from "../api/project"
+import { responseApi } from "../api/response"
 import { useUserStore } from "../store/UserStore"
+import { toast } from "react-toastify"
 import ResponseCard from "../components/ResponseCard"
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css' 
 
 function ConfirmationModal ({onClose}) {
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -44,6 +49,8 @@ function Responses () {
     const [projectName, setProjectName] = useState('')
     const [responses, setRepsonses] = useState([])
 
+    const [isLoading, setIsLoading] = useState(false)
+
     const closeModal = () => {
         setIsModalOpen(false)
         navigate('/profile')
@@ -64,45 +71,21 @@ function Responses () {
             e.preventDefault()
         }
 
-        const payload = {
-            responses_id: selectedResponses,
-        }
-
-        if (selectedResponses) {
-            try {
-                const response = await fetch(`/api/project_exchange/${taskId}/responses/appoint/`, {
-                    method: "POST",
-                    headers: {
-                        'Authorization': `Basic ${user}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                })
-                if (response.ok) {
-                    setIsModalOpen(true)
-                } else {
-                    throw new Error(response.statusText)
-                }
-            } catch (error) {
-                if (error.message === 'Bad Request') {
-                    alert('Недопустимое количество исполнителей')
-                }
+        if (selectedResponses.length === 0) {
+            toast.error('Недопустимое количество исполнителей')
+        } else {
+            const payload = {
+                responses_id: selectedResponses,
             }
+            const response = await responseApi.fetchAppoint(taskId, JSON.stringify(payload))
+            setIsModalOpen(true)
         }
     }
 
     useEffect(() => {
         async function fetchProject() {
-            const response = await fetch(`/api/project_exchange/${taskId}/`, {
-              method: 'GET',
-              headers: {
-                'Authorization': `Basic ${user}`
-              }
-            })
-            if (response.ok) {
-              const data = await response.json()
-              setProjectName(data.name)
-            }
+            const data = await projectApi.fetchChosenProject(taskId)
+            setProjectName(data.name)
         }
         if (taskId) {
             fetchProject()
@@ -111,16 +94,10 @@ function Responses () {
 
     useEffect(() => {
         async function fetchResponses() {
-            const response = await fetch(`/api/project_exchange/${taskId}/responses/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Basic ${user}`
-                }
-            })
-            if (response.ok) {
-                const data = await response.json()
-                setRepsonses(data)
-            }
+            setIsLoading(true)
+            const data = await responseApi.fetchAllResponses(taskId)
+            setRepsonses(data)
+            setIsLoading(false)
         }
         fetchResponses()
     }, [])
@@ -135,14 +112,24 @@ function Responses () {
                 </div>
             </div>
             <div className="grid 2xl:grid-cols-2 gap-5 md:gap-7.5 xl:grid-cols-1 pb-7">
-                {responses.map((response) => (
-                    <ResponseCard 
-                        key={response.id}
-                        data={response} 
-                        isSelected={selectedResponses.includes(response.id)}
-                        onSelect={handleSelect}
-                    />
-                ))}
+                {isLoading ? (
+                    <div className="flex gap-5">
+                        {[1, 2].map(i => (
+                            <div key={i} className="rounded-md">
+                                <Skeleton height={364} width={695} />
+                            </div>
+                        ))}
+                    </div>
+                ): (
+                    responses.map((response) => (
+                        <ResponseCard 
+                            key={response.id}
+                            data={response} 
+                            isSelected={selectedResponses.includes(response.id)}
+                            onSelect={handleSelect}
+                        />
+                    ))
+                )}
             </div>
             <div className="mx-auto w-max pb-5">
                 <div 

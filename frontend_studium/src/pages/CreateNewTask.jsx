@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react"
 import { useNavigate, useParams } from 'react-router-dom'
+import { projectApi } from "../api/project"
 import { useUserStore } from "../store/UserStore"
 import { useTechnologiesStore } from "../store/TechnologiesStore"
 import { useProjectCategoryStore } from "../store/ProjectCategoryStore"
 import { useUser } from "../userContext"
-
+import { toast } from "react-toastify"
 
 function TaskModal ({ onClose, type }) {
     const [title, setTitle] = useState('')
@@ -14,19 +15,19 @@ function TaskModal ({ onClose, type }) {
     useEffect (() => {
         switch (type) {
             case 'create':
-                setTitle('Задача была создана!')
-                setText('После прохождения модерации, задача станет доступна исполнителям')
-                setSubtext('Созданную задачу Вы сможете найти в разделе "На модерации". Задача останется доступной для редактирования')
+                setTitle('Проект был создан!')
+                setText('После прохождения модерации, проект станет доступна исполнителям')
+                setSubtext('Созданный проект Вы сможете найти в разделе "На модерации". Проект останется доступным для редактирования')
                 break
             case 'moderate':
-                setTitle('Задача была опубликована!')
-                setText('Теперь задача доступна исполнителям')
-                setSubtext('Задачу Вы сможете найти в разделе "Текущие проекты". Задача останется доступной для редактирования')
+                setTitle('Проект был опубликован!')
+                setText('Теперь проект доступна исполнителям')
+                setSubtext('Проект Вы сможете найти в разделе "Текущие проекты". Проект останется доступным для редактирования')
                 break
             case 'edit':
-                setTitle('Задача была изменена!')
+                setTitle('Проект был изменен!')
                 setText('Теперь внесенные изменения доступны исполнителям')
-                setSubtext('Задачу Вы сможете найти в разделе "Текущие проекты". Задача останется доступной для редактирования')
+                setSubtext('Проект Вы сможете найти в разделе "Текущие проекты". Проект останется доступным для редактирования')
                 break
         }
     }, [])
@@ -67,16 +68,20 @@ function CreateNewTask ({ type }) {
 
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
-    const [category, setCategory] = useState('')
+    const [category, setCategory] = useState(null)
     const [technology, setTechnology] = useState([])
     const [cashReward, setCashReward] = useState(false)
-    const [pointsNumber, setPointsNumber] = useState(1)
+    const [pointsNumber, setPointsNumber] = useState(50)
     const [dueDate, setDueDate] = useState('')
     const [selectedFiles, setSelectedFiles] = useState([])
+    const [customCategory, setCustomCategory] = useState('')
+    const [customTechnology, setCustomTechnology] = useState('')
+
+    const [types, setTypes] = useState([])
 
     const [currentTech, setCurrrentTech] = useState([])
-
-    const [url, setUrl] = useState('')
+    const [customCategoryOpen, setCustomCategoryOpen] = useState(false)
+    const [customTechnologyOpen, setCustomTechnologyOpen] = useState(false)
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -86,7 +91,7 @@ function CreateNewTask ({ type }) {
                 setText('Отправить на проверку модератору')
                 break
             case 'moderate':
-                setText('Опубликовать задачу')
+                setText('Опубликовать проект')
                 break
             case 'edit':
                 setText('Опубликовать изменения')
@@ -94,30 +99,28 @@ function CreateNewTask ({ type }) {
         }
 
         async function fetchProject() {
-            const response = await fetch(`/api/project_exchange/${taskId}/`, {
-				method: 'GET',
-				headers: {
-					'Authorization': `Basic ${user}`
-				}
-			})
-            if (response.ok) {
-                const data = await response.json()
+            const data = await projectApi.fetchChosenProject(taskId)
 
-                setName(data.name)
-                setDescription(data.description)
-                setCategory(data.category_project_id)
-                setTechnology(data.technologies_id)
-                setCashReward(data.cash_reward)
-                setPointsNumber(data.number_of_points)
-                setDueDate(data.due_date)
-                setCurrrentTech(data.technologies_id)
+            setName(data.name)
+            setDescription(data.description)
+            setCategory(data.category_project_id)
+            setTechnology(data.technologies_id)
+            setCashReward(data.cash_reward)
+            setPointsNumber(data.number_of_points)
+            setDueDate(data.due_date)
+            setCurrrentTech(data.technologies_id)
+        }
 
-            }
+        async function fetchTypes() {
+            const projectTypes = await projectApi.fetchProjectTypes()
+            setTypes(projectTypes)
         }
 
         if (type === 'edit' || type === 'moderate') {
             fetchProject()
         }
+
+        fetchTypes()
     }, [])
 
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -128,7 +131,6 @@ function CreateNewTask ({ type }) {
         navigate('/profile')
     }
 
-    
     const fileInputRef = useRef(null)
 
     const triggerFileInput = () => {
@@ -166,10 +168,50 @@ function CreateNewTask ({ type }) {
         }
     }
 
+    const validateForm = () => {
+        const errors = []
+
+        console.log(category === null)
+
+        if (!name || name.trim() === '') {
+            errors.push('Укажите название проекта!')
+        }
+
+        if (!description || description.trim() === '') {
+            errors.push('Укажите описание проекта!')
+        }
+
+        if (!category && (!customCategory || customCategory.trim() === '')) {
+            errors.push('Выберите категорию или укажите свою!')
+        }
+
+        if (!technology && (!customTechnology || customTechnology.trim() === '')) {
+            errors.push('Выберите хотя бы одну технологию или укажите свою!')
+        }
+
+        if (!dueDate) {
+            errors.push('Укажите дату сдачи проекта!')
+        }
+
+        if (errors.length > 0) {
+            for (let index = 0; index < errors.length; index++) {
+                toast.error(errors[index])
+            }
+            return false
+        }
+        return true
+    }
+
     const handleCreate = async (e) => {
+        if (!validateForm()) {
+            return
+        }
+
         const data = {
             "category_project_id": category,
+            "custom_category_project": customCategory === '' ? null : customCategory, 
             "technologies_id": technology,
+            "custom_technologies": customTechnology === '' ? null : customTechnology,
             "name": name,
             "description": description,
             "cash_reward": cashReward,
@@ -186,20 +228,18 @@ function CreateNewTask ({ type }) {
             }
         }
 
-        const response = await fetch(`/api/project_exchange/`, {
-			method: 'POST',
-			headers: {
-				'Authorization': `Basic ${user}`,
-			},
-            body: formData
-		})
+        const response = await projectApi.fetchPostProjects(formData)
 
-        if (response.ok) {
+        if (response.detail === 'Проект создан') {
             setIsModalOpen(true)
         }
     }
 
     const handleChanges = async (e) => {
+        if (!validateForm()) {
+            return
+        }
+
         const data = {
             "new_category_project_id": category,
             "new_name": name,
@@ -216,35 +256,32 @@ function CreateNewTask ({ type }) {
         formData.append('payload', JSON.stringify(data))
 
         if (type === 'moderate') {
-            setUrl(`/api/project_exchange/${taskId}/publish/`)
+            const response = await projectApi.fetchPublishProject(taskId, formData)
         } else {
-            setUrl(`/api/project_exchange/${taskId}/`)
+            const response = await projectApi.fetchChangeProject(taskId, formData)
         }
 
-        const response = await fetch(url, {
-			method: 'PUT',
-			headers: {
-				'Authorization': `Basic ${user}`,
-			},
-            body: formData
-		})
-
-
-        if (response.ok) {
-            setIsModalOpen(true)
-        }
+        setIsModalOpen(true)
     }
 
     return (
         <>
             <div className="mx-5 md:mx-62.5 flex flex-col">
                 <div className="text-2xl md:text-3xl font-semibold mb-8.75">
-                    {type === 'create' ? 'Создание новой задачи' : 'Редактирование задачи'}
+                    {type === 'create' ? 'Создание нового проекта' : 'Редактирование проекта'}
                 </div>
+                
                 <div className="flex flex-col gap-10 pb-12.5">
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-                        <div className="text-base font-semibold md:font-normal md:text-lg basis-1/4">
-                            Название задачи
+                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4">
+                            Название нового проекта
+                            <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
+                                ?
+                            </div>
+                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-300 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
+                                Название должно отражать суть программного продукта, который Вы хотите получить. <br /><br />
+                                <span className="font-bold">Пример:</span> "Веб-приложение для ветеринарной клиники"
+                            </div>
                         </div>
                         <div className="basis-3/4">
                             <input 
@@ -255,13 +292,20 @@ function CreateNewTask ({ type }) {
                                 required 
                             />
                             <div className="text-sm text-gray-500 mt-2.5">
-                                В названии постарайтесь указать основную суть проекта. Например, "Веб-приложение для ветеринарной клиники"
+                                В названии постарайтесь указать основную суть проекта.
                             </div>
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-                        <div className="text-base font-semibold md:font-normal md:text-lg basis-1/4">
-                            Описание задачи
+                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4">
+                            Описание проекта
+                            <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
+                                ?
+                            </div>
+                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-300 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
+                                Описание проекта должно быть информативным и понятным. <br /><br />
+                                <span className="font-bold">Пример:</span> "Необходимо разработать комплексную информационную систему, автоматизирующую работу регистратуры ветеринарной клиники, врачей и владельцев питомцев. У клиентов должна быть возможность создать профиль одного или нескольких питомцев, записать питомца на прием, просмотреть историю приемов и результаты анализов. Администратор сможет вести и просматривать календарь-планировщик, управлять БД и вести финансовый учет клиники. Врачи должны видеть и редактировать карту пациента, просматривать каталог услуг и товаров, иметь доступ к справочнику. В системе также должна быть предусмотрена функция шаблонов документов"
+                            </div>
                         </div>
                         <div className="basis-3/4">
                             <textarea 
@@ -279,8 +323,16 @@ function CreateNewTask ({ type }) {
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-                        <div className="text-base font-semibold md:font-normal md:text-lg basis-1/4">
+                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4">
                             Категория
+                            <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
+                                ?
+                            </div>
+                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-300 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
+                                <span className="font-bold">Категория</span> - описание? Тогда в БД должна зранится не только категория и икнока, но и какое-то описание, чтобы оно отображалось здесь а-ля справочник?? <br /><br />
+                                <span className="font-bold">Категория</span> - описание? <br /><br />
+                                <span className="font-bold">Категория</span> - описание? <br /><br />
+                            </div>
                         </div>
                         <div className="basis-3/4">
                             <div className="flex gap-2.5 flex-wrap">
@@ -305,11 +357,34 @@ function CreateNewTask ({ type }) {
                             <div className="text-sm text-gray-500 mt-2.5">
                                 Укажите, какой продукт хотите получить
                             </div>
+                            <div className="flex flex-col gap-2 mt-2.5">
+                                <div className="pt-1.25 flex gap-1.5">
+                                    <input 
+                                        type="checkbox" 
+                                        className="h-5 w-5 rounded border-gray-400 accent-green-700 cursor-pointer" 
+                                        checked={customCategoryOpen}
+                                        onChange={() => setCustomCategoryOpen(!customCategoryOpen)}
+                                    />
+                                    <label htmlFor="" className="text-nowrap">Нет подходящей категории</label>
+                                </div>
+                                <div className={`${customCategoryOpen ? '' : 'hidden'}`}>
+                                    <input type="text" value={customCategory} onChange={(e) => setCustomCategory(e.target.value)} className="bg-white outline outline-gray-400 rounded-md focus:outline-green-600 p-1.25 w-full" />
+                                    <p className='text-sm text-gray-500 mt-2.5'>Введите название нужной категории</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-                        <div className="text-base font-semibold md:font-normal md:text-lg basis-1/4">
+                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4">
                             Технологии
+                            <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
+                                ?
+                            </div>
+                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-300 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
+                                Технологии  проекта - инструменты, с помощью которых должно быть выполнено программное решение <br /><br />
+
+                                Если не уверены, какие технологии являются подходящими, то отметьте галочкой поле "Нет подходящих технологий" и впишите туда прочерк. Модератор свяжется с Вами и поможет выбрать подходящие варианты.
+                            </div>
                         </div>
                         <div className="basis-3/4">
                             <div className="flex gap-2.5 flex-wrap">
@@ -337,28 +412,45 @@ function CreateNewTask ({ type }) {
                                 ))}
                             </div>
                             <div className="text-sm text-gray-500 mt-2.5">
-                                Выберите пункты, соответствующие задаче
+                                Выберите пункты, соответствующие проекту
+                            </div>
+                            <div className="flex flex-col gap-2 mt-2.5">
+                                <div className="pt-1.25 flex gap-1.5">
+                                    <input 
+                                        type="checkbox" 
+                                        className="h-5 w-5 rounded border-gray-400 accent-green-700 cursor-pointer" 
+                                        checked={customTechnologyOpen}
+                                        onChange={() => setCustomTechnologyOpen(!customTechnologyOpen)}
+                                    />
+                                    <label htmlFor="" className="text-nowrap">Нет подходящих технологий</label>
+                                </div>
+                                <div className={`${customTechnologyOpen ? '' : 'hidden'}`}>
+                                    <input value={customTechnology} onChange={(e) => setCustomTechnology(e.target.value)} type="text" className="bg-white outline outline-gray-400 rounded-md focus:outline-green-600 p-1.25 w-full" />
+                                    <p className='text-sm text-gray-500 mt-2.5'>Введите название нужной технологии</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-                        <div className="text-base font-semibold md:font-normal md:text-lg basis-1/4">
+                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4">
                             Вознаграждение
+                            <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
+                                ?
+                            </div>
+                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-300 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
+                                <span className="font-bold">Маленький проект</span> - такая категория подойдет небольшим, легким проектам, например, созданию лендинга или чат-бота.<br /><br />
+                                <span className="font-bold">Средний проект</span> - категория для проектов по созданию простого интернет-магазина или мобильного приложения, чьи функции будут автоматизировать реальные бизнес-процессы.<br /><br />
+                                <span className="font-bold">Большой проект</span> - категория проектов, которые являются сложными в реализациями и, возможно, требуют участия нескольких исполнителей. Например, разработка информационной системы или работа с Big-Data и ИИ.
+                            </div>
                         </div>
                         <div className="basis-3/4 flex flex-col">
                             <div className="flex md:gap-15 flex-col md:flex-row">
                                 <div className="">
-                                    <input 
-                                        type="number" 
-                                        min='1' 
-                                        className="peer w-full bg-white outline outline-gray-400 rounded-md focus:outline-green-600 p-1.25 invalid:outline-red-500" 
-                                        value={pointsNumber ?? 1}
-                                        onChange={(e) => setPointsNumber(e.target.value)}
-                                        required 
-                                    />
-                                    <p className="hidden peer-invalid:block text-sm text-red-500">
-                                        Сумма вознаграждения не может быть равной нулю
-                                    </p>
+                                    <select value={pointsNumber} onChange={(e) => setPointsNumber(e.target.value)} className="outline outline-gray-400 rounded-md focus:outline-green-600 p-1.25">
+                                        {types?.map((type) => (
+                                            <option key={type.number_of_points} value={type.number_of_points}>{type.type_project} проект - {type.number_of_points} баллов</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="flex items-start gap-5 flex-col md:flex-row">
                                     <div className="pt-1.25 flex gap-1.5">
@@ -375,13 +467,13 @@ function CreateNewTask ({ type }) {
                                 </div>
                             </div>
                             <div className="text-sm text-gray-500 mt-2.5">
-                                Укажите сумму вознаграждения во внутренней валюте онлайн-платформы, которое получит исполнитель в случае успешного завершения задачи. Вы также можете указать наличие денежного вознаграждения
+                                Выберите сумму вознаграждения во внутренней валюте онлайн-платформы, которое получит исполнитель в случае успешного завершения проекта. Вы также можете указать наличие денежного вознаграждения
                             </div>
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
                         <div className="text-base font-semibold md:font-normal md:text-lg basis-1/4">
-                            Срок выполнения
+                            Дата сдачи проекта
                         </div>
                         <div className="basis-3/4">
                             <input 
@@ -393,7 +485,7 @@ function CreateNewTask ({ type }) {
                                 required 
                             />
                             <div className="text-sm text-gray-500 mt-2.5">
-                                Укажите дату, до которой необходимо выполнить данную задачу
+                                Укажите дату, до которой необходимо выполнить данный проект
                             </div>
                         </div>
                     </div>

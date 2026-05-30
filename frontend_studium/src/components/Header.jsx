@@ -51,7 +51,7 @@ function NavigationPanel () {
     return (
         <nav className="flex w-full justify-between items-center">
                 <div className="text-2xl font-bold">
-                    Studium
+                    Стадиум
                 </div>
 
                    
@@ -65,9 +65,12 @@ function NavigationPanel () {
                 </div>
 
                 <div className="flex gap-7">
-                    <div title='Баланс пользователя во внутренней валюте' className={`${userGroup === "Исполнитель" ? '' : 'hidden'}`}>
-                        {balance}🪙
+                    <div className="">
+                        {userGroup} ?
                     </div>
+                    {/* <div title='Баланс пользователя во внутренней валюте' className={`${userGroup === "Исполнитель" ? '' : 'hidden'}`}>
+                        {balance}🪙
+                    </div> */}
                     <div onClick={handleLogout} className="text-red-600 font-bold cursor-pointer">
                         ➜]
                     </div>
