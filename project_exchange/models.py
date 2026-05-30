@@ -131,11 +131,11 @@ class ChatMessages(models.Model):
     changed = models.BooleanField(default=False, verbose_name="Изменено")
     
     def __str__(self):
-        return f"{self.user}: {self.message}"
+        return f""
     
     class Meta:
         verbose_name = "Сообщение чата"
-        verbose_name_plural = "Сообщения чатов"
+        verbose_name_plural = "Сообщения чата"
         ordering = ("-id",)
   
  
@@ -146,7 +146,7 @@ class MessageFiles(models.Model):
 
     class Meta:
         verbose_name = "Файл в сообщении"
-        verbose_name_plural = "Файлы в сообщениях"
+        verbose_name_plural = "Файлы в сообщении"
         ordering = ("-id",)
         
         
@@ -187,17 +187,20 @@ class ProjectFiles(models.Model):
 
     class Meta:
         verbose_name = "Файлы проекта"
-        verbose_name_plural = "Файлы проектов"
+        verbose_name_plural = "Файлы проекта"
         ordering = ("-id",)
 
 
 class ChatUsers(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, verbose_name="Чат")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name="Пользователь")
-    last_read_message_id = models.IntegerField(default=0, verbose_name="Последнее прочитанное сообщение")
+    last_read_message_id = models.IntegerField(default=0, verbose_name="ID последнего прочитанного сообщение")
+
+    def __str__(self):
+        return f""
 
     class Meta:
-        verbose_name = "Пользователи чата"
-        verbose_name_plural = "Пользователи чатов"
+        verbose_name = "Пользователь чата"
+        verbose_name_plural = "Пользователи чата"
         unique_together = ("chat", "user")
         ordering = ("-id",)

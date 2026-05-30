@@ -48,7 +48,7 @@ class Cart(models.Model):
     executor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name="Исполнитель")
     
     def __str__(self):
-        return f"Корзина {self.executor}"
+        return f"Корзина - {self.executor}"
     
     class Meta:
         verbose_name = "Корзина"
@@ -62,11 +62,11 @@ class CartProduct(models.Model):
     quantity = models.IntegerField(default=1, verbose_name="Количество")
     
     def __str__(self):
-        return f"{self.quantity} + {self.quantity} из {self.cart}"
+        return f""
 
     class Meta:
         verbose_name = "Товары в корзине"
-        verbose_name_plural = "Товары в корзинах"
+        verbose_name_plural = "Товары в корзине"
         unique_together = ("cart", "product")
         ordering = ("cart", "product") 
         
@@ -93,7 +93,7 @@ class Order(models.Model):
     total_amount.fget.short_description = "Сумма заказа"
     
     def __str__(self):
-        return f"Заказ {self.executor} №{self.id}"
+        return f"Заказ №{self.id} - {self.executor}"
     
     class Meta:
         verbose_name = "Заказ"
@@ -111,10 +111,10 @@ class OrderProduct(models.Model):
         return self.price * self.quantity
     
     def __str__(self):
-        return f"{self.quantity} + {self.quantity} из {self.order}"
+        return f""
     
     class Meta:
         verbose_name = "Товар в заказе"
-        verbose_name_plural = "Товары в заказах"
+        verbose_name_plural = "Товары в заказе"
         unique_together = ("order", "product")
         ordering = ("order", "product")

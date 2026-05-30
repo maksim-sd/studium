@@ -2,8 +2,9 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Case, IntegerField, When
+from django.utils.html import mark_safe
 
-from unfold.admin import ModelAdmin
+from unfold.admin import ModelAdmin, TabularInline
 
 from .models import CategoryProject, Technology, Project, Chat, ChatMessages, MessageFiles, Feedback, Response, ProjectFiles, ChatUsers
 from user.models import CustomUser
@@ -23,6 +24,18 @@ class TechnologyAdmin(ModelAdmin):
     search_fields = ("name",)
 
 
+class ProjectFilesInline(TabularInline):
+    model = ProjectFiles
+    extra = 1
+    readonly_fields = ("project_file_id",)
+    fields = ("project_file_id", "file")
+
+    def project_file_id(self, obj):
+        return obj.pk
+    
+    project_file_id.short_description = "ID"
+
+
 @admin.register(Project)
 class ProjectAdmin(ModelAdmin):
     list_display = ("id", "name", "project_status", "category_project", "cash_reward", "created_at")
@@ -30,6 +43,7 @@ class ProjectAdmin(ModelAdmin):
     filter_horizontal = ("moderators", "executors", "technologies")
     search_fields = ("name",)
     list_filter = ("category_project", "project_status")
+    inlines = [ProjectFilesInline]
 
     STATUS_ORDER = (
         "IN_PROGRESS",
@@ -81,25 +95,73 @@ class ProjectAdmin(ModelAdmin):
         return form
 
 
+class ChatUsersInline(TabularInline):
+    model = ChatUsers
+    extra = 0
+    can_delete = False
+    max_num = 0
+    readonly_fields = ("chat_user_id", "user", "last_read_message_id")
+    fields = ("chat_user_id", "user", "last_read_message_id")
+
+    def chat_user_id(self, obj):
+        return obj.pk
+    
+    chat_user_id.short_description = "ID"
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+class ChatMessagesInline(TabularInline):
+    model = ChatMessages
+    extra = 0
+    can_delete = False
+    max_num = 0
+    readonly_fields = ("message_id", "user", "message", "created_at", "changed", "files_list")
+    fields = ("message_id", "user", "message", "created_at", "changed", "files_list")
+    
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def message_id(self, obj):
+        return obj.pk
+    
+    message_id.short_description = "ID"
+    
+
+    def files_list(self, obj):
+        files = obj.files.all()
+        if not files:
+            return "—"
+        links = []
+        for f in files:
+            name = f.file.name.split("/")[-1]
+            links.append(f'<a href="{f.file.url}" target="_blank">{name}</a>')
+        return mark_safe("<br>".join(links))
+    files_list.short_description = "Файлы"
+
+
 @admin.register(Chat)
 class ChatAdmin(ModelAdmin):
     list_display = ("id", "project")
     list_display_links = ("project",)
     search_fields = ("project",)
+    inlines = [ChatUsersInline, ChatMessagesInline]
     
 
-@admin.register(ChatMessages)
-class ChatMessagesAdmin(ModelAdmin):
-    list_display = ("id", "chat", "user", "message", "created_at")
-    list_display_links = ("chat",)
-    search_fields = ("user", "message",)
+# @admin.register(ChatMessages)
+# class ChatMessagesAdmin(ModelAdmin):
+#     list_display = ("id", "chat", "user", "message", "created_at")
+#     list_display_links = ("chat",)
+#     search_fields = ("user", "message",)
     
     
-@admin.register(MessageFiles)
-class MessageFilesAdmin(ModelAdmin):
-    list_display = ("id", "chat_message", "file")
-    list_display_links = ("chat_message",)
-    search_fields = ("chat_message",)
+# @admin.register(MessageFiles)
+# class MessageFilesAdmin(ModelAdmin):
+#     list_display = ("id", "chat_message", "file")
+#     list_display_links = ("chat_message",)
+#     search_fields = ("chat_message",)
     
    
 @admin.register(Response)
@@ -141,15 +203,15 @@ class FeedbackAdmin(ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-@admin.register(ProjectFiles)
-class ProjectFilesAdmin(ModelAdmin):
-    list_display = ("id", "project", "file")
-    list_display_links = ("project",)
-    search_fields = ("project",)
+# @admin.register(ProjectFiles)
+# class ProjectFilesAdmin(ModelAdmin):
+#     list_display = ("id", "project", "file")
+#     list_display_links = ("project",)
+#     search_fields = ("project",)
 
 
-@admin.register(ChatUsers)
-class ChatUsersAdmin(ModelAdmin):
-    list_display = ("id", "chat", "user", "last_read_message_id")
-    list_display_links = ("chat",)
-    search_fields = ("user",)
+# @admin.register(ChatUsers)
+# class ChatUsersAdmin(ModelAdmin):
+#     list_display = ("id", "chat", "user", "last_read_message_id")
+#     list_display_links = ("chat",)
+#     search_fields = ("user",)
