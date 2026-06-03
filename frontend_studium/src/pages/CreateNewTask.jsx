@@ -255,6 +255,12 @@ function CreateNewTask ({ type }) {
         const formData = new FormData()
         formData.append('payload', JSON.stringify(data))
 
+        if (selectedFiles && selectedFiles.length > 0) {
+            for (let i = 0; i < selectedFiles.length; i++) {
+                formData.append('new_files', selectedFiles[i])
+            }
+        }
+
         if (type === 'moderate') {
             const response = await projectApi.fetchPublishProject(taskId, formData)
         } else {
@@ -383,7 +389,7 @@ function CreateNewTask ({ type }) {
                             <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-300 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
                                 Технологии  проекта - инструменты, с помощью которых должно быть выполнено программное решение <br /><br />
 
-                                Если не уверены, какие технологии являются подходящими, то отметьте галочкой поле "Нет подходящих технологий" и впишите туда прочерк. Модератор свяжется с Вами и поможет выбрать подходящие варианты.
+                                Если не уверены, какие технологии являются подходящими, то отметьте галочкой поле "Нет подходящих технологий" и впишите туда прочерк. Модератор выьерет подходящие технологии при проверке Вашего проекта.
                             </div>
                         </div>
                         <div className="basis-3/4">
@@ -426,7 +432,7 @@ function CreateNewTask ({ type }) {
                                 </div>
                                 <div className={`${customTechnologyOpen ? '' : 'hidden'}`}>
                                     <input value={customTechnology} onChange={(e) => setCustomTechnology(e.target.value)} type="text" className="bg-white outline outline-gray-400 rounded-md focus:outline-green-600 p-1.25 w-full" />
-                                    <p className='text-sm text-gray-500 mt-2.5'>Введите название нужной технологии</p>
+                                    <p className='text-sm text-gray-500 mt-2.5'>Введите название нужной технологии. Если технологий несколько, то вводите их названия через запятую</p>
                                 </div>
                             </div>
                         </div>

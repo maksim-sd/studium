@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useUserStore } from '../store/UserStore'
 import { useTechnologiesStore } from '../store/TechnologiesStore'
 import { useProjectCategoryStore } from '../store/ProjectCategoryStore'
+import { FormatDate } from '../shared/FormatDate'
 import points from '../assets/points-reward.png'
 import money from '../assets/money-reward.png'
 import custom_category from '../assets/custom_category.png'
@@ -18,7 +19,7 @@ function UserProjectCategory ({ category }) {
     )
 }
 
-function UserProjectButton ({ activeTab, project }) {
+function UserProjectButton ({ activeTab, project, isOwnProfile }) {
     const navigate = useNavigate()
     const user = useUserStore((state) => state.currentUserData)
     const userGroup = useUserStore((state) => state.groups)
@@ -26,21 +27,38 @@ function UserProjectButton ({ activeTab, project }) {
     switch(activeTab) {
         case 'current-projects':
             return (
-                <div className="flex gap-3.75 text-sm">
-                    <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-nowrap rounded-md" onClick={() => navigate(`/chats`)}>
-                        Перейти к чату
+                isOwnProfile ? (
+                    <div className="flex gap-3.75 text-sm">
+                        <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-nowrap rounded-md" onClick={() => navigate(`/chats`)}>
+                            Перейти к чату
+                        </div>
+                        <div className="underline px-3.5 py-1.25 hover:font-medium cursor-pointer hidden md:block" onClick={() => navigate(`/tasks/${project.id}`)}>
+                            Посмотреть подробности проекта
+                        </div>
                     </div>
-                    <div className="underline px-3.5 py-1.25 hover:font-medium cursor-pointer hidden md:block" onClick={() => navigate(`/tasks/${project.id}`)}>
-                        Посмотреть подробности задачи
+                ) : (
+                    <div className="flex gap-3.75 text-sm">
+                        <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-nowrap rounded-md" onClick={() => navigate(`/chats`)}>
+                            Посмотреть подробности проекта
+                        </div>
                     </div>
-                </div>
+                )
             )
-
         case 'my-responses':
             return (
-                <div className="flex mt-auto gap-3.75">
-                    <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/tasks/${project.id}`)}>
-                        Посмотреть подробности задачи
+                <div className='flex gap-3.75 text-sm'>
+                    <div className="w-full">
+                        <div className="flex justify-between pb-2.5">
+                            <div className="font-bold">
+                                Вы откликнулись:
+                            </div>
+                            <div className="">
+                                {FormatDate(project.response_create_at)}
+                            </div>
+                        </div>
+                        <div className={`${project.response_comment ? 'pl-2.5' : 'hidden'}`}>
+                            {project.response_comment}
+                        </div>
                     </div>
                 </div>
             )
@@ -54,7 +72,7 @@ function UserProjectButton ({ activeTab, project }) {
                         </div>
                     }
                     <div className={`${userGroup === 'Модератор' ? 'underline px-3.5 py-1.25 hover:font-medium cursor-pointer' : 'px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md'}`} onClick={() => navigate(`/tasks/${project}`)}>
-                        Посмотреть подробности задачи
+                        Посмотреть подробности проекта
                     </div>
                 </div>
             )
@@ -63,7 +81,7 @@ function UserProjectButton ({ activeTab, project }) {
             return (
                 <div className="flex gap-3.75">
                     <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/tasks/${project.id}`)}>
-                        Посмотреть подробности задачи
+                        Посмотреть подробности проекта
                     </div>
                 </div>
             )
@@ -72,7 +90,7 @@ function UserProjectButton ({ activeTab, project }) {
             return (
                 <div className="flex gap-3.75">
                     <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md" onClick={() => navigate(`/moderate-task/${project.id}`)}>
-                        Перейти к задаче
+                        Перейти к описанию проекта
                     </div>
                 </div>
             )
@@ -81,7 +99,7 @@ function UserProjectButton ({ activeTab, project }) {
             return (
                 <div className="flex gap-3.75 text-sm">
                     <div className="px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-nowrap rounded-md" onClick={() => navigate(`/chats`)}>
-                        Посмотреть подробности задачи
+                        Посмотреть подробности проекта
                     </div>
                 </div>
             )
@@ -109,7 +127,7 @@ function UserProjectButton ({ activeTab, project }) {
         }
 }
 
-function UserProject ({ project, activeTab }) {
+function UserProject ({ project, activeTab, isOwnProfile }) {
     const navigate = useNavigate()
 
     const technologies = useTechnologiesStore((state) => state.technologies)
@@ -172,7 +190,7 @@ function UserProject ({ project, activeTab }) {
                 }
             </div>
 
-            <UserProjectButton activeTab={activeTab} project={project}/>
+            <UserProjectButton activeTab={activeTab} project={project} isOwnProfile={isOwnProfile} />
 
         </div>
     )

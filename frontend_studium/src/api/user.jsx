@@ -43,4 +43,11 @@ export const userApi = {
     },
 
     // API фото
+    fetchUserPhoto: (photo) => {
+        return apiFetch(`${BASE_URL}photo/`, {
+            method: "POST",
+            'accept': '*/*',
+            body: photo,
+        })
+    }
 }

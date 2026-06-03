@@ -2,9 +2,39 @@ import { useState, useEffect } from "react"
 import { useNavigate } from 'react-router-dom'
 import { useUserStore } from "../store/UserStore"
 import { useProductCategoryStore } from "../store/ProductCategoryStore"
+import { cartApi } from "../api/cart"
+import { shopApi } from "../api/shop"
+import { useCartStore } from "../store/CartStore"
+import { toast } from "react-toastify"
 import ProductCard from '../components/ProductCard'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 function ConfirmationModal ({onClose}) {
+    const cart = useCartStore((state) => state.cart)
+    const incrementItem = useCartStore((state) => state.incrementItem)
+    const decrementItem = useCartStore((state) => state.decrementItem)
+
+    const handleDecrease = async (productId) => {
+        await decrementItem(productId)
+    }
+
+    const handleIncrease = async (productId) => {
+        await incrementItem(productId)
+    }
+
+    const handleCreateOrder = async (cart) => {
+        const payload = {
+            cart_product_id: cart.map(item => Number(item.product_id))
+        }
+
+        await shopApi.fetchCreateOrder(payload)
+
+        toast.success("Заказ успешно оформлен!")
+
+        onClose()
+    }
+
     return (
         <div className="fixed top-0 left-0 w-full h-full z-9999 bg-black/50">
             <div className="w-[90%] md:w-[30%] absolute top-[50%] left-[50%] translate-[-50%]">
@@ -17,89 +47,57 @@ function ConfirmationModal ({onClose}) {
                             Корзина
                         </div>
                     </div>
-                    <div className="">
-                        <div className="flex border-b justify-between border-gray-300 py-3 md:py-5 items-center">
-                            <div className="flex gap-2.5 items-center">
-                                <div className="bg-gray-200 rounded-full px-2.5 py-5.5">
-                                    photo
-                                </div>
-                                <div className="">
-                                    Наименование товара
-                                </div>
-                            </div>
-                            <div className="flex gap-3 items-center">
-                                <div className="cursor-pointer px-2.25 py-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-full">
-                                    –
-                                </div>
-                                <div className="text-xl">
-                                    1
-                                </div>
-                                <div className="cursor-pointer px-2.25 py-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-full">
-                                    +
-                                </div>
-                            </div>
-                            <div className="text-nowrap pl-5">
-                                $ 0
-                            </div>
-                        </div>
-                        <div className="flex border-b justify-between border-gray-300 py-3 md:py-5 items-center">
-                            <div className="flex gap-2.5 items-center">
-                                <div className="bg-gray-200 rounded-full px-2.5 py-5.5">
-                                    photo
-                                </div>
-                                <div className="">
-                                    Наименование товара
-                                </div>
-                            </div>
-                            <div className="flex gap-3 items-center">
-                                <div className="cursor-pointer px-2.25 py-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-full">
-                                    –
-                                </div>
-                                <div className="text-xl">
-                                    1
-                                </div>
-                                <div className="cursor-pointer px-2.25 py-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-full">
-                                    +
+                    {cart.length > 0 ? (
+                        <div className="">
+                            {cart.map((item) => (
+                                <div className="flex border-b justify-between border-gray-300 py-3 md:py-5 items-center">
+                                    <div className="flex gap-2.5 items-center">
+                                        <div className="bg-gray-200 rounded-full px-2.5 py-5.5">
+                                            photo
+                                        </div>
+                                        <div className="">
+                                            {item.product_id}
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3 items-center">
+                                        <div 
+                                            className="cursor-pointer px-2.25 py-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-full"
+                                            onClick={() => handleDecrease(item.product_id)}
+                                        >
+                                            –
+                                        </div>
+                                        <div className="text-xl">
+                                            {item.quantity}
+                                        </div>
+                                        <div 
+                                            className="cursor-pointer px-2.25 py-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-full"
+                                            onClick={() => handleIncrease(item.product_id)}
+                                        >
+                                            +
+                                        </div>
+                                    </div>
+                                    <div className="text-nowrap pl-5">
+                                        $ 0
                                 </div>
                             </div>
-                            <div className="text-nowrap pl-5">
-                                $ 0
+                        ))}
+                            <div className="py-2.5 font-bold text-base">
+                                Итоговая стоимость заказа: $ 0
+                            </div>
+                            <div 
+                                className="text-center cursor-pointer text-base md:text-lg self-center text-white bg-green-700 hover:bg-green-800 active:bg-green-900 px-7 py-1.5 rounded-md" 
+                                onClick={() => handleCreateOrder(cart)}
+                            >
+                                Оформить заказ
                             </div>
                         </div>
-                        <div className="flex border-b justify-between border-gray-300 py-3 md:py-5 items-center">
-                            <div className="flex gap-2.5 items-center">
-                                <div className="bg-gray-200 rounded-full px-2.5 py-5.5">
-                                    photo
-                                </div>
-                                <div className="">
-                                    Наименование товара
-                                </div>
+                        ) : (
+                            <div className="text-center">
+                                Пусто
                             </div>
-                            <div className="flex gap-3 items-center">
-                                <div className="cursor-pointer px-2.25 py-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-full">
-                                    –
-                                </div>
-                                <div className="text-xl">
-                                    1
-                                </div>
-                                <div className="cursor-pointer px-2.25 py-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-full">
-                                    +
-                                </div>
-                            </div>
-                            <div className="text-nowrap pl-5">
-                                $ 0
-                            </div>
-                        </div>
-                    </div>
-                    <div className="py-2.5 font-bold text-base">
-                        Итоговая стоимость заказа: $ 0
-                    </div>
-                    <div className="cursor-pointer text-base md:text-lg self-center text-white bg-green-700 hover:bg-green-800 active:bg-green-900 px-7 py-1.5 rounded-md" onClick={onClose}>
-                        Оформить заказ
-                    </div>
+                        )}
                 </div>
             </div>
-            
         </div>
     )   
 }
@@ -109,8 +107,13 @@ function Shop() {
     const user = useUserStore((state) => state.currentUser)
 
     const [categories, setCategories] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState(null)
     const [products, setProducts] = useState([])
     const [balance, setBalance] = useState(0)
+
+    const fetchCart = useCartStore((state) => state.fetchCart)
+
+    const [isLoading, setIsLoading] = useState(false)
 
     const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -132,35 +135,45 @@ function Shop() {
             }
         }
 
-        async function fetchUsers() {
+        async function fetchProducts() {
+            setIsLoading(true)
             try {
                 const [responseCategories, responseProducts] = await Promise.all([
-                    fetch(`/api/shop/categories/`, {
-                        method: 'GET',
-                        headers: { 'Authorization': `Basic ${user}` }
-                    }),
-                    fetch(`/api/shop/products/`, {
-                        method: 'GET',
-                        headers: { 'Authorization': `Basic ${user}` }
-                    })
+                    shopApi.fetchCategories(), 
+                    shopApi.fetchProducts(),
+                    fetchCart(),
                 ])
-                if (responseCategories.ok && responseProducts.ok) {
-                    const dataCategories = await responseCategories.json()
-                    const dataProducts = await responseProducts.json()
-                        
-                    setCategories(dataCategories)
-                    setProducts(dataProducts)
-                } else {
-                    console.error('Ошибка при получении данных')
-                }
+                setCategories(responseCategories)
+                setProducts(responseProducts)
             } catch (error) {
                 console.error('Ошибка при получении данных')
             }
+            setIsLoading(false)
         }
 
         fetchBalance()
-        fetchUsers()
+        fetchProducts()
     }, [])
+
+    const handleCategoryChange = async (category) => {
+        if (category === selectedCategory) {
+            setSelectedCategory(null)
+
+            setIsLoading(true)
+            const data = await shopApi.fetchProducts()
+            setProducts(data)
+
+            setIsLoading(false)
+        } else {
+            setSelectedCategory(category)
+            setIsLoading(true)
+
+            const data = await shopApi.fetchProductsByCategory(category)
+            setProducts(data)
+
+            setIsLoading(false)
+        }
+    }
 
     return (
         <>
@@ -171,7 +184,7 @@ function Shop() {
                             Обмен внутренней валюты
                         </div>
                         <div className="text-2xl text-nowrap">
-                            🪙{balance}
+                            🪙 {balance}
                         </div>
                     </div>
                     <div className="flex flex-row-reverse self-start md:flex-row md:items-center gap-10">
@@ -188,23 +201,49 @@ function Shop() {
                             Корзина
                         </div>
                     </div>
-                    
                 </div>
-                <div className="pb-5 w-full flex gap-2.5 flex-wrap">
-                    {categories.map((category) => (
-                        <div className="relative block">
-                            <input type="checkbox" name="category" id={`category${category.id}`} className="peer absolute left-0 -z-1 opacity-0 checked:bg-gray-600" />
-                            <label htmlFor={`category${category.id}`} className="cursor-pointer px-3 md:px-3.5 py-1.5 rounded-[50px] font-normal inline-block relative mb-0 bg-gray-200 hover:bg-gray-300 peer-checked:bg-white peer-checked:outline-2 peer-checked:outline-green-600">
-                                {category.name}
-                            </label>
-                        </div>
-                    ))}
-                </div>
-                <div className="grid md:grid-cols-4 gap-5">
-                    {products.map((item) => (
-                        <ProductCard item={item} />
-                    ))}
-                </div>
+                {isLoading ? (
+                    <div className="pb-5 w-full flex gap-2.5 flex-wrap">
+                        {[1, 2, 3].map(i => (
+                            <Skeleton height={30} width={130} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="pb-5 w-full flex gap-2.5 flex-wrap">
+                        {categories.map((category) => (
+                            <div className="relative block">
+                                <input 
+                                    type="radio" 
+                                    name="category" 
+                                    id={`category${category.id}`} 
+                                    className="peer absolute left-0 -z-1 opacity-0 checked:bg-gray-600"
+                                    checked={selectedCategory === category.id}
+                                    onClick={() => handleCategoryChange(category.id)}
+                                />
+                                <label htmlFor={`category${category.id}`} className="cursor-pointer px-3 md:px-3.5 py-1.5 rounded-[50px] font-normal inline-block relative mb-0 bg-gray-200 hover:bg-gray-300 peer-checked:bg-white peer-checked:outline-2 peer-checked:outline-green-600">
+                                    {category.name}
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                {isLoading ? (
+                    <div className="grid md:grid-cols-4 gap-5">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="border border-gray-200 rounded-md p-5">
+                                <Skeleton width="100%" height={160}/>
+                                <Skeleton count={2} width="100%" className="mt-6"/>
+                                <Skeleton width="100%" height={39} />
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid md:grid-cols-4 gap-5">
+                        {products.map((item) => (
+                            <ProductCard item={item} />
+                        ))}
+                    </div>
+                )}
             </div>
 
             {isModalOpen && <ConfirmationModal onClose={closeModal}/>}

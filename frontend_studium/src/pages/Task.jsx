@@ -170,25 +170,33 @@ function Task() {
                             <div className="font-normal text-base">
                                 <div className="flex items-center gap-15 md:gap-20">
                                     <div className="flex justify-baseline gap-2">
-                                        {projectData.category_project_id !== null &&
-                                            <UserProjectCategory category={projectData.category_project_id} />
-                                        }
-                                        {projectData.category_project_id === null &&
-                                            <div className="flex justify-baseline text-sm gap-2">
-                                                <img className='size-8 md:size-10' src={custom_category} alt='' />
-                                                {projectData.custom_category_project}
-                                            </div>
-                                        }
+                                        {isLoading ? (
+                                            <Skeleton height={48} width={120}/>
+                                        ) : (
+                                            projectData.category_project_id !== null ? (
+                                                <UserProjectCategory category={projectData.category_project_id} />
+                                            ) : (
+                                                <div className="flex justify-baseline text-sm gap-2">
+                                                    <img className='size-8 md:size-10' src={custom_category} alt='' />
+                                                    {projectData.custom_category_project}
+                                                </div>
+                                            )
+                                        )}
                                     </div>
-                                    <div title="Сумма баллов, которые получит исполнитель в случае успешного выполнения задачи" className="flex gap-2">
-                                        <img className='size-8 md:size-10' src={points} alt="" />
-                                        <div className="">
-                                            Вознаграждение
+                                    {isLoading ? (
+                                        <Skeleton height={48} width={120}/>
+                                    ) : (
+                                        <div title="Сумма баллов, которые получит исполнитель в случае успешного выполнения задачи" className="flex gap-2">
+                                            <img className='size-8 md:size-10' src={points} alt="" />
                                             <div className="">
-                                                {isLoading ? <Skeleton height={24} width={40}/> : `${projectData.number_of_points} баллов`} 
+                                                Вознаграждение
+                                                <div className="">
+                                                    {projectData.number_of_points} баллов
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
+                                    
                                     {projectData.cash_reward && (
                                         <div className="flex gap-2">
                                             <img className='size-8 md:size-10' src={money} alt="" />
@@ -261,8 +269,12 @@ function Task() {
                 </div>
               </div> */}
             
-
+                {isLoading ? (
+                    <Skeleton width={240} height={320} />
+                ) : (
                     <ProjectManagementPanel project={projectData} />
+                )}
+                    
             {/* <div className="flex basis-1/4">
             {user.role === 'student' &&
               <div className="bg-gray-100 rounded-md flex flex-col p-5 items-center text-center gap-2.5 self-start">

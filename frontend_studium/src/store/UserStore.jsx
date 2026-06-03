@@ -2,6 +2,7 @@ import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 
 export const createUserGroupSlice = (set, get) => ({
+    allGroups: [],
     groups: [],
     isLoading: false,
 
@@ -16,7 +17,7 @@ export const createUserGroupSlice = (set, get) => ({
             if (userGroupId && userGroupId.length > 0) {
                 const userGroup = data.filter(group => userGroupId[0] === group.id)
                 if (userGroup.length > 0) {
-                    set({ groups: userGroup[0].name, isLoading: false })
+                    set({ allGroups: data, groups: userGroup[0].name, isLoading: false })
                 }
             } else {
                 set({ isLoading: false })
@@ -82,7 +83,7 @@ export const createUserSlice = (set, get) => ({
             currentUserData: [],
             isLoading: false,
         })
-        set({ groups: [] })
+        set({ groups: [], allGroups: [] })
         localStorage.removeItem('user-storage')
     },
 
@@ -105,6 +106,22 @@ export const createUserSlice = (set, get) => ({
             set({ isLoading: false })
             return false
         }
+    }, 
+
+    updateUserPhoto: async (photo) => {
+        try {
+            const { userApi } = await import('../api/user')
+            const response = await userApi.fetchUserPhoto(photo)
+
+            const updatedUserData = await userApi.fetchUser(get().currentUser)
+
+            set((state) => ({
+                currentUserData: updatedUserData
+            }))
+        } catch (error) {
+            console.log("failed update photo:", error)
+            throw error
+        }
     }
 })
 
@@ -119,7 +136,8 @@ export const useUserStore = create()(persist((set, get, store) => ({
             isAuth: state.isAuth,
             currentUser: state.currentUser,
             currentUserData: state.currentUserData,
-            groups: state.groups
+            groups: state.groups,
+            allGroups: state.allGroups
         })
     }
 ))

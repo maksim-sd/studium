@@ -67,7 +67,11 @@ export const projectApi = {
     },
 
     // Проекты, в которых участвует выбранный пользователь
-
+    fetchUserActiveProjects: (userId) => {
+        return apiFetch(`${BASE_URL}${userId}/active/`, {
+            method: 'GET',
+        })
+    },
 
     // Проекты, в которых участвовал текущий пользователь
     fetchArchivedProjects: () => {
@@ -77,6 +81,11 @@ export const projectApi = {
     },
 
     // Проекты, в которых участвовал выбранный пользователь
+    fetchUserHistoryProjects: (userId) => {
+        return apiFetch(`${BASE_URL}${userId}/history/`, {
+            method: 'GET',
+        })
+    },
 
     // Подробнее о выбранном проекте
     fetchChosenProject: (projectId) => {

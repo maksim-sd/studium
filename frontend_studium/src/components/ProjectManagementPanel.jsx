@@ -203,6 +203,7 @@ function ExecutorResponsePanel ({ project }) {
 function ProjectManagementPanel ({ project }) {
     const userGroup = useUserStore((state) => state.groups)
     const user = useUserStore((state) => state.currentUser)
+    const currentUserData = useUserStore((state) => state.currentUserData)
 
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
@@ -309,12 +310,12 @@ function ProjectManagementPanel ({ project }) {
                         </div>
                     }
                     <div className="text-lg font-bold self-center pb-5">
-                        Текущие участники проекта:
+                        Участники проекта:
                     </div>
                     <div className="flex flex-col">
                         <div className="border-b border-gray-400 pb-2.5">
                             Заказчик:
-                            <div className="pl-2.5 py-4 text-sm">
+                            <div className="pl-2.5 py-4 text-sm cursor-pointer" onClick={() => navigate(`/profile/${project.customer.id}`)}>
                                 {project.customer.last_name} {project.customer.first_name}
                             </div>
                         </div>
@@ -323,12 +324,14 @@ function ProjectManagementPanel ({ project }) {
                             <ul className='pl-2.5 text-sm'>
                                 {participants.moderators?.map((person) => (
                                     <li key={person.id} className='flex justify-between py-4'>
-                                        <div className="">
+                                        <div className="cursor-pointer" onClick={() => navigate(`/profile/${person.id}`)}>
                                             {person.last_name} {person.first_name}
                                         </div>
-                                        <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer ${userGroup === "Модератор" ? '' : "hidden"}`}>
-                                            ❌
-                                        </div>
+                                        {currentUserData.id !== person.id &&
+                                            <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer ${(userGroup === "Модератор" && project.project_status !== "Завершен") ? '' : "hidden"}`}>
+                                                ❌
+                                            </div>
+                                        }
                                     </li>
                                 ))}
                             </ul>
@@ -338,10 +341,10 @@ function ProjectManagementPanel ({ project }) {
                             <ul className='pl-2.5 text-sm'>
                                 {participants.executors?.map((person) => (
                                     <li className='flex justify-between py-4'>
-                                        <div className="">
+                                        <div className="cursor-pointer" onClick={() => navigate(`/profile/${person.id}`)}>
                                             {person.last_name} {person.first_name}
                                         </div>
-                                        <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer ${userGroup === "Модератор" ? '' : "hidden"}`}>
+                                        <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer ${(userGroup === "Модератор" && project.project_status !== "Завершен") ? '' : "hidden"}`}>
                                             ❌
                                         </div>
                                     </li>
@@ -349,7 +352,7 @@ function ProjectManagementPanel ({ project }) {
                             </ul>
                         </div>
                     </div>
-                    {(userGroup === "Модератор" && project.permission?.view_participants) &&
+                    {(userGroup === "Модератор" && project.project_status !== "Завершен") &&
                         <div className="self-center mt-auto mb-7.5">
                             <div onClick={() => navigate(`/tasks/${project.id}/edit-users`, { state : { from : location.pathname }})} className="px-9 py-3 cursor-pointer rounded-md text-white text-lg font-bold bg-green-700 hover:bg-green-800 active:bg-green-900">
                                 Добавить участников

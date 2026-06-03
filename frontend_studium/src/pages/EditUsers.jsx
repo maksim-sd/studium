@@ -201,6 +201,12 @@ function EditUsers () {
 
     const location = useLocation()
 
+    const [searchTerm, setSearchTerm] = useState('')
+
+    const handleSearchChange = (e) => {
+		setSearchTerm(e.target.value)
+	}
+
     const handleAddUser = async (userId, group) => {
         try {
             const response = await responseApi.fetchAddParticipant(taskId, group, userId)
@@ -323,8 +329,14 @@ function EditUsers () {
                             </div>
                             <div className="mb-2">
                                 <div className="flex bg-white outline outline-gray-400 rounded-md focus-within:outline-green-600">
-                                    <input type="text" placeholder='Искать по имени...' className='bg-white outline-transparent rounded-md p-1.25' onChange={(e) => testData.filter(data => data.name.toLowerCase().includes(e.target.value.toLowerCase()))} />
-                                    <div className="px-2.5 py-2 cursor-pointer">
+                                    <input 
+                                        type="text" 
+                                        placeholder='Искать по имени...' 
+                                        className='bg-white outline-transparent rounded-md p-1.25' 
+                                        value={searchTerm}
+                                        onChange={handleSearchChange} 
+                                    />
+                                    <div className="px-2.5 py-2 cursor-pointer" onClick={applyFilters}>
                                         🔍
                                     </div>
                                 </div>

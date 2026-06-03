@@ -1,7 +1,9 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { FormatDate } from "../shared/FormatDate"
 
 function ResponseCard ({ data, isSelected, onSelect }) {
+    const navigate = useNavigate()
     const [buttonState, setButtonState] = useState(false)
 
     const toggle = () => {
@@ -17,7 +19,7 @@ function ResponseCard ({ data, isSelected, onSelect }) {
                 <div className="pt-6.25">
                     <div className="text-[18px] font-bold cursor-pointer">
                         <a href="/profile" className="cursor-pointer">
-                            Имя пользователя
+                            {data?.executor.last_name} {data?.executor.first_name}
                         </a>
                     </div>
                     <div className="text-sm pt-2.5 text-gray-500">
@@ -42,7 +44,7 @@ function ResponseCard ({ data, isSelected, onSelect }) {
                 </div>
             </div>
             <div className="mt-6.25 flex gap-7.5 justify-end items-center">
-                <a href="/profile" className="text-sm underline hover:font-medium hidden md:block">
+                <a href={`/profile/${data.executor.id}`} className="text-sm underline hover:font-medium hidden md:block">
                     Посмотреть профиль
                 </a>
                 {/* <div className="bg-gray-500 px-5 py-3.75 hover:bg-gray-600 cursor-pointer" onClick={toggle}>

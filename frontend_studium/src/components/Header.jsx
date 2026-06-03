@@ -65,9 +65,9 @@ function NavigationPanel () {
                 </div>
 
                 <div className="flex gap-7">
-                    <div className="">
+                    {/* <div className="">
                         {userGroup} ?
-                    </div>
+                    </div> */}
                     {/* <div title='Баланс пользователя во внутренней валюте' className={`${userGroup === "Исполнитель" ? '' : 'hidden'}`}>
                         {balance}🪙
                     </div> */}

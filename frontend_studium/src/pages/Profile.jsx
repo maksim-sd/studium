@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { projectApi } from '../api/project'
 import { FormatDate } from '../shared/FormatDate'
 import { useUserStore } from '../store/UserStore'
@@ -7,6 +7,8 @@ import { useProductCategoryStore } from '../store/ProductCategoryStore'
 import UserProject from '../components/UserProject'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import { userApi } from '../api/user'
+import avatar from '../assets/avatar.png'
 
 function Profile () {
     const navigate = useNavigate()
@@ -14,6 +16,8 @@ function Profile () {
     const user = useUserStore((state) => state.currentUser)
     const userData = useUserStore((state) => state.currentUserData)
     const userGroup = useUserStore((state) => state.groups)
+    const allGroups = useUserStore((state) => state.allGroups)
+    const updateUserPhoto = useUserStore((state) => state.updateUserPhoto)
     const fetchCategories = useProductCategoryStore((state) => state.fetchCategories)
 
     const [currentProjects, setCurrentProjects] = useState([])
@@ -22,6 +26,11 @@ function Profile () {
     const [moderateProjects, setModerateProjects] = useState([])
     const [underInspectionProjects, setUnderInspectionProjects] = useState([])
     const [archivedProjects, setArchivedProjects] = useState([])
+
+    const { userId } = useParams()
+    const [chosenUser, setChosenUser] = useState([])
+    const [chosenUserGroup, setChosenUserGroup] = useState('')
+    const [isOwnProfile, setIsOwnProfile] = useState(false)
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -50,7 +59,16 @@ function Profile () {
         return tabsMap[group]
     }
 
-    const tabs = getTabs(userGroup)
+    let tabs
+
+    if (isOwnProfile) {
+        tabs = getTabs(userGroup)
+    } else {
+        tabs = [
+            {id: 'current-projects', label: 'Текущие проекты'},
+            {id: 'archived-projects', label: 'Завершенные проекты'},
+        ]
+    }
 
     const tabContent = {
         'current-projects': (
@@ -62,7 +80,7 @@ function Profile () {
                 ) : (
                     <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
                         {currentProjects.map((project) => (
-                            <UserProject project={project} activeTab={activeTab} />
+                            <UserProject project={project} activeTab={activeTab} isOwnProfile={isOwnProfile} />
                         ))}
                     </div>
                 )}
@@ -77,7 +95,7 @@ function Profile () {
                 ) : (
                     <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
                         {responsedProjects.map((project) => (
-                            <UserProject project={project} activeTab={activeTab} />
+                            <UserProject project={project} activeTab={activeTab} isOwnProfile={isOwnProfile} />
                         ))}
                     </div>
                 )}
@@ -92,7 +110,7 @@ function Profile () {
                 ) : (
                     <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
                         {futureProjects.map((project) => (
-                            <UserProject project={project} activeTab={activeTab} />
+                            <UserProject project={project} activeTab={activeTab} isOwnProfile={isOwnProfile} />
                         ))}
                     </div>
                 )}
@@ -107,7 +125,7 @@ function Profile () {
                 ) : (
                     <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
                         {moderateProjects.map((project) => (
-                            <UserProject project={project} activeTab={activeTab} />
+                            <UserProject project={project} activeTab={activeTab} isOwnProfile={isOwnProfile} />
                         ))}
                     </div>
                 )}
@@ -122,7 +140,7 @@ function Profile () {
                 ) : (
                     <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
                         {underInspectionProjects.map((project) => (
-                            <UserProject project={project} activeTab={activeTab} />
+                            <UserProject project={project} activeTab={activeTab} isOwnProfile={isOwnProfile} />
                         ))}
                     </div>
                 )}
@@ -137,7 +155,7 @@ function Profile () {
                 ) : (
                     <div className="grid 2xl:grid-cols-2 gap-7.5 xl:grid-cols-1">
                         {archivedProjects.map((project) => (
-                            <UserProject project={project} activeTab={activeTab} />
+                            <UserProject project={project} activeTab={activeTab} isOwnProfile={isOwnProfile} />
                         ))}
                     </div>
                 )}
@@ -169,25 +187,45 @@ function Profile () {
                 setResponsedProjects(data)
             }
 
-            const active = await projectApi.fetchActiveProjects()
+            if (isOwnProfile) {
+                const active = await projectApi.fetchActiveProjects()
+                const archived = await projectApi.fetchArchivedProjects()
 
-            setCurrentProjects(active.filter((project) => project.project_status === 'В работе'))
-            setUnderInspectionProjects(active.filter((project) => project.project_status === 'На проверке'))
+                setCurrentProjects(active.filter((project) => project.project_status === 'В работе'))
+                setUnderInspectionProjects(active.filter((project) => project.project_status === 'На проверке'))
+                setArchivedProjects(archived)
 
-            if (userGroup === "Заказчик") {
-                setFutureProjects(active.filter((project) => project.project_status === "Поиск исполнителя"))
+                if (userGroup === "Заказчик") {
+                    setFutureProjects(active.filter((project) => project.project_status === "Поиск исполнителя"))
+                }
+            } else {
+                const chosenUserData = await userApi.fetchChosenUser(userId)
+                const active = await projectApi.fetchUserActiveProjects(userId)
+                const archived = await projectApi.fetchUserHistoryProjects(userId)
+
+                setChosenUser(chosenUserData)
+                setChosenUserGroup(allGroups.filter(group => chosenUserData?.groups_id?.[0] === group.id)[0]?.name)
+                setCurrentProjects(active.filter((project) => project.project_status === 'В работе'))
+                setArchivedProjects(archived)
             }
-
-            const archived = await projectApi.fetchArchivedProjects()
-            setArchivedProjects(archived)
 
             if (isInitial) {
                 setIsLoading(false)
             }
 		}
 
-        fetchProjects(true)
+        if (!userId) {
+            setIsOwnProfile(true)
+        } else {
+            if (Number(userId) === Number(userData.id)) {
+                setIsOwnProfile(true)
+            } else {
+                setIsOwnProfile(false)
+            }
+        }
 
+        fetchProjects(true)
+        
         const intervalId = setInterval(() => {
             if (user) {
                 fetchProjects(false)
@@ -196,37 +234,96 @@ function Profile () {
 
         return () => clearInterval(intervalId)
 
-    }, [user, userGroup])
+    }, [user, userGroup, isOwnProfile])
+
+    const fileInputRef = useRef(null)
+
+    const handleChangeProfilePhoto = () => {
+        fileInputRef.current.click()
+    }
+
+    const handleFileChange = async (e) => {
+        const file = event.target.files[0]
+        if (!file) return
+
+        const formData = new FormData()
+        formData.append('image', file)
+
+        if (file) {
+            try {
+                await updateUserPhoto(formData)
+                e.target.value = ''
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    }
+
+    const photoUrl = isOwnProfile ? userData?.photo : chosenUser?.photo
 
     return (
         <div className="mx-5 sm:mx-15 lg:mx-62.5">
             <div className="flex gap-7.5 mb-12.5">
-                <div className="bg-gray-200 w-18.75 h-18.75 md:w-37.5 md:h-37.5 rounded-full content-center text-center">
-                    фото
-                </div>
-                <div className="flex justify-between basis-7/8">
-                    <div className="flex flex-col mt-2.5 md:mt-5">
-                        <div className="font-bold text-xl md:text-2xl mb-2.5 md:mb-3">
-                            {userData.last_name} {userData.first_name} {userData.patronymic}
+                {isLoading ? (
+                    <Skeleton circle width={150} height={150} />
+                ) : (
+                    <div className="relative w-37.5 h-37.5">
+                        <input
+                            type="file" 
+                            ref={fileInputRef} 
+                            onChange={handleFileChange}
+                            accept="image/*"
+                            className='hidden'
+                            disabled={!isOwnProfile}
+                        />
+                        <img 
+                            className={`${isOwnProfile ? "peer absolute z-1 transition-all duration-300 hover:brightness-50 cursor-pointer" : ""} w-18.75 h-18.75 md:w-37.5 md:h-37.5 rounded-full content-center object-cover`}
+                            src={photoUrl === null ? avatar : photoUrl} 
+                            alt="" 
+                            onClick={handleChangeProfilePhoto}
+                        />
+                        <div className="hidden peer-hover:block absolute z-2 text-center justify-self-center mt-17 text-white pointer-events-none">
+                            Изменить фото
                         </div>
-                        <div className="h-fit rounded-md mb-2.5 md:mb-3 font-semibold">
-                            {userGroup}
-                        </div>
-                        {userGroup === 'Исполнитель' &&
-                            <div className="text-base text-gray-600 mt-3">
-                                Факультет {userData.faculty}, {userData.specialty}, {userData.study_group}
-                            </div>
-                        }
-                        {userGroup === 'Заказчик' &&
-                            <div className="px-4 py-2 rounded-md cursor-pointer text-sm md:text-lg bg-green-700 hover:bg-green-800 active:bg-green-900 text-center text-white mt-5"
-                                onClick={() => navigate('/create-new-task')}>
-                                Создать новый проект
-                            </div>
-                        }
                     </div>
-                    {userGroup === 'Исполнитель' && 
-                        <div className={`text-sm md:text-lg mt-2.5 md:mt-5 outline-2 outline-amber-400 px-2 py-0.5 rounded-md h-fit ${userData.average_rating > 4 ? "outline-green-700" : "outline-amber-400"}`}>
-                            Рейтинг пользователя: {userData.average_rating}⭐
+                )}
+                <div className="flex justify-between basis-7/8">
+                    {isLoading ? (
+                        <div className="mt-2.5 md:mt-5">
+                            <Skeleton height={40} width={400} className='mb-3'/>
+                            <Skeleton height={20} width={250}/>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col mt-2.5 md:mt-5">
+                            <div className="font-bold text-xl md:text-2xl mb-2.5 md:mb-3">
+                                {isOwnProfile ? `${userData.last_name} ${userData.first_name} ${userData.patronymic}` : `${chosenUser.last_name} ${chosenUser.first_name} ${chosenUser.patronymic}`}
+                            </div>
+                            <div className="h-fit rounded-md mb-2.5 md:mb-3 font-semibold">
+                                {isOwnProfile ? userGroup : allGroups.filter(group => chosenUser?.groups_id?.[0] === group.id)[0]?.name}
+                            </div>
+
+                            {(userGroup === 'Исполнитель' || chosenUserGroup === 'Исполнитель') &&
+                                <div className="text-base text-gray-600 mt-3">
+                                    Факультет {isOwnProfile ? `${userData.faculty}, ${userData.specialty}, ${userData.study_group}` : `${chosenUser.faculty}, ${chosenUser.specialty}, ${chosenUser.study_group}`}
+                                </div>
+                            }
+                            {(userGroup === 'Заказчик' && isOwnProfile) &&
+                                <div className="">
+                                    {/* <div className="text-base text-gray-600 mt-3">
+                                        {isOwnProfile ? `${userData.faculty}, ${userData.specialty}, ${userData.study_group}` : `${chosenUser.faculty}, ${chosenUser.specialty}, ${chosenUser.study_group}`}
+                                    </div> */}
+                                    <div className="px-4 py-2 rounded-md cursor-pointer text-sm md:text-lg bg-green-700 hover:bg-green-800 active:bg-green-900 text-center text-white mt-5"
+                                        onClick={() => navigate('/create-new-task')}>
+                                        Создать новый проект
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    )}
+                        
+                    {(userGroup === 'Исполнитель' || chosenUserGroup === 'Исполнитель') && 
+                        <div className={`text-sm md:text-lg mt-2.5 md:mt-5 outline-2 outline-amber-400 px-2 py-0.5 rounded-md h-fit ${(userData.average_rating > 3.5 || chosenUser.average_rating > 3.5) ? "outline-green-700" : "outline-amber-400"}`}>
+                            Рейтинг пользователя: {isOwnProfile ? userData.average_rating.toFixed(1) : chosenUser.average_rating.toFixed(1)}⭐
                         </div>
                     }
                 </div>
@@ -244,9 +341,11 @@ function Profile () {
                             </button>
                         ))}
                     </div>
-                    <div onClick={() => navigate('/help-us-become-better')} className="cursor-pointer hover:border-b hover:border-b-green-700">
-                        Помогите нам стать лучше!
-                    </div>
+                    {isOwnProfile &&
+                        <div onClick={() => navigate('/help-us-become-better')} className="cursor-pointer hover:border-b hover:border-b-green-700">
+                            Помогите нам стать лучше!
+                        </div>
+                    }
                 </div>
                 <div className="p-4">
                     {isLoading ? (

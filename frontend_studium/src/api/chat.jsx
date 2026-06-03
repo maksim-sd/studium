@@ -23,9 +23,20 @@ export const chatApi = {
             method: 'POST',
             body: message
         })
-    }
+    },
 
     // Обновить выбранное сообщение
+    fetchUpdateMessages: (messageId, message) => {
+        return apiFetch(`${BASE_URL}chat/message/${messageId}`, {
+            method: 'PUT',
+            body: message
+        })
+    },
 
     // Удалить свое сообщение для всех
+    fetchDeleteMessages: (messageId) => {
+        return apiFetch(`${BASE_URL}chat/message/${messageId}/`, {
+            method: 'DELETE'
+        })
+    }
 }

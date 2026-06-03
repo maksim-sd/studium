@@ -120,8 +120,11 @@ function Tasks () {
 		fetchProjects({ search: '', categories: [], technologies: [] })
 	}
 
-	const applyFilters = () => {
-		fetchProjects()
+	const applyFilters = (e) => {
+		if (e.key === 'Enter') {
+			e.preventDefault()
+			fetchProjects()
+		}
 	}
 
 	useEffect(() => {
@@ -203,6 +206,7 @@ function Tasks () {
 							type="text" 
 							placeholder='Искать проект...' 
 							size='25' 
+							onKeyDown={applyFilters}
 						/>
 						<div className="px-2.5 py-2 cursor-pointer" onClick={applyFilters}>
 						🔍

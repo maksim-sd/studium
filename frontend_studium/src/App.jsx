@@ -103,6 +103,7 @@ function App() {
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["Модератор", "Заказчик", "Исполнитель"]} />}>
           <Route path='/profile' element={ <LazyRoute> <Profile /> </LazyRoute> }/>
+          <Route path='/profile/:userId' element={ <Profile /> }/>
           <Route path='/tasks' element={ <Tasks /> }/>
           <Route path='/tasks/:taskId' element={ <Task /> }/>
           <Route path='/chats' element={ <Chats /> }/>
