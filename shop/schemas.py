@@ -25,6 +25,13 @@ class ProductOut(Schema):
     photo: str | None = None
     product_status: str = Field(alias="get_product_status_display")
 
+
+class DetailProductOust(Schema):
+    id: int
+    name: str
+    price: int
+    photo: str | None = None
+
     
 class CartOut(Schema):
     id: int
@@ -34,7 +41,7 @@ class CartOut(Schema):
 class CartProductOut(Schema):
     id: int
     cart_id: int
-    product_id: int
+    product: DetailProductOust
     quantity: int
     
     
@@ -49,7 +56,7 @@ class OrderOut(Schema):
 class OrderProductOut(Schema):
     id: int
     order_id: int
-    product_id: int
+    product: DetailProductOust
     quantity: int
     price: int
     

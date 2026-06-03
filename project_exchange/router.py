@@ -1001,7 +1001,7 @@ def post_chat_message(
 def put_chat_message(
     request, payload:ChatMessageUpdateIn,
     id_message:int = Path(..., description="ID сообщения"),
-    new_files:List[UploadedFile] = File(..., description="Список новых фалов сообщения")
+    new_files:List[UploadedFile] = File(None, description="Список новых фалов сообщения")
 ):
     user = request.auth
     chat_message = get_object_or_404(ChatMessages, id=id_message)
