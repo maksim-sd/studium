@@ -616,7 +616,7 @@ def post_project_complete(request, id_project:int = Path(..., description="ID п
             balance, _ = Balance.objects.get_or_create(executor=executor)
             balance.number_of_points += project.number_of_points
             balance.save()
-    return {"detail": "Задача завершена"}
+    return {"detail": "Проект завершен"}
 
 
 @router.post(
@@ -649,7 +649,7 @@ def post_project_cancel(request, id_project:int = Path(..., description="ID пр
     with transaction.atomic():
         project.project_status = "CANCELED"
         project.save()
-    return {"detail": "Задача отменена"}
+    return {"detail": "Проект отменен"}
 
 
 # Отклик и назначение

@@ -1,0 +1,124 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="24.0.0">
+  <diagram name="C4 - Контекст (уровень 1)" id="c4-context">
+    <mxGraphModel dx="1100" dy="760" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="ctx-title" value="Диаграмма контекста системы (C4, уровень 1)" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontFamily=Times New Roman;" vertex="1" parent="1">
+          <mxGeometry x="120" y="30" width="610" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Актёры -->
+        <mxCell id="actor-cust" value="Заказчик&#10;&#10;[Представитель организации]&#10;Создаёт проекты, завершает их и&#10;оставляет отзывы исполнителям" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;outlineConnect=0;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="90" y="120" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-mod" value="Модератор&#10;&#10;[Сотрудник вуза]&#10;Проверяет и публикует проекты,&#10;назначает исполнителей" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;outlineConnect=0;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="365" y="120" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-exec" value="Исполнитель&#10;&#10;[Студент]&#10;Откликается на проекты, выполняет&#10;их и взаимодействует в чате" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;outlineConnect=0;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="640" y="120" width="120" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Система -->
+        <mxCell id="ctx-system" value="Онлайн-платформа формирования&#10;профессиональных компетенций&#10;&#10;[Программная система]&#10;&#10;Обеспечивает единое цифровое пространство&#10;для публикации проектов, поиска исполнителей,&#10;выполнения проектов и коммуникации участников" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168BD;strokeColor=#0B4884;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=12;verticalAlign=middle;align=center;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="285" y="470" width="280" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- Связи -->
+        <mxCell id="e-cust" value="Публикует и завершает проекты,&#10;оставляет отзывы [HTTPS]" style="endArrow=block;html=1;fontFamily=Times New Roman;fontSize=10;rounded=0;endFill=1;strokeColor=#707070;fontColor=#404040;" edge="1" parent="1" source="actor-cust" target="ctx-system">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-mod" value="Модерирует проекты,&#10;назначает исполнителей [HTTPS]" style="endArrow=block;html=1;fontFamily=Times New Roman;fontSize=10;rounded=0;endFill=1;strokeColor=#707070;fontColor=#404040;" edge="1" parent="1" source="actor-mod" target="ctx-system">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-exec" value="Откликается, выполняет&#10;проекты, общается [HTTPS]" style="endArrow=block;html=1;fontFamily=Times New Roman;fontSize=10;rounded=0;endFill=1;strokeColor=#707070;fontColor=#404040;" edge="1" parent="1" source="actor-exec" target="ctx-system">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram name="C4 - Контейнеры (уровень 2)" id="c4-containers">
+    <mxGraphModel dx="1100" dy="760" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="cnt-title" value="Диаграмма контейнеров системы (C4, уровень 2)" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontFamily=Times New Roman;" vertex="1" parent="1">
+          <mxGeometry x="120" y="20" width="610" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Актёры сверху -->
+        <mxCell id="c-cust" value="Заказчик&#10;[Представитель&#10;организации]" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;outlineConnect=0;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="120" y="70" width="80" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="c-mod" value="Модератор&#10;[Сотрудник&#10;вуза]" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;outlineConnect=0;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="385" y="70" width="80" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="c-exec" value="Исполнитель&#10;[Студент]" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;outlineConnect=0;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="650" y="70" width="80" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="c-admin" value="Администратор&#10;[Сотрудник вуза]" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;outlineConnect=0;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="650" y="690" width="80" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Граница системы -->
+        <mxCell id="boundary" value="Онлайн-платформа формирования профессиональных компетенций" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#444444;fontFamily=Times New Roman;fontSize=12;fontStyle=2;verticalAlign=top;align=center;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="60" y="250" width="730" height="500" as="geometry" />
+        </mxCell>
+
+        <!-- Контейнер: SPA -->
+        <mxCell id="cont-spa" value="Клиентское веб-приложение&#10;&#10;[Контейнер: React, SPA]&#10;&#10;Одностраничное приложение,&#10;реализующее пользовательский&#10;интерфейс в браузере" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#2E6295;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=11;verticalAlign=middle;align=center;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="110" y="300" width="230" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Контейнер: API -->
+        <mxCell id="cont-api" value="Серверное приложение (REST API)&#10;&#10;[Контейнер: Python, Django, Django Ninja]&#10;&#10;Реализует бизнес-логику и предоставляет&#10;REST API в формате JSON. Модули:&#10;user, project_exchange, shop" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#2E6295;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=11;verticalAlign=middle;align=center;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="110" y="520" width="280" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Контейнер: Админка -->
+        <mxCell id="cont-admin" value="Административная панель&#10;&#10;[Контейнер: Django Unfold]&#10;&#10;Управление данными платформы&#10;и аналитический дашборд&#10;(мониторинг активности)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#2E6295;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=11;verticalAlign=middle;align=center;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="470" y="520" width="250" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Контейнер: БД -->
+        <mxCell id="cont-db" value="База данных&#10;&#10;[Контейнер: PostgreSQL / SQLite]&#10;&#10;Хранение данных пользователей,&#10;проектов, чатов, отзывов&#10;и данных магазина" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;strokeColor=#2E6295;fontColor=#FFFFFF;fontFamily=Times New Roman;fontSize=11;verticalAlign=middle;align=center;" vertex="1" parent="1">
+          <mxGeometry x="250" y="800" width="230" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- Связи актёры -> SPA -->
+        <mxCell id="ce-cust" value="Использует [HTTPS]" style="endArrow=block;html=1;fontFamily=Times New Roman;fontSize=10;endFill=1;strokeColor=#707070;fontColor=#404040;" edge="1" parent="1" source="c-cust" target="cont-spa">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ce-mod" value="Использует [HTTPS]" style="endArrow=block;html=1;fontFamily=Times New Roman;fontSize=10;endFill=1;strokeColor=#707070;fontColor=#404040;" edge="1" parent="1" source="c-mod" target="cont-spa">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ce-exec" value="Использует [HTTPS]" style="endArrow=block;html=1;fontFamily=Times New Roman;fontSize=10;endFill=1;strokeColor=#707070;fontColor=#404040;" edge="1" parent="1" source="c-exec" target="cont-spa">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- SPA -> API -->
+        <mxCell id="ce-spa-api" value="Запросы к API&#10;[HTTPS, REST/JSON,&#10;HTTP Basic Auth]" style="endArrow=block;html=1;fontFamily=Times New Roman;fontSize=10;endFill=1;strokeColor=#707070;fontColor=#404040;" edge="1" parent="1" source="cont-spa" target="cont-api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- API -> DB -->
+        <mxCell id="ce-api-db" value="Читает/пишет&#10;[Django ORM, SQL]" style="endArrow=block;html=1;fontFamily=Times New Roman;fontSize=10;endFill=1;strokeColor=#707070;fontColor=#404040;" edge="1" parent="1" source="cont-api" target="cont-db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Admin -> DB -->
+        <mxCell id="ce-admin-db" value="Читает/пишет&#10;[Django ORM, SQL]" style="endArrow=block;html=1;fontFamily=Times New Roman;fontSize=10;endFill=1;strokeColor=#707070;fontColor=#404040;" edge="1" parent="1" source="cont-admin" target="cont-db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Администратор -> Админка -->
+        <mxCell id="ce-admin" value="Управляет данными&#10;[HTTPS]" style="endArrow=block;html=1;fontFamily=Times New Roman;fontSize=10;endFill=1;strokeColor=#707070;fontColor=#404040;" edge="1" parent="1" source="c-admin" target="cont-admin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
