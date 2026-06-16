@@ -336,7 +336,7 @@ function EditUsers () {
                                         value={searchTerm}
                                         onChange={handleSearchChange} 
                                     />
-                                    <div className="px-2.5 py-2 cursor-pointer" onClick={applyFilters}>
+                                    <div className="px-2.5 py-2 cursor-pointer">
                                         🔍
                                     </div>
                                 </div>

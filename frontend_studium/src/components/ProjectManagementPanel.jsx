@@ -243,7 +243,7 @@ function ProjectManagementPanel ({ project }) {
         try {
             const data = await projectApi.fetchCompleteProject(project.id)
             
-            if (data.detail === "Задача завершена") {
+            if (data.detail === "Проект завершен") {
                 setIsFeedbackModalOpen(true)
                 toast.success(data.detail)
             } else {

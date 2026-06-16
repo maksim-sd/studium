@@ -10,7 +10,7 @@ import ProductCard from '../components/ProductCard'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
-function ConfirmationModal ({onClose}) {
+function ConfirmationModal ({ onClose, balance }) {
     const cart = useCartStore((state) => state.cart)
     const incrementItem = useCartStore((state) => state.incrementItem)
     const decrementItem = useCartStore((state) => state.decrementItem)
@@ -25,15 +25,21 @@ function ConfirmationModal ({onClose}) {
 
     const handleCreateOrder = async (cart) => {
         const payload = {
-            cart_product_id: cart.map(item => Number(item.product_id))
+            cart_product_id: cart.map(item => Number(item.id))
         }
 
-        await shopApi.fetchCreateOrder(payload)
+        console.log(cart.map(item => Number(item.id)))
+
+        await shopApi.fetchCreateOrder(JSON.stringify(payload))
 
         toast.success("Заказ успешно оформлен!")
 
         onClose()
     }
+
+    const totalPrice = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
+
+    const isEnough = balance > totalPrice || balance === totalPrice;
 
     return (
         <div className="fixed top-0 left-0 w-full h-full z-9999 bg-black/50">
@@ -52,17 +58,17 @@ function ConfirmationModal ({onClose}) {
                             {cart.map((item) => (
                                 <div className="flex border-b justify-between border-gray-300 py-3 md:py-5 items-center">
                                     <div className="flex gap-2.5 items-center">
-                                        <div className="bg-gray-200 rounded-full px-2.5 py-5.5">
-                                            photo
+                                        <div className="bg-gray-200 rounded-full">
+                                            <img src={item.product.photo} alt="" className="size-12 rounded-full m-2" />
                                         </div>
                                         <div className="">
-                                            {item.product_id}
+                                            {item.product.name}
                                         </div>
                                     </div>
                                     <div className="flex gap-3 items-center">
                                         <div 
                                             className="cursor-pointer px-2.25 py-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-full"
-                                            onClick={() => handleDecrease(item.product_id)}
+                                            onClick={() => handleDecrease(item.product.id)}
                                         >
                                             –
                                         </div>
@@ -71,25 +77,35 @@ function ConfirmationModal ({onClose}) {
                                         </div>
                                         <div 
                                             className="cursor-pointer px-2.25 py-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-full"
-                                            onClick={() => handleIncrease(item.product_id)}
+                                            onClick={() => handleIncrease(item.product.id)}
                                         >
                                             +
                                         </div>
                                     </div>
                                     <div className="text-nowrap pl-5">
-                                        $ 0
+                                        🪙 {item.product.price * item.quantity}
                                 </div>
                             </div>
                         ))}
-                            <div className="py-2.5 font-bold text-base">
-                                Итоговая стоимость заказа: $ 0
+                            <div className="py-6.5 font-bold text-base flex justify-between items-center">
+                                <span>Итоговая стоимость заказа: 🪙 {totalPrice}</span>
+                                {!isEnough && (
+                                    <span className="text-red-500 text-sm font-normal block">
+                                        Недостаточно средств
+                                    </span>
+                                )}
                             </div>
-                            <div 
-                                className="text-center cursor-pointer text-base md:text-lg self-center text-white bg-green-700 hover:bg-green-800 active:bg-green-900 px-7 py-1.5 rounded-md" 
+                            <button 
+                                disabled={!isEnough}
+                                className={`w-full text-center text-base md:text-lg self-center text-white px-7 py-1.5 rounded-md transition-all
+                                    ${!isEnough 
+                                        ? 'bg-gray-400 cursor-not-allowed opacity-60' 
+                                        : 'bg-green-700 hover:bg-green-800 active:bg-green-900 cursor-pointer'
+                                    }`}
                                 onClick={() => handleCreateOrder(cart)}
                             >
                                 Оформить заказ
-                            </div>
+                            </button>
                         </div>
                         ) : (
                             <div className="text-center">
@@ -246,7 +262,7 @@ function Shop() {
                 )}
             </div>
 
-            {isModalOpen && <ConfirmationModal onClose={closeModal}/>}
+            {isModalOpen && <ConfirmationModal onClose={closeModal} balance={balance} />}
 
         </>
     )

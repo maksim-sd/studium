@@ -12,11 +12,11 @@ function ProductCard ({ item }) {
 
     return (
         <div className="flex flex-col outline outline-gray-200 rounded-md p-5">
-            <div className={`w-fit px-3 py-1.25 rounded-md ml-auto ${item.product_status === "В наличии" ? "text-green-700 border-2 border-green-700" : "text-amber-600 border-2 border-amber-600"}`}>
+            <div className={`w-fit px-3 py-1.25 rounded-md ml-auto bg-white ${item.product_status === "В наличии" ? "text-green-700 border-2 border-green-700" : "text-amber-600 border-2 border-amber-600"}`}>
                 {item.product_status}
             </div>
-            <div className="w-full size-40 items-center text-center">
-                {item.photo ? <img src="" alt="" /> : <div className="text-4xl pt-10">🖼️</div>}
+            <div className="w-full h-40 overflow-hidden flex items-center justify-center my-4">
+                {item.photo ? <img src={item.photo} alt="" className="w-full h-full object-contain" /> : <div className="text-4xl pt-10">🖼️</div>}
             </div>
             <div className="flex flex-col gap-2.5 mt-auto">
                 <div className="font-bold text-base">
@@ -31,12 +31,12 @@ function ProductCard ({ item }) {
                     disabled={item.product_status !== "В наличии"}
                 >
                     {item.product_status === "В наличии" ? (
-                        cart.includes(item => item.product_id === product_id) ? (
+                        cart.some(elem => elem.product.id === item.id) ? (
                             <div className="">
-                                Товар добавлен в корзину
+                                Товар добавлен в корзину 
                             </div>
                         ) : (
-                            `Обменять за ${item.price}🪙`
+                            `Обменять за ${item.price}🪙` 
                         )
                     ) : (
                         item.product_status

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { FormatDate } from "../shared/FormatDate"
+import avatar from '../assets/avatar.png'
 
 function ResponseCard ({ data, isSelected, onSelect }) {
     const navigate = useNavigate()
@@ -10,11 +11,19 @@ function ResponseCard ({ data, isSelected, onSelect }) {
         onSelect(data.id, !isSelected)
     }
 
+    const photoUrl = data?.executor?.photo
+
+    console.log(photoUrl ? 'a' : 'b')
+
     return (
-        <div className="bg-white outline outline-gray-300 rounded-md max-w-173.75 p-6.25">
+        <div className="bg-white outline outline-gray-300 rounded-md min-w-173.75 p-6.25">
             <div className="flex gap-16.25 mb-7.5">
-                <div className="bg-gray-500 w-24.75 h-24.75 rounded-full content-center text-center">
-                    фото
+                <div className="">
+                    <img 
+                        className="w-24.75 h-24.75 rounded-full content-center"
+                        src={photoUrl ? photoUrl : avatar} 
+                        alt="" 
+                    />
                 </div>
                 <div className="pt-6.25">
                     <div className="text-[18px] font-bold cursor-pointer">

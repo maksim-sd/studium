@@ -99,18 +99,22 @@ function Task() {
                     
             setCurrentOrganization(organizations.find(item => item.id === data.customer.organization_id))
             
-            const techList = data.technologies_id.map(technology_id => {
+            const techList = data?.technologies_id ? data.technologies_id.map(technology_id => {
                 const technology = technologies.find(item => item.id === technology_id)
                     return {
                         ...technology_id,
                         technologyName: technology ? technology.name : '',
                     }
-                })
+                }) : []
 
-                setTechList(techList)
+            const customTech = data?.custom_technologies ? data.custom_technologies.split(',').map(item => ({ id: item.trim(), technologyName: item.trim() })) : []
 
-                setIsLoading(false)
-            }
+            const result = [...techList, ...customTech]
+
+            setTechList(result)
+
+            setIsLoading(false)
+        }
         if (taskId) {
             fetchProject()
         }
@@ -219,11 +223,12 @@ function Task() {
                                         {item.technologyName}
                                     </div>
                                 ))}
+                                {/* {}
                                 {(projectData.custom_technologies !== '' && projectData.custom_technologies !== null) &&
                                     <div className="bg-gray-200 px-3 py-1.5 rounded-[50px] text-sm font-normal">
                                         {projectData.custom_technologies}
                                     </div>
-                                }
+                                } */}
                             </div>
                         </div>
                         <div className="text-lg md:text-xl font-semibold">

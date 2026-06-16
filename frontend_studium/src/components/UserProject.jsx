@@ -71,7 +71,7 @@ function UserProjectButton ({ activeTab, project, isOwnProfile }) {
                             Посмотреть откликнувшихся
                         </div>
                     }
-                    <div className={`${userGroup === 'Модератор' ? 'underline px-3.5 py-1.25 hover:font-medium cursor-pointer' : 'px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md'}`} onClick={() => navigate(`/tasks/${project}`)}>
+                    <div className={`${userGroup === 'Модератор' ? 'underline px-3.5 py-1.25 hover:font-medium cursor-pointer' : 'px-3.5 py-1.25 text-white bg-green-700 hover:bg-green-800 cursor-pointer text-sm rounded-md'}`} onClick={() => navigate(`/tasks/${project.id}`)}>
                         Посмотреть подробности проекта
                     </div>
                 </div>
@@ -133,13 +133,17 @@ function UserProject ({ project, activeTab, isOwnProfile }) {
     const technologies = useTechnologiesStore((state) => state.technologies)
     const categories = useProjectCategoryStore((state) => state.categories)
 
-    const techList = project.technologies_id.map(technology_id => {
+    const techList = project?.technologies_id ? project.technologies_id.map(technology_id => {
         const technology = technologies.find(item => item.id === technology_id)
         return {
             ...technology_id,
             technologyName: technology ? technology.name : '',
         }
-    })
+    }) : []
+
+    const customTech = project?.custom_technologies ? project.custom_technologies.split(',').map(item => ({ id: item.trim(), technologyName: item.trim() })) : []
+
+    const result = [...techList, ...customTech]
     
     return (
         <div className='outline outline-gray-200 rounded-md max-w-173.5 p-3 md:p-5 text-base flex flex-col'>
@@ -178,16 +182,16 @@ function UserProject ({ project, activeTab, isOwnProfile }) {
                 {project.description}
             </div>
             <div className="flex gap-1.25 flex-wrap pb-3 md:pb-6">
-                {techList.map((item) => (
+                {result.map((item) => (
                     <div className="bg-gray-200 px-2.5 py-1.5 rounded-[50px] text-xs">
                         {item.technologyName}
                     </div>
                 ))}
-                {(project.custom_technologies !== null && project.custom_technologies !== '') &&
+                {/* {(project.custom_technologies !== null && project.custom_technologies !== '') &&
                     <div className="bg-gray-200 px-2.5 py-1.5 rounded-[50px] text-xs">
                         {project.custom_technologies}
                     </div>
-                }
+                } */}
             </div>
 
             <UserProjectButton activeTab={activeTab} project={project} isOwnProfile={isOwnProfile} />

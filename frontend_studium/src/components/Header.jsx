@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useUserStore } from '../store/UserStore'
+import pic from '../assets/pic.png'
 
 function NavigationPanel () {
     const navigate = useNavigate()
@@ -51,7 +52,10 @@ function NavigationPanel () {
     return (
         <nav className="flex w-full justify-between items-center">
                 <div className="text-2xl font-bold">
-                    Стадиум
+                    <div className="text-2xl font-bold self-center flex text-center items-center gap-3">
+                        <img src={pic} alt="" className="hue-rotate-200 size-12 object-contain" />
+                        Стадиум
+                    </div>
                 </div>
 
                    
@@ -99,13 +103,21 @@ function NavigationPanel () {
 function Header () {
     const isAuth = useUserStore((state) => state.isAuth)
     const user = useUserStore((state) => state.currentUserData)
+    const location = useLocation()
 
     return (
         <header className="h-12.5 md:px-26 px-5 flex mb-12.5 sticky top-0 z-1000 bg-white outline outline-gray-300">
             {!isAuth &&
-                <div className="text-2xl font-bold self-center">
-                    Studium
+            <div className="flex justify-between w-full items-center">
+                <div className="text-2xl font-bold self-center flex text-center items-center gap-3">
+                    <img src={pic} alt="" className="hue-rotate-200 size-12 object-contain" />
+                    Стадиум
                 </div>
+                <a href="/login" className={`cursor-pointer outline-3 font-semibold outline-green-700 rounded-md px-5 py-2 ${location.pathname === '/login' ? 'hidden' : 'block'}`}>
+                    Войти
+                </a>
+            </div>
+                
             }
 
             {isAuth && 

@@ -296,7 +296,7 @@ function Profile () {
                     ) : (
                         <div className="flex flex-col mt-2.5 md:mt-5">
                             <div className="font-bold text-xl md:text-2xl mb-2.5 md:mb-3">
-                                {isOwnProfile ? `${userData.last_name} ${userData.first_name} ${userData.patronymic}` : `${chosenUser.last_name} ${chosenUser.first_name} ${chosenUser.patronymic}`}
+                                {isOwnProfile ? `${userData.last_name} ${userData.first_name} ${userData.patronymic}` : `${chosenUser.last_name} ${chosenUser.first_name} ${chosenUser.patronymic === null ? '' : chosenUser.patronymic}`}
                             </div>
                             <div className="h-fit rounded-md mb-2.5 md:mb-3 font-semibold">
                                 {isOwnProfile ? userGroup : allGroups.filter(group => chosenUser?.groups_id?.[0] === group.id)[0]?.name}
@@ -304,7 +304,7 @@ function Profile () {
 
                             {(userGroup === 'Исполнитель' || chosenUserGroup === 'Исполнитель') &&
                                 <div className="text-base text-gray-600 mt-3">
-                                    Факультет {isOwnProfile ? `${userData.faculty}, ${userData.specialty}, ${userData.study_group}` : `${chosenUser.faculty}, ${chosenUser.specialty}, ${chosenUser.study_group}`}
+                                    {isOwnProfile ? `Факультет ${userData.faculty}, ${userData.specialty}, ${userData.study_group}` : `${chosenUser.faculty == null ? '' : `Факультет ${chosenUser.faculty}, `} ${chosenUser.specialty === null ? '' : `${chosenUser.specialty}, `} ${chosenUser.study_group === null ? '' : chosenUser.study_group}`}
                                 </div>
                             }
                             {(userGroup === 'Заказчик' && isOwnProfile) &&
@@ -322,8 +322,8 @@ function Profile () {
                     )}
                         
                     {(userGroup === 'Исполнитель' || chosenUserGroup === 'Исполнитель') && 
-                        <div className={`text-sm md:text-lg mt-2.5 md:mt-5 outline-2 outline-amber-400 px-2 py-0.5 rounded-md h-fit ${(userData.average_rating > 3.5 || chosenUser.average_rating > 3.5) ? "outline-green-700" : "outline-amber-400"}`}>
-                            Рейтинг пользователя: {isOwnProfile ? userData.average_rating.toFixed(1) : chosenUser.average_rating.toFixed(1)}⭐
+                        <div className={`${(chosenUserGroup === 'Исполнитель' && chosenUser.average_rating === null) ? 'hidden' : 'block'} text-sm md:text-lg mt-2.5 md:mt-5 outline-2 outline-amber-400 px-2 py-0.5 rounded-md h-fit ${(userData.average_rating > 3.5 || chosenUser.average_rating > 3.5) ? "outline-green-700" : "outline-amber-400"}`}>
+                            Рейтинг пользователя: {isOwnProfile ? userData.average_rating.toFixed(1) : chosenUser.average_rating?.toFixed(1)}⭐
                         </div>
                     }
                 </div>

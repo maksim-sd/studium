@@ -52,10 +52,10 @@ function OrderCard ({ order }) {
                                     <div className="flex justify-between">
                                         <div className="flex gap-5 items-center">
                                             <div className="bg-gray-200 h-15 w-15 rounded-full flex items-center justify-center">
-                                                photo
+                                                <img src={detail.product.photo} alt="" />
                                             </div>
                                             <div className="">
-                                                {detail.product_id}
+                                                {detail.product.name}
                                             </div>
                                         </div>
                                         <div className="flex gap-5 md:gap-50 items-center">

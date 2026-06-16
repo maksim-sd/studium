@@ -127,6 +127,11 @@ function Tasks () {
 		}
 	}
 
+	const applyFiltersButton = (e) => {
+		e.preventDefault()
+		fetchProjects()
+	}
+
 	useEffect(() => {
 		fetchProjects()
 	}, [])
@@ -179,7 +184,7 @@ function Tasks () {
 				<div className="text-lg flex flex-col gap-5">
 					<button 
 						className='w-full px-3.5 text-center py-2 text-white bg-green-700 hover:bg-green-800 cursor-pointer rounded-md'
-						onClick={applyFilters}
+						onClick={applyFiltersButton}
 					>
 						Применить фильтр
 					</button>

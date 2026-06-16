@@ -2,6 +2,7 @@ import { useState, useContext, useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { useUserStore } from './store/UserStore.jsx'
 import { ToastContainer, Zoom } from 'react-toastify'
+import LandingPage from './pages/LandingPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
@@ -99,6 +100,7 @@ function App() {
       <Header />
       <Routes>
         <Route element={<PublicRoute />}>
+        <Route path='/' element={ <LandingPage /> }/>
           <Route path='/login' element={ <LoginPage /> }/>
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["Модератор", "Заказчик", "Исполнитель"]} />}>

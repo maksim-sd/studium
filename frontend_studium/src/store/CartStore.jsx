@@ -61,7 +61,7 @@ export const useCartStore = create((set, get) => ({
             await cartApi.fetchIncrease(productId)
 
             const updatedCart = get().cart.map(item => 
-                item.product_id === productId ? { ...item, quantity: item.quantity + 1} : item
+                item.product.id === productId ? { ...item, quantity: item.quantity + 1} : item
             )
 
             set({
@@ -76,7 +76,7 @@ export const useCartStore = create((set, get) => ({
     }, 
 
     decrementItem: async (productId) => {
-        const product = get().cart.find(item => item.product_id === productId)
+        const product = get().cart.find(item => item.product.id === productId)
 
         if(product.quantity === 1) {
             get().removeItem(productId)
@@ -85,7 +85,7 @@ export const useCartStore = create((set, get) => ({
                 await cartApi.fetchDecrease(productId)
 
                 const updatedCart = get().cart.map(item => 
-                    item.product_id === productId ? { ...item, quantity: item.quantity - 1} : item
+                    item.product.id === productId ? { ...item, quantity: item.quantity - 1} : item
                 )
 
                 set({

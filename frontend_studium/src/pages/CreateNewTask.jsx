@@ -68,7 +68,7 @@ function CreateNewTask ({ type }) {
 
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
-    const [category, setCategory] = useState(null)
+    const [category, setCategory] = useState('')
     const [technology, setTechnology] = useState([])
     const [cashReward, setCashReward] = useState(false)
     const [pointsNumber, setPointsNumber] = useState(50)
@@ -109,6 +109,19 @@ function CreateNewTask ({ type }) {
             setPointsNumber(data.number_of_points)
             setDueDate(data.due_date)
             setCurrrentTech(data.technologies_id)
+            setCustomCategory(data.custom_category_project)
+            setCustomTechnology(data.custom_technologies)
+            setSelectedFiles(data.files)
+
+            console.log(data.files)
+
+            if (data.custom_category_project !== '' && data.custom_category_project !== null) {
+                setCustomCategoryOpen(true)
+            }
+
+            if (data.custom_technologies !== '' && data.custom_technologies !== null) {
+                setCustomTechnologyOpen(true)
+            }
         }
 
         async function fetchTypes() {
@@ -242,11 +255,13 @@ function CreateNewTask ({ type }) {
 
         const data = {
             "new_category_project_id": category,
+            "new_custom_category_project": customCategory === '' ? '' : customCategory, 
             "new_name": name,
             "new_technologies_id": technology,
             "new_number_of_points": pointsNumber,
             "delete_files_id": [],
             "new_due_date": dueDate,
+            "new_custom_technologies": customTechnology === '' ? '' : customTechnology,
             "delete_technologies_id": currentTech.filter(item => !technology.includes(item)),
             "new_cash_reward": cashReward,
             "new_description": description
@@ -279,12 +294,14 @@ function CreateNewTask ({ type }) {
                 
                 <div className="flex flex-col gap-10 pb-12.5">
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4">
-                            Название нового проекта
+                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4 justify-between pr-10">
+                            <div className="">
+                                Название нового проекта<span className="text-red-500">*</span>
+                            </div>
                             <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
                                 ?
                             </div>
-                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-300 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
+                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-200 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
                                 Название должно отражать суть программного продукта, который Вы хотите получить. <br /><br />
                                 <span className="font-bold">Пример:</span> "Веб-приложение для ветеринарной клиники"
                             </div>
@@ -303,13 +320,15 @@ function CreateNewTask ({ type }) {
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4">
-                            Описание проекта
+                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4 justify-between pr-10">
+                            <div className="">
+                                Описание проекта<span className="text-red-500">*</span>
+                            </div>
                             <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
                                 ?
                             </div>
-                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-300 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
-                                Описание проекта должно быть информативным и понятным. <br /><br />
+                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-200 bg-transparent absolute mt-10 w-[25%] z-100 p-3 rounded-md text-sm">
+                                Описание проекта должно быть информативным и понятным, объясняющим суть проекта. <br /><br />
                                 <span className="font-bold">Пример:</span> "Необходимо разработать комплексную информационную систему, автоматизирующую работу регистратуры ветеринарной клиники, врачей и владельцев питомцев. У клиентов должна быть возможность создать профиль одного или нескольких питомцев, записать питомца на прием, просмотреть историю приемов и результаты анализов. Администратор сможет вести и просматривать календарь-планировщик, управлять БД и вести финансовый учет клиники. Врачи должны видеть и редактировать карту пациента, просматривать каталог услуг и товаров, иметь доступ к справочнику. В системе также должна быть предусмотрена функция шаблонов документов"
                             </div>
                         </div>
@@ -329,15 +348,17 @@ function CreateNewTask ({ type }) {
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4">
-                            Категория
+                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4 justify-between pr-10">
+                            <div className="">
+                                Категория<span className="text-red-500">*</span>
+                            </div>
                             <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
                                 ?
                             </div>
-                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-300 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
-                                <span className="font-bold">Категория</span> - описание? Тогда в БД должна зранится не только категория и икнока, но и какое-то описание, чтобы оно отображалось здесь а-ля справочник?? <br /><br />
-                                <span className="font-bold">Категория</span> - описание? <br /><br />
-                                <span className="font-bold">Категория</span> - описание? <br /><br />
+                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-200 bg-transparent absolute mt-10 w-[25%] z-100 p-3 rounded-md text-sm">
+                                Категория может отражать суть программного продукта, который Вы хотите получить, либо ту область знаний, в которой будет вестись проектная деятельность<br /><br />
+                                Если ни одна из категория не подходит, Вы можете отметить галочкой полу "Нет подходящей категории" и ввести необходимую категорию<br /><br />
+                                Если не уверены, то поставьте в поле символ тире (-). Модератор самостоятельно укажет подходящую категорию
                             </div>
                         </div>
                         <div className="basis-3/4">
@@ -381,15 +402,17 @@ function CreateNewTask ({ type }) {
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4">
-                            Технологии
+                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4 justify-between pr-10">
+                            <div className="">
+                                Технологии<span className="text-red-500">*</span>
+                            </div>
                             <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
                                 ?
                             </div>
-                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-300 bg-transparent absolute mt-10 w-[30%] z-100 p-2 rounded-md text-sm">
-                                Технологии  проекта - инструменты, с помощью которых должно быть выполнено программное решение <br /><br />
-
-                                Если не уверены, какие технологии являются подходящими, то отметьте галочкой поле "Нет подходящих технологий" и впишите туда прочерк. Модератор выьерет подходящие технологии при проверке Вашего проекта.
+                            <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-200 bg-transparent absolute mt-10 w-[25%] z-100 p-3 rounded-md text-sm">
+                                Технологии  проекта - инструменты, с помощью которых должно быть выполнено программное решение<br /><br />
+                                Если ни одна из технологий не подходит, Вы можете отметить галочкой полу "Нет подходящих технологий" и ввести перечислить необходимые технологии <span className="underline">через запятую</span> <br /><br />
+                                Если не уверены, то поставьте в поле символ тире (-). Модератор самостоятельно укажет подходящие проекту технологии
                             </div>
                         </div>
                         <div className="basis-3/4">
@@ -438,8 +461,10 @@ function CreateNewTask ({ type }) {
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
-                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4">
-                            Вознаграждение
+                        <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4 justify-between pr-10">
+                            <div className="">
+                                Вознаграждение<span className="text-red-500">*</span>
+                            </div>
                             <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
                                 ?
                             </div>
@@ -479,7 +504,9 @@ function CreateNewTask ({ type }) {
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
                         <div className="text-base font-semibold md:font-normal md:text-lg basis-1/4">
-                            Дата сдачи проекта
+                            <div className="">
+                                Дата сдачи проекта<span className="text-red-500">*</span>
+                            </div>
                         </div>
                         <div className="basis-3/4">
                             <input 
@@ -526,7 +553,7 @@ function CreateNewTask ({ type }) {
                                         <li key={index} className="flex items-center justify-between py-3 text-sm text-gray-700 not-last:border-b not-last:border-b-gray-300">
                                             <div className="flex items-center truncate">
                                                 📄
-                                                <span className="truncate">{file.name}</span>
+                                                <span className="truncate">{file.name || file.file.substring(file.file.lastIndexOf('/') + 1) }</span>
                                             </div>
                                             <button
                                                 onClick={() => removeFile(file.name)}

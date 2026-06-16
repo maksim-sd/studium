@@ -34,13 +34,17 @@ function TaskCard ({ project }) {
     const technologies = useTechnologiesStore((state) => state.technologies)
     const categories = useProjectCategoryStore((state) => state.categories)
 
-    const techList = project.technologies_id.map(technology_id => {
+    const techList = project?.technologies_id ? project.technologies_id.map(technology_id => {
         const technology = technologies.find(item => item.id === technology_id)
         return {
             ...technology_id,
             technologyName: technology ? technology.name : '',
         }
-    })
+    }) : []
+
+    const customTech = project?.custom_technologies ? project.custom_technologies.split(',').map(item => ({ id: item.trim(), technologyName: item.trim() })) : []
+
+    const result = [...techList, ...customTech]
     
     return (
         <div className='bg-white outline outline-gray-300 rounded-md md:max-w-264.25 p-3.75 md:p-7.5 text-base flex flex-col cursor-pointer' onClick={() => navigate(`/tasks/${project.id}`)}>
@@ -77,7 +81,7 @@ function TaskCard ({ project }) {
                 {project.description}
             </div>
             <div className="flex gap-1.25 flex-wrap">
-                {techList.map((item) => (
+                {result.map((item) => (
                     <div className="bg-gray-200 px-2.5 py-1.5 rounded-[50px] text-sm">
                         {item.technologyName}
                     </div>
