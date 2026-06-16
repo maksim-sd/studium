@@ -1,0 +1,14 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+frontend_studium/
+media/
+static/
+.env
+.env.*
+!.env.example
+*.md
+test_data.json

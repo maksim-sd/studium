@@ -1,0 +1,27 @@
+services:
+  backend:
+    build: .
+    env_file: .env
+    environment:
+      SQLITE_PATH: /app/data/db.sqlite3
+    volumes:
+      - data:/app/data
+      - media:/app/media
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend_studium
+    depends_on:
+      - backend
+    volumes:
+      - media:/usr/share/nginx/media:ro
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+volumes:
+  data:
+  media:
