@@ -83,7 +83,6 @@ function Tasks () {
 		// 		setProjects(data)
 		// 	}
 		} catch (error) {
-			console.log(error)
 		}
 		setIsLoading(false)
 	}

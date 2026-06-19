@@ -76,7 +76,6 @@ function OrdersPage () {
                 setActiveOrders(filteredDataActive)
                 setFinishedOrders(filteredDataFinished)
             } catch (error) {
-                console.log(error)
             }
             setIsLoading(false)
         }

@@ -13,7 +13,6 @@ function ResponseCard ({ data, isSelected, onSelect }) {
 
     const photoUrl = data?.executor?.photo
 
-    console.log(photoUrl ? 'a' : 'b')
 
     return (
         <div className="bg-white outline outline-gray-300 rounded-md min-w-173.75 p-6.25">
@@ -27,13 +26,15 @@ function ResponseCard ({ data, isSelected, onSelect }) {
                 </div>
                 <div className="pt-6.25">
                     <div className="text-[18px] font-bold cursor-pointer">
-                        <a href="/profile" className="cursor-pointer">
+                        <a href={`/profile/${data?.executor.id}`} className="cursor-pointer">
                             {data?.executor.last_name} {data?.executor.first_name}
                         </a>
                     </div>
-                    <div className="text-sm pt-2.5 text-gray-500">
-                        Рейтинг пользователя: 5 ⭐
-                    </div>
+                    {data?.executor?.average_rating != null &&
+                        <div className="text-sm pt-2.5 text-gray-500">
+                            Рейтинг пользователя: {data.executor.average_rating} ⭐
+                        </div>
+                    }
                 </div>
             </div>
             <div className="flex gap-2.5 text-sm border-b border-gray-400 pb-2.5">

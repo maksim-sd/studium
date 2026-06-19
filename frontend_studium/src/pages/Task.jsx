@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useParams, useNavigate } from 'react-router-dom'
 import { projectApi } from "../api/project"
 import { FormatDate } from "../shared/FormatDate"
@@ -68,12 +68,10 @@ function Task() {
     const userData = useUserStore((state) => state.currentUserData)
 
     const organizations = useOrganizationStore((state) => state.organizations)
-    const [currentOrganization, setCurrentOrganization] = useState([])
 
     const { taskId } = useParams()
 
     const [projectData, setProjectData] = useState([])
-    const [techList, setTechList] = useState([])
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -89,6 +87,25 @@ function Task() {
 
     const technologies = useTechnologiesStore((state) => state.technologies)
 
+    const techList = useMemo(() => {
+        const fromStore = (projectData?.technologies_id || []).map(technology_id => {
+            const technology = technologies.find(item => item.id === technology_id)
+            return {
+                id: technology_id,
+                technologyName: technology ? technology.name : '',
+            }
+        })
+        const customTech = projectData?.custom_technologies
+            ? projectData.custom_technologies.split(',').map(item => ({ id: item.trim(), technologyName: item.trim() }))
+            : []
+        return [...fromStore, ...customTech]
+    }, [projectData, technologies])
+
+    const currentOrganization = useMemo(
+        () => organizations.find(item => item.id === projectData?.customer?.organization_id),
+        [organizations, projectData]
+    )
+
     useEffect(() => {
         async function fetchProject() {
             setIsLoading(true)
@@ -96,22 +113,6 @@ function Task() {
             const data = await projectApi.fetchChosenProject(taskId)
             
             setProjectData(data)
-                    
-            setCurrentOrganization(organizations.find(item => item.id === data.customer.organization_id))
-            
-            const techList = data?.technologies_id ? data.technologies_id.map(technology_id => {
-                const technology = technologies.find(item => item.id === technology_id)
-                    return {
-                        ...technology_id,
-                        technologyName: technology ? technology.name : '',
-                    }
-                }) : []
-
-            const customTech = data?.custom_technologies ? data.custom_technologies.split(',').map(item => ({ id: item.trim(), technologyName: item.trim() })) : []
-
-            const result = [...techList, ...customTech]
-
-            setTechList(result)
 
             setIsLoading(false)
         }
@@ -152,14 +153,14 @@ function Task() {
                                             🗎
                                         </div>
                                         <a href={`/tasks/${projectData.id}/edit`} className="flex-start underline text-nowrap text-base">
-                                            Редактировать задачу
+                                            Редактировать проект
                                         </a>
                                     </div>
                                 }
                             </div>
                             <div className="flex gap-3.75 md:gap-7.5 text-sm md:text-sm pt-1.25 md:pt-2.5 font-normal">
                                 <p>
-                                    Автор: {isLoading ? <Skeleton height={14} width={200}/> : currentOrganization?.full_name }
+                                    Автор: {isLoading ? <Skeleton height={14} width={200}/> : `${projectData.customer?.last_name ?? ''} ${projectData.customer?.first_name ?? ''}${currentOrganization?.full_name ? `, ${currentOrganization.full_name}` : ''}` }
                                 </p>
                                 <p>
                                     Опубликовано: {isLoading ? <Skeleton height={14} width={120}/> : FormatDate(projectData.created_at) }
@@ -190,7 +191,7 @@ function Task() {
                                     {isLoading ? (
                                         <Skeleton height={48} width={120}/>
                                     ) : (
-                                        <div title="Сумма баллов, которые получит исполнитель в случае успешного выполнения задачи" className="flex gap-2">
+                                        <div title="Сумма баллов, которые получит исполнитель в случае успешного выполнения проекта" className="flex gap-2">
                                             <img className='size-8 md:size-10' src={points} alt="" />
                                             <div className="">
                                                 Вознаграждение
@@ -215,7 +216,7 @@ function Task() {
                         <div className="text-lg md:text-xl font-semibold">
                             Стек технологий
                             <div className="text-sm pt-1.25 md:pt-2.5 font-normal">
-                                Список технологий, которые будут полезны при выполнении данной задачи
+                                Список технологий, которые будут полезны при выполнении данного проекта
                             </div>
                             <div className="flex gap-1.25 md:gap-2 flex-wrap pt-3.25 md:pt-5.25">
                                 {techList.map((item) => (

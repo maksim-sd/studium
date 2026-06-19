@@ -139,7 +139,7 @@ def get_responses_user(
     responses = (Response.objects.filter(executor=user, project__project_status="LOOKING_FOR_EXECUTOR")
                  .select_related('project')
                  .prefetch_related('project__technologies', 'project__category_project')
-    )
+    ).distinct()
     if search:
         responses = responses.filter(Q(project__name__iregex=search) | Q(project__description__iregex=search))
     if category_id:
@@ -178,7 +178,7 @@ def get_projects_moderation(
     if not user.groups.filter(name=MODERATOR).exists():
         raise HttpError(403, "Недостаточно прав")
     projects = Project.objects.ordered_by_status()
-    projects = projects.filter(Q(project_status="UNDER_INSPECTION") | Q(project_status="LOOKING_FOR_EXECUTOR"))
+    projects = projects.filter(Q(project_status="UNDER_INSPECTION") | Q(project_status="LOOKING_FOR_EXECUTOR")).distinct()
     if search:
         projects = projects.filter(Q(name__iregex=search) | Q(description__iregex=search))
     if category_id:
@@ -218,7 +218,7 @@ def get_projects_active(request):
             "LOOKING_FOR_EXECUTOR",
             "UNDER_INSPECTION"
         ]
-    )
+    ).distinct()
     projects_out = []
     for project in projects:
         project_out=ProjectOut(
@@ -252,7 +252,7 @@ def get_projects_user_active(request, id_user:int = Path(..., description="ID п
             "LOOKING_FOR_EXECUTOR",
             "UNDER_INSPECTION"
         ]
-    )
+    ).distinct()
     projects_out = []
     for project in projects:
         project_out=ProjectOut(
@@ -316,7 +316,7 @@ def get_projects_user_history(request, id_user:int = Path(..., description="ID �
     projects = Project.objects.ordered_by_status().filter(
         Q(customer=user) | Q(moderators=user) | Q(executors=user),
         project_status="COMPLETED"
-    )
+    ).distinct()
     projects_out = []
     for project in projects:
         project_out=ProjectCompletedOut(
@@ -462,12 +462,11 @@ def get_project_participants(request, id_project:int = Path(..., description="ID
     )
     if not permission_view_participants_project(user, project):
         raise HttpError(400, "Недоступно")
-    participants_out = ProjectParticipantsOut(
-        customer=project.customer,
-        moderators=project.moderators,
-        executors=project.executors
-    )
-    return participants_out
+    return {
+        "customer": project.customer,
+        "moderators": project.moderators.all(),
+        "executors": project.executors.all(),
+    }
 
 
 @router.post("/", auth=BasicAuth(), summary="Создать проект")
@@ -507,12 +506,9 @@ def put_project(
         raise HttpError(400, "Недоступно")
     with transaction.atomic():
         data = payload.dict()
-        if data["new_category_project_id"]:
-            project.category_project_id = data["new_category_project_id"]
-        if data["new_custom_category_project"]:
-            project.new_custom_category_project = data["new_custom_category_project"]
-        if data["new_custom_technologies"]:
-            project.new_custom_technologies = data["new_custom_technologies"]
+        project.category_project_id = data["new_category_project_id"]
+        project.custom_category_project = data["new_custom_category_project"] or None
+        project.custom_technologies = data["new_custom_technologies"] or None
         if data["new_name"]:
             project.name = data["new_name"]
         if data["new_description"]:
@@ -560,12 +556,9 @@ def put_project_publish(
         raise HttpError(400, "Недоступно")
     with transaction.atomic():
         data = payload.dict()
-        if data["new_category_project_id"]:
-            project.category_project_id = data["new_category_project_id"]
-        if data["new_custom_category_project"]:
-            project.new_custom_category_project = data["new_custom_category_project"]
-        if data["new_custom_technologies"]:
-            project.new_custom_technologies = data["new_custom_technologies"]
+        project.category_project_id = data["new_category_project_id"]
+        project.custom_category_project = data["new_custom_category_project"] or None
+        project.custom_technologies = data["new_custom_technologies"] or None
         if data["new_name"]:
             project.name = data["new_name"]
         if data["new_description"]:
@@ -879,7 +872,9 @@ def delete_user(
         raise HttpError(400, "Невозможно удалить самого себя из участников проекта")
     elif project.moderators.filter(id=selected_user.id).exists():
         project.moderators.remove(selected_user)
-    elif project.executors.filter(id=selected_user.id).exists():   
+    elif project.executors.filter(id=selected_user.id).exists():
+        if project.executors.count() <= 1:
+            raise HttpError(400, "Невозможно удалить единственного исполнителя проекта")
         project.executors.remove(selected_user)
     else:
         raise HttpError(400, "Пользователь не является участником в выбранном проекте")

@@ -1,6 +1,9 @@
 import { useState, useContext, useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { useUserStore } from './store/UserStore.jsx'
+import { useTechnologiesStore } from './store/TechnologiesStore.jsx'
+import { useProjectCategoryStore } from './store/ProjectCategoryStore.jsx'
+import { useOrganizationStore } from './store/OrganizationStore.jsx'
 import { ToastContainer, Zoom } from 'react-toastify'
 import LandingPage from './pages/LandingPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
@@ -74,21 +77,30 @@ function ProtectedRoute ({ allowedRoles }) {
 function App() {
   const navigate = useNavigate()
   const { checkAuth, isLoading, isAuth } = useUserStore()
-  
-  useEffect(() => {   
+  const fetchTechnologies = useTechnologiesStore((state) => state.fetchTechnologies)
+  const fetchProjectCategories = useProjectCategoryStore((state) => state.fetchCategories)
+  const fetchOrganizations = useOrganizationStore((state) => state.fetchOrganizations)
+
+  useEffect(() => {
     const initApp = async () => {
       const hasVisited = localStorage.getItem('hasVisitedBefore')
 
       if (!hasVisited) {
         localStorage.setItem('hasVisitedBefore', 'true')
         navigate('/login', { replace: true })
-        setCheckingAuth(false)
       }
 
-      await checkAuth()
-    } 
+      const isAuthed = await checkAuth()
+
+      if (isAuthed) {
+        const credentials = useUserStore.getState().currentUser
+        fetchProjectCategories(credentials)
+        fetchTechnologies(credentials)
+        fetchOrganizations(credentials)
+      }
+    }
     initApp()
-  }, [checkAuth, navigate])
+  }, [checkAuth, navigate, fetchProjectCategories, fetchTechnologies, fetchOrganizations])
 
   if (isLoading) {
     return <FullScreenLoader />

@@ -24,7 +24,6 @@ export const createUserGroupSlice = (set, get) => ({
             }
             return true
         } catch (error) {
-            console.log(error)
             set({ groups: userGroup[0].name, isLoading: false })
             return false
         }
@@ -54,11 +53,11 @@ export const createUserSlice = (set, get) => ({
                 const isValid = await userApi.fetchUser(currentUser)
                 
                 if (isValid) {
-                    set({ 
-                        isAuth: true, 
-                        currentUser, 
-                        currentUserData,
-                        isLoading: false 
+                    set({
+                        isAuth: true,
+                        currentUser,
+                        currentUserData: isValid,
+                        isLoading: false
                     })
                     if (!get().groups?.length) {
                         await get().fetchGroups()
@@ -70,7 +69,6 @@ export const createUserSlice = (set, get) => ({
             set({ isLoading: false, isAuth: false })
             return false
         } catch (error) {
-            console.log('Auth check failed:', error)
             set({ isLoading: false, isAuth: false })
             return false
         }
@@ -102,7 +100,6 @@ export const createUserSlice = (set, get) => ({
             await get().fetchGroups()
             return true
         } catch (error) {
-            console.log(error)
             set({ isLoading: false })
             return false
         }
@@ -119,7 +116,6 @@ export const createUserSlice = (set, get) => ({
                 currentUserData: updatedUserData
             }))
         } catch (error) {
-            console.log("failed update photo:", error)
             throw error
         }
     }

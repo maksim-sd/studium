@@ -1,13 +1,28 @@
 #!/bin/sh
 set -e
 
-# Persistent dirs (mounted as volumes in production).
-mkdir -p /app/data /app/media
+mkdir -p /app/media
 
-# On the very first deploy, seed the volume with the database baked into the
-# image so existing local data is not lost. Afterwards the volume copy wins.
-if [ ! -f "${SQLITE_PATH:-/app/data/db.sqlite3}" ] && [ -f /app/db.sqlite3 ]; then
-    cp /app/db.sqlite3 "${SQLITE_PATH:-/app/data/db.sqlite3}"
+if [ -n "$POSTGRES_DB" ]; then
+    echo "Waiting for PostgreSQL at ${POSTGRES_HOST:-db}:${POSTGRES_PORT:-5432}..."
+    until python -c "
+import os, sys, psycopg
+try:
+    psycopg.connect(
+        host=os.environ.get('POSTGRES_HOST', 'db'),
+        port=os.environ.get('POSTGRES_PORT', '5432'),
+        dbname=os.environ['POSTGRES_DB'],
+        user=os.environ.get('POSTGRES_USER', 'postgres'),
+        password=os.environ.get('POSTGRES_PASSWORD', ''),
+        connect_timeout=3,
+    ).close()
+except Exception as e:
+    sys.exit(1)
+" 2>/dev/null; do
+        echo "  ...database not ready yet, retrying in 2s"
+        sleep 2
+    done
+    echo "PostgreSQL is ready."
 fi
 
 python manage.py migrate --noinput

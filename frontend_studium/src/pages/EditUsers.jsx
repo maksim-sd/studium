@@ -183,6 +183,7 @@ function PaginatedTable ({ type, data, onAddUser, participants }) {
 function EditUsers () {
     const navigate = useNavigate()
     const user = useUserStore((state) => state.currentUser)
+    const currentUserData = useUserStore((state) => state.currentUserData)
 
     const [participants, setParticipants] = useState([])
 
@@ -388,9 +389,11 @@ function EditUsers () {
                                                     <div className="">
                                                         {person.last_name} {person.first_name}
                                                     </div>
-                                                    <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer`}>
-                                                        ❌
-                                                    </div>
+                                                    {Number(currentUserData?.id) !== Number(person.id) &&
+                                                        <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer`}>
+                                                            ❌
+                                                        </div>
+                                                    }
                                                 </li>
                                             ))}
                                         </ul>
@@ -407,13 +410,15 @@ function EditUsers () {
                                     ) : (
                                         <ul className='pl-2.5 text-sm'>
                                             {participants.executors?.map((person) => (
-                                                <li className='flex justify-between py-4'>
+                                                <li key={person.id} className='flex justify-between py-4'>
                                                     <div className="">
                                                         {person.last_name} {person.first_name}
                                                     </div>
-                                                    <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer`}>
-                                                        ❌
-                                                    </div>
+                                                    {participants.executors?.length > 1 &&
+                                                        <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer`}>
+                                                            ❌
+                                                        </div>
+                                                    }
                                                 </li>
                                             ))}
                                         </ul>

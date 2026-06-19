@@ -14,10 +14,10 @@ function ConfirmationModal ({task, onClose}) {
                         Отлично!
                     </div>
                     <div className="">
-                        Вы откликнулись на задачу {task}
+                        Вы откликнулись на проект {task}
                     </div>
                     <div className="text-gray-500 text-sm">
-                        Отследить статус задачи можно в профиле
+                        Отследить статус проекта можно в профиле
                     </div>
                     <div className="cursor-pointer rounded-md self-center text-white bg-green-700 hover:bg-green-800 active:bg-green-900 px-6 py-1.5" onClick={onClose}>
                         Понятно
@@ -102,7 +102,7 @@ function FeedbackModal ({ projectId, onClose }) {
                         Отлично!
                     </div>
                     <div className="">
-                        Работа над задачей была завершена
+                        Работа над проектом была завершена
                     </div>
                     <div className="text-gray-500 text-sm">
                         Оставьте исполнителям небольшой отзыв о их работе
@@ -162,7 +162,7 @@ function ExecutorResponsePanel ({ project }) {
                 <>
                     <div className="bg-gray-100 rounded-md flex flex-col p-5 items-center text-center gap-2.5 self-start">
                         <div className="font-bold text-xl">
-                            Готовы приступить к выполнению задачи?
+                            Готовы приступить к выполнению проекта?
                         </div>
                         <div className="text-gray-700 text-sm">
                             Вы можете добавить небольшой текст к своему отклику, который увидит модератор, или продолжить без него
@@ -189,10 +189,10 @@ function ExecutorResponsePanel ({ project }) {
             return (
                 <div className="bg-gray-100 rounded-md flex flex-col p-5 items-center text-center gap-2.5 self-start">
                     <div className="font-bold text-xl">
-                        Вы уже откликнулись на данную задачу
+                        Вы уже откликнулись на данный проект
                     </div>
                     <div className="text-gray-700 text-sm">
-                        Если Вы будете назначены исполнителем, то задача появится в разделе "Текущие проекты"
+                        Если Вы будете назначены исполнителем, то проект появится в разделе "Текущие проекты"
                     </div>
                 </div>
             )
@@ -305,7 +305,7 @@ function ProjectManagementPanel ({ project }) {
             {(project.permission?.view_participants && project.project_status !== 'На проверке') &&
                 <div className="flex flex-col min-h-[70vh]">
                     {(project.permission?.complete && project.project_status === 'В работе') &&
-                        <div className="text-center font-bold mb-5 text-white bg-green-700 hover:bg-green-800 active:bg-green-900 rounded-md w-full py-3.25 mt-3.75" onClick={() => handleCompleting()}>
+                        <div className="cursor-pointer text-center font-bold mb-5 text-white bg-green-700 hover:bg-green-800 active:bg-green-900 rounded-md w-full py-3.25 mt-3.75" onClick={() => handleCompleting()}>
                             Завершить проект
                         </div>
                     }
@@ -327,7 +327,7 @@ function ProjectManagementPanel ({ project }) {
                                         <div className="cursor-pointer" onClick={() => navigate(`/profile/${person.id}`)}>
                                             {person.last_name} {person.first_name}
                                         </div>
-                                        {currentUserData.id !== person.id &&
+                                        {Number(currentUserData?.id) !== Number(person.id) &&
                                             <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer ${(userGroup === "Модератор" && project.project_status !== "Завершен") ? '' : "hidden"}`}>
                                                 ❌
                                             </div>
@@ -340,13 +340,15 @@ function ProjectManagementPanel ({ project }) {
                             Исполнители:
                             <ul className='pl-2.5 text-sm'>
                                 {participants.executors?.map((person) => (
-                                    <li className='flex justify-between py-4'>
+                                    <li key={person.id} className='flex justify-between py-4'>
                                         <div className="cursor-pointer" onClick={() => navigate(`/profile/${person.id}`)}>
                                             {person.last_name} {person.first_name}
                                         </div>
-                                        <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer ${(userGroup === "Модератор" && project.project_status !== "Завершен") ? '' : "hidden"}`}>
-                                            ❌
-                                        </div>
+                                        {participants.executors?.length > 1 &&
+                                            <div onClick={() => handleDeleteUser(person.id)} className={`cursor-pointer ${(userGroup === "Модератор" && project.project_status !== "Завершен") ? '' : "hidden"}`}>
+                                                ❌
+                                            </div>
+                                        }
                                     </li>
                                 ))}
                             </ul>

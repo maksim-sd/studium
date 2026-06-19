@@ -16,18 +16,18 @@ function TaskModal ({ onClose, type }) {
         switch (type) {
             case 'create':
                 setTitle('Проект был создан!')
-                setText('После прохождения модерации, проект станет доступна исполнителям')
+                setText('После прохождения модерации проект станет доступен исполнителям')
                 setSubtext('Созданный проект Вы сможете найти в разделе "На модерации". Проект останется доступным для редактирования')
                 break
             case 'moderate':
                 setTitle('Проект был опубликован!')
-                setText('Теперь проект доступна исполнителям')
-                setSubtext('Проект Вы сможете найти в разделе "Текущие проекты". Проект останется доступным для редактирования')
+                setText('Теперь проект доступен исполнителям')
+                setSubtext('Проект Вы сможете найти в разделе "Отклики на проекты". Проект останется доступным для редактирования')
                 break
             case 'edit':
                 setTitle('Проект был изменен!')
-                setText('Теперь внесенные изменения доступны исполнителям')
-                setSubtext('Проект Вы сможете найти в разделе "Текущие проекты". Проект останется доступным для редактирования')
+                setText('Изменения сохранены')
+                setSubtext('Проект останется доступным для редактирования')
                 break
         }
     }, [])
@@ -113,7 +113,6 @@ function CreateNewTask ({ type }) {
             setCustomTechnology(data.custom_technologies)
             setSelectedFiles(data.files)
 
-            console.log(data.files)
 
             if (data.custom_category_project !== '' && data.custom_category_project !== null) {
                 setCustomCategoryOpen(true)
@@ -184,7 +183,6 @@ function CreateNewTask ({ type }) {
     const validateForm = () => {
         const errors = []
 
-        console.log(category === null)
 
         if (!name || name.trim() === '') {
             errors.push('Укажите название проекта!')
@@ -192,14 +190,6 @@ function CreateNewTask ({ type }) {
 
         if (!description || description.trim() === '') {
             errors.push('Укажите описание проекта!')
-        }
-
-        if (!category && (!customCategory || customCategory.trim() === '')) {
-            errors.push('Выберите категорию или укажите свою!')
-        }
-
-        if (!technology && (!customTechnology || customTechnology.trim() === '')) {
-            errors.push('Выберите хотя бы одну технологию или укажите свою!')
         }
 
         if (!dueDate) {
@@ -221,10 +211,10 @@ function CreateNewTask ({ type }) {
         }
 
         const data = {
-            "category_project_id": category,
-            "custom_category_project": customCategory === '' ? null : customCategory, 
+            "category_project_id": category || null,
+            "custom_category_project": (customCategoryOpen && customCategory !== '') ? customCategory : null,
             "technologies_id": technology,
-            "custom_technologies": customTechnology === '' ? null : customTechnology,
+            "custom_technologies": (customTechnologyOpen && customTechnology !== '') ? customTechnology : null,
             "name": name,
             "description": description,
             "cash_reward": cashReward,
@@ -254,14 +244,14 @@ function CreateNewTask ({ type }) {
         }
 
         const data = {
-            "new_category_project_id": category,
-            "new_custom_category_project": customCategory === '' ? '' : customCategory, 
+            "new_category_project_id": category || null,
+            "new_custom_category_project": (customCategoryOpen && customCategory !== '') ? customCategory : '',
             "new_name": name,
             "new_technologies_id": technology,
             "new_number_of_points": pointsNumber,
             "delete_files_id": [],
             "new_due_date": dueDate,
-            "new_custom_technologies": customTechnology === '' ? '' : customTechnology,
+            "new_custom_technologies": (customTechnologyOpen && customTechnology !== '') ? customTechnology : '',
             "delete_technologies_id": currentTech.filter(item => !technology.includes(item)),
             "new_cash_reward": cashReward,
             "new_description": description
@@ -350,7 +340,7 @@ function CreateNewTask ({ type }) {
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
                         <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4 justify-between pr-10">
                             <div className="">
-                                Категория<span className="text-red-500">*</span>
+                                Категория
                             </div>
                             <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
                                 ?
@@ -358,7 +348,7 @@ function CreateNewTask ({ type }) {
                             <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-200 bg-transparent absolute mt-10 w-[25%] z-100 p-3 rounded-md text-sm">
                                 Категория может отражать суть программного продукта, который Вы хотите получить, либо ту область знаний, в которой будет вестись проектная деятельность<br /><br />
                                 Если ни одна из категория не подходит, Вы можете отметить галочкой полу "Нет подходящей категории" и ввести необходимую категорию<br /><br />
-                                Если не уверены, то поставьте в поле символ тире (-). Модератор самостоятельно укажет подходящую категорию
+                                Если не уверены, можете оставить без выбора — модератор самостоятельно укажет подходящую категорию
                             </div>
                         </div>
                         <div className="basis-3/4">
@@ -372,8 +362,8 @@ function CreateNewTask ({ type }) {
                                             className="peer absolute left-0 -z-1 opacity-0 checked:bg-gray-600"
                                             checked={item.id === category}
                                             value={item.id}
-                                            onChange={(e) => setCategory(item.id)}
-                                            required
+                                            onClick={() => { if (item.id === category) setCategory('') }}
+                                            onChange={() => setCategory(item.id)}
                                         />
                                         <label htmlFor={`category${item.id}`} className="cursor-pointer px-3 md:px-3.5 py-1.5 rounded-[50px] font-normal inline-block relative mb-0 bg-gray-200 hover:bg-gray-300 peer-checked:bg-white peer-checked:outline-2 peer-checked:outline-green-600">
                                             {item.name}
@@ -390,7 +380,10 @@ function CreateNewTask ({ type }) {
                                         type="checkbox" 
                                         className="h-5 w-5 rounded border-gray-400 accent-green-700 cursor-pointer" 
                                         checked={customCategoryOpen}
-                                        onChange={() => setCustomCategoryOpen(!customCategoryOpen)}
+                                        onChange={() => {
+                                            if (customCategoryOpen) setCustomCategory('')
+                                            setCustomCategoryOpen(!customCategoryOpen)
+                                        }}
                                     />
                                     <label htmlFor="" className="text-nowrap">Нет подходящей категории</label>
                                 </div>
@@ -404,7 +397,7 @@ function CreateNewTask ({ type }) {
                     <div className="flex flex-col md:flex-row gap-2 md:gap-0">
                         <div className="flex gap-5 text-base font-semibold md:font-normal md:text-lg basis-1/4 justify-between pr-10">
                             <div className="">
-                                Технологии<span className="text-red-500">*</span>
+                                Технологии
                             </div>
                             <div className="rounded-full cursor-pointer bg-green-700 text-white font-bold h-fit px-2 peer">
                                 ?
@@ -412,7 +405,7 @@ function CreateNewTask ({ type }) {
                             <div className="hidden peer-checked: peer-hover:block peer-hover:bg-gray-200 bg-transparent absolute mt-10 w-[25%] z-100 p-3 rounded-md text-sm">
                                 Технологии  проекта - инструменты, с помощью которых должно быть выполнено программное решение<br /><br />
                                 Если ни одна из технологий не подходит, Вы можете отметить галочкой полу "Нет подходящих технологий" и ввести перечислить необходимые технологии <span className="underline">через запятую</span> <br /><br />
-                                Если не уверены, то поставьте в поле символ тире (-). Модератор самостоятельно укажет подходящие проекту технологии
+                                Если не уверены, можете оставить без выбора — модератор самостоятельно укажет подходящие проекту технологии
                             </div>
                         </div>
                         <div className="basis-3/4">
@@ -432,7 +425,6 @@ function CreateNewTask ({ type }) {
                                                     setTechnology([...technology, item.id])
                                                 }
                                             }}
-                                            required
                                         />
                                         <label htmlFor={`technology${item.id}`} className="cursor-pointer px-3 md:px-3.5 py-1.5 rounded-[50px] font-normal inline-block relative mb-0 bg-gray-200 hover:bg-gray-300 peer-checked:bg-white peer-checked:outline-2 peer-checked:outline-green-600">
                                             {item.name}
@@ -449,7 +441,10 @@ function CreateNewTask ({ type }) {
                                         type="checkbox" 
                                         className="h-5 w-5 rounded border-gray-400 accent-green-700 cursor-pointer" 
                                         checked={customTechnologyOpen}
-                                        onChange={() => setCustomTechnologyOpen(!customTechnologyOpen)}
+                                        onChange={() => {
+                                            if (customTechnologyOpen) setCustomTechnology('')
+                                            setCustomTechnologyOpen(!customTechnologyOpen)
+                                        }}
                                     />
                                     <label htmlFor="" className="text-nowrap">Нет подходящих технологий</label>
                                 </div>
@@ -553,7 +548,7 @@ function CreateNewTask ({ type }) {
                                         <li key={index} className="flex items-center justify-between py-3 text-sm text-gray-700 not-last:border-b not-last:border-b-gray-300">
                                             <div className="flex items-center truncate">
                                                 📄
-                                                <span className="truncate">{file.name || file.file.substring(file.file.lastIndexOf('/') + 1) }</span>
+                                                <span className="truncate">{file.name || decodeURIComponent(file.file.substring(file.file.lastIndexOf('/') + 1)) }</span>
                                             </div>
                                             <button
                                                 onClick={() => removeFile(file.name)}

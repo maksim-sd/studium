@@ -20,7 +20,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def env_list(name, default=''):
-    """Read a comma-separated env var into a clean list of strings."""
     return [item.strip() for item in os.environ.get(name, default).split(',') if item.strip()]
 
 
@@ -40,7 +39,6 @@ ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', '127.0.0.1,localhost')
 
 CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS')
 
-# Behind nginx/any TLS-terminating proxy, trust the forwarded protocol header.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
@@ -297,12 +295,25 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.environ.get('SQLITE_PATH', BASE_DIR / 'db.sqlite3'),
+if os.environ.get('POSTGRES_DB'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ['POSTGRES_DB'],
+            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+            'CONN_MAX_AGE': int(os.environ.get('DB_CONN_MAX_AGE', '60')),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.environ.get('SQLITE_PATH', BASE_DIR / 'db.sqlite3'),
+        }
+    }
 
 
 # Password validation
@@ -351,7 +362,6 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = BASE_DIR / 'static'
 STATIC_URL = '/static/'
 
-# Let whitenoise serve and compress collected static files (admin / unfold).
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",

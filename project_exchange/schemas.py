@@ -29,6 +29,21 @@ class CustomUserOut(Schema):
     id: int
     last_name: str
     first_name: str
+    average_rating: float | None = None
+
+    @staticmethod
+    def resolve_average_rating(obj):
+        from user.models import CustomUser
+        if not isinstance(obj, CustomUser):
+            return getattr(obj, "average_rating", None)
+        from django.db.models import Avg
+        from .models import Project, Feedback
+        avg = (
+            Feedback.objects
+            .filter(project__in=Project.objects.filter(executors=obj))
+            .aggregate(avg=Avg("number_stars"))["avg"]
+        )
+        return round(avg, 1) if avg is not None else None
 
 
 class CustomerUserOut(Schema):

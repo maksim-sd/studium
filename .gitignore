@@ -1,15 +1,11 @@
-# Secrets — never commit
 .env
 .env.*
 !.env.example
 
-# Python
 .venv/
 venv/
 __pycache__/
 *.pyc
 
-# Django collected static (generated at build/deploy time)
 /static/
-
-DEPLOY.md
+/media/

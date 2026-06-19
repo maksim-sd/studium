@@ -28,7 +28,6 @@ function ConfirmationModal ({ onClose, balance }) {
             cart_product_id: cart.map(item => Number(item.id))
         }
 
-        console.log(cart.map(item => Number(item.id)))
 
         await shopApi.fetchCreateOrder(JSON.stringify(payload))
 

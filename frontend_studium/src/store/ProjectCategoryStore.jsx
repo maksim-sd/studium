@@ -1,8 +1,7 @@
 import { create } from "zustand"
-import { createJSONStorage, persist } from "zustand/middleware"
 import { projectApi } from "../api/project"
 
-export const useProjectCategoryStore = create()(persist((set, get) => ({
+export const useProjectCategoryStore = create((set, get) => ({
     categories: [],
 
     fetchCategories: async (currentUser) => {
@@ -17,13 +16,7 @@ export const useProjectCategoryStore = create()(persist((set, get) => ({
 
             return true
         } catch (error) {
-            console.log(error)
             return false
         }
     }
-}),
-    {
-        name: 'project-categories-storage',
-        storage: createJSONStorage(() => localStorage),
-    }
-))
+}))

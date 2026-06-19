@@ -14,7 +14,6 @@ function OrderCard ({ order }) {
                 const data = await shopApi.fetchSpecificOrder(orderId)
                 setOrderDetail(data)
             } catch (error) {
-                console.log(error)
             }
             setIsOpenDetails(true)
         }

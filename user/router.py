@@ -68,7 +68,7 @@ def get_user(request, id_user:int=Path(..., description="ID пользовате
     current_user = request.auth
     user = get_object_or_404(CustomUser, id=id_user)
     user_out = create_user_out(user)
-    if current_user.groups.filter(name=MODERATOR).exists() or current_user == user:
+    if current_user.groups.filter(name=MODERATOR).exists() or current_user == user or user.groups.filter(name=EXECUTOR).exists():
         user_out = create_user_out_private(user, user_out)
     return user_out
 

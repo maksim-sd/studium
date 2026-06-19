@@ -25,7 +25,7 @@ function ConfirmationModal ({onClose}) {
                         </div>
                     </div>
                     <div className="">
-                        Пользователи были назначены исполнителями для данной задачи.
+                        Пользователи были назначены исполнителями для данного проекта.
                     </div>
                     <div className="text-gray-500 text-sm">
                         Задача теперь будет отображаться в профиле в разделе "Текущие проекты". Теперь доступен чат между всеми участниками проекта.
@@ -106,7 +106,7 @@ function Responses () {
         <>
         <div className="mx-5 md:mx-62.5">
             <div className="text-2xl md:text-3xl font-bold">
-                Отклики к задаче {isLoading ? <Skeleton width={350} height={40} /> : projectName}
+                Отклики к проекту {isLoading ? <Skeleton width={350} height={40} /> : projectName}
                 <div className="font-normal text-lg md:text-xl pt-3.75 mb-10 text-black">
                     Выберите студентов, которых готовы назначить исполнителями 
                 </div>

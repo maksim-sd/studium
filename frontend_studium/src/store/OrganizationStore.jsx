@@ -1,8 +1,7 @@
 import { create } from "zustand"
-import { createJSONStorage, persist } from "zustand/middleware"
 import { userApi } from "../api/user"
 
-export const useOrganizationStore = create()(persist((set, get) => ({
+export const useOrganizationStore = create((set, get) => ({
     organizations: [],
 
     fetchOrganizations: async (currentUser) => {
@@ -17,13 +16,7 @@ export const useOrganizationStore = create()(persist((set, get) => ({
 
             return true
         } catch (error) {
-            console.log(error)
             return false
         }
     }
-}),
-    {
-        name: 'project-organizations-storage',
-        storage: createJSONStorage(() => localStorage),
-    }
-))
+}))

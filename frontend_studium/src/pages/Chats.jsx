@@ -11,8 +11,8 @@ function ChatPanel ({ chatInfo }) {
     
     return (
         <div onClick={() => navigate(`/chats/${chatInfo.id}`)} className="cursor-pointer bg-white flex gap-2.5 p-2.5 border-b border-gray-200">
-            <div className="flex flex-col gap-1.25">
-                <div className="flex justify-between">
+            <div className="flex flex-col gap-1.25 w-full">
+                <div className="flex justify-between gap-2">
                     <div title={chatInfo.project.name} className="line-clamp-2 text-green-700 font-bold">
                         {chatInfo.project.name}
                     </div>
@@ -224,7 +224,7 @@ function Messenger ({ chatId, user, userId }) {
                                                 {message.files.map(f => (
                                                     <label key={f.id} className="flex items-center gap-1.5 truncate max-w-100 cursor-pointer">
                                                         <span className={filesToDelete.includes(f.id) ? "line-through opacity-60" : ""}>
-                                                            Удалить {f.file.split('/').pop()} ?
+                                                            Удалить {decodeURIComponent(f.file.split('/').pop())} ?
                                                         </span>
                                                         <input 
                                                             type="checkbox" 
@@ -306,7 +306,7 @@ function Messenger ({ chatId, user, userId }) {
                                         {message.files.map((file, index) => (
                                             <div key={index} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded border border-gray-300 truncate max-w-62.5">
                                                 <a href={file.file} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                                                    📄 {file.file.split('/').pop() || 'Файл'}
+                                                    📄 {decodeURIComponent(file.file.split('/').pop()) || 'Файл'}
                                                 </a>
                                             </div>
                                         ))}
@@ -364,14 +364,12 @@ function Chats() {
         if (message.trim() || selectedFiles.length > 0) {
             const formData = new FormData()
 
-            if (message.trim()) {
-                const data = {
-                    'message': message,
-                }
-
-                formData.append('payload', JSON.stringify(data))
+            const data = {
+                'message': message.trim() ? message : '',
             }
-            
+
+            formData.append('payload', JSON.stringify(data))
+
             if (selectedFiles && selectedFiles.length > 0) {
                 for (let i = 0; i < selectedFiles.length; i++) {
                     formData.append('files', selectedFiles[i])
@@ -517,7 +515,7 @@ function Chats() {
                                             className="text-gray-700 block px-4 py-2 text-sm"
                                             onClick={() => setIsOpen(false)}
                                         >
-                                            Перейти к задаче
+                                            Перейти к проекту
                                         </a>
                                     </div>
                                     {userGroup === "Модератор" &&
