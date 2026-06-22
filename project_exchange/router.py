@@ -10,6 +10,7 @@ from django.db.models.functions import Concat
 from django.db import transaction
 
 from user.router import BasicAuth, CUSTOMER, MODERATOR, EXECUTOR
+from .ws_broadcast import broadcast_chat_message
 from user.models import CustomUser, Balance, Group, ExecutorData
 from .models import (
     CategoryProject, 
@@ -52,11 +53,11 @@ from .schemas import (
 )
 
 
-MAX_SIZE_FILE_PROJECT = 500 # размер в МБ
+MAX_SIZE_FILE_PROJECT = 100 # размер в МБ
 MAX_COUNT_FILES_PROJECT = 5
 MAX_COUNT_EXECUTORS = 3
 MAX_COUNT_MODERATORS = 3
-MAX_SIZE_FILE_CHAT = 500 # размер в МБ
+MAX_SIZE_FILE_CHAT = 100 # размер в МБ
 MAX_COUNT_FILES_CHAT = 5
 
 router = Router(tags=["Проект"])
@@ -944,8 +945,9 @@ def get_chat_messages(request, id_chat:int = Path(..., description="ID чата"
         raise HttpError(403, "Недостаточно прав")
     chat_messages = ChatMessages.objects.filter(chat=chat).prefetch_related("files")
     chat_user, _ = ChatUsers.objects.get_or_create(chat=chat, user=user)
-    if chat_messages.last():
-        chat_user.last_read_message_id = chat_messages.last().id
+    last_message = chat_messages.first()
+    if last_message:
+        chat_user.last_read_message_id = last_message.id
     chat_user.save()
     messages = [
         ChatMessageOut(
@@ -989,6 +991,7 @@ def post_chat_message(
                 if file.size > MAX_SIZE_FILE_CHAT * 1024 * 1024:
                     raise HttpError(400, "Недопустимый размер файла")
                 MessageFiles.objects.create(chat_message=chat_message, file=file)
+    broadcast_chat_message(chat, 'new', msg=chat_message)
     return {"detail": "Сообщение отправлено"}
 
 
@@ -1026,6 +1029,7 @@ def put_chat_message(
                 MessageFiles.objects.create(chat_message=chat_message, file=file)
             chat_message.changed = True
             chat_message.save()
+    broadcast_chat_message(chat_message.chat, 'edit', msg=chat_message)
     return {"detail": "Сообщение обновлено"}
 
 
@@ -1040,5 +1044,8 @@ def delete_chat_message(request, id_message:int = Path(..., description="ID со
     chat_message = get_object_or_404(ChatMessages, id=id_message, user=user)
     if (timezone.now() - chat_message.created_at) > timedelta(hours=24):
         raise HttpError(400, "Уже прошло 24 часа")
+    chat = chat_message.chat
+    message_id = chat_message.id
     chat_message.delete()
+    broadcast_chat_message(chat, 'delete', message_id=message_id)
     return {"detail": "Сообщение удалено"}

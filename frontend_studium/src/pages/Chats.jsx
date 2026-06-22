@@ -8,7 +8,8 @@ import 'react-loading-skeleton/dist/skeleton.css'
 
 function ChatPanel ({ chatInfo }) {
     const navigate = useNavigate()
-    
+    const { chatId } = useParams()
+
     return (
         <div onClick={() => navigate(`/chats/${chatInfo.id}`)} className="cursor-pointer bg-white flex gap-2.5 p-2.5 border-b border-gray-200">
             <div className="flex flex-col gap-1.25 w-full">
@@ -20,17 +21,17 @@ function ChatPanel ({ chatInfo }) {
                         {chatInfo.last_message ? FormatDate(chatInfo.last_message?.created_at) : ''}
                     </div>
                 </div>
-                <div className="flex gap-2.5 text-sm line-clamp-2">
-                    {chatInfo.last_message && 
-                        <p className="text-sm leading-[1.3] line-clamp-2 h-9">
+                <div className="flex gap-2.5 text-sm items-center">
+                    {chatInfo.last_message &&
+                        <p className="text-sm leading-[1.3] line-clamp-2 h-9 flex-1">
                             <span className="text-gray-400">{chatInfo.last_message?.user.last_name} {chatInfo.last_message?.user.first_name}: </span>{chatInfo.last_message?.message}
                         </p>
                     }
-                    <div className="hidden">
-                        <div className="bg-gray-500 w-5 h-5 rounded-full content-center text-center">
+                    {chatInfo.unread_count > 0 && String(chatInfo.id) !== chatId &&
+                        <div className="shrink-0 bg-green-700 text-white text-xs font-semibold min-w-5 h-5 px-1.5 rounded-full flex items-center justify-center">
                             {chatInfo.unread_count}
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>
@@ -123,7 +124,7 @@ function Messenger ({ chatId, user, userId }) {
         mountedRef.current = true
         let abortController = new AbortController()
 
-        const fetchMessages = async () => {
+        const loadHistory = async () => {
             try {
                 const response = await fetch(`/api/project_exchange/user/chat/${chatId}/messages/`, {
                     method: 'GET',
@@ -136,27 +137,52 @@ function Messenger ({ chatId, user, userId }) {
                 if (!response.ok) throw new Error('Ошибка загрузки данных')
                 const data = await response.json()
 
-                if (mountedRef.current) {
-                    setChatMessage(data)
-                    setTimeout(() => {
-                        if (mountedRef.current) fetchMessages()
-                    }, 2000)
-                }
+                if (mountedRef.current) setChatMessage(data)
             } catch (err) {
-                if (err.name !== 'AbortError' && mountedRef.current) {
-                    setError(err.message)
-                    setTimeout(() => {
-                        if (mountedRef.current) fetchMessages()
-                    }, 5000)
-                }
+                if (err.name !== 'AbortError' && mountedRef.current) setError(err.message)
             }
         }
 
-        fetchMessages();
+        loadHistory()
+
+        let ws = null
+        let reconnectTimer = null
+        let stopped = false
+
+        const connect = () => {
+            const proto = window.location.protocol === 'https:' ? 'wss' : 'ws'
+            ws = new WebSocket(`${proto}://${window.location.host}/ws/chat/${chatId}/?token=${encodeURIComponent(user)}`)
+
+            ws.onmessage = (event) => {
+                if (!mountedRef.current) return
+                const payload = JSON.parse(event.data)
+                if (payload.action === 'new') {
+                    setChatMessage(prev => prev.some(m => m.id === payload.message.id) ? prev : [payload.message, ...prev])
+                } else if (payload.action === 'edit') {
+                    setChatMessage(prev => prev.map(m => m.id === payload.message.id ? payload.message : m))
+                } else if (payload.action === 'delete') {
+                    setChatMessage(prev => prev.filter(m => m.id !== payload.message_id))
+                }
+            }
+
+            ws.onclose = () => {
+                if (stopped) return
+                reconnectTimer = setTimeout(() => {
+                    if (stopped) return
+                    loadHistory()
+                    connect()
+                }, 2000)
+            }
+        }
+
+        connect()
 
         return () => {
             mountedRef.current = false
+            stopped = true
             abortController.abort()
+            clearTimeout(reconnectTimer)
+            if (ws) ws.close()
         }
     }, [chatId, user])
 
@@ -399,22 +425,53 @@ function Chats() {
     const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
+        let active = true
         async function fetchUserChats () {
-            setIsLoading(true)
             const response = await fetch('/api/project_exchange/user/chats/', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Basic ${user}`
                 }
             })
-            if (response.ok) {
+            if (response.ok && active) {
                 const data = await response.json()
                 setUserChats(data)
                 setCurrentChat(data.find((chat) => parseInt(chat.id, 10) === parseInt(chatId, 10)))
                 setIsLoading(false)
             }
-        } 
+        }
+        setIsLoading(true)
         fetchUserChats()
+
+        let ws = null
+        let reconnectTimer = null
+        let stopped = false
+
+        const connect = () => {
+            const proto = window.location.protocol === 'https:' ? 'wss' : 'ws'
+            ws = new WebSocket(`${proto}://${window.location.host}/ws/chats/?token=${encodeURIComponent(user)}`)
+            ws.onmessage = (event) => {
+                const payload = JSON.parse(event.data)
+                if (payload.action === 'refresh') fetchUserChats()
+            }
+            ws.onclose = () => {
+                if (stopped) return
+                reconnectTimer = setTimeout(() => {
+                    if (stopped) return
+                    fetchUserChats()
+                    connect()
+                }, 2000)
+            }
+        }
+
+        connect()
+
+        return () => {
+            active = false
+            stopped = true
+            clearTimeout(reconnectTimer)
+            if (ws) ws.close()
+        }
     }, [user, chatId])
 
     const fileInputRef = useRef(null)

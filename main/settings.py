@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_cleanup',
     'corsheaders',
+    'channels',
     'project_exchange',
     'shop',
 ]
@@ -290,6 +291,16 @@ UNFOLD = {
 }
 
 WSGI_APPLICATION = 'main.wsgi.application'
+ASGI_APPLICATION = 'main.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [(os.environ.get('REDIS_HOST', 'redis'), int(os.environ.get('REDIS_PORT', '6379')))],
+        },
+    },
+}
 
 
 # Database
